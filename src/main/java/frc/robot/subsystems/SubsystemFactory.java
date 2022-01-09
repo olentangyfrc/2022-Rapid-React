@@ -16,6 +16,7 @@ public class SubsystemFactory {
   private PowerDistributionPanel pdp;
 
   // Variables for all subsystems:
+  private PortManager portManager;
 
   // Should not be used outside of this class!
   private SubsystemFactory() {}
@@ -40,7 +41,14 @@ public class SubsystemFactory {
     pdp = new PowerDistributionPanel();
 
     // Create and initialize all subsystems:
+
+    portManager = new PortManager();
+
   }
   
   // Getter methods for all of the subsystems:
+
+  public PortManager getPortManager() {
+    return portManager;
+  }
 }
