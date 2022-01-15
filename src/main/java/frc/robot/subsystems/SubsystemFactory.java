@@ -4,7 +4,7 @@
 
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj.PowerDistributionPanel;
+import edu.wpi.first.wpilibj.PowerDistribution;
 
 // Subsystem imports:
 
@@ -13,7 +13,7 @@ public class SubsystemFactory {
   // SubsystemFactory is a singleton, so keep a static instance.
   private static SubsystemFactory instance;
 
-  private PowerDistributionPanel pdp;
+  private PowerDistribution pdp;
 
   // Variables for all subsystems:
   private PortManager portManager;
@@ -38,7 +38,7 @@ public class SubsystemFactory {
    * Create and initialize all of the subsystems.
    */
   public void init() {
-    pdp = new PowerDistributionPanel();
+    pdp = new PowerDistribution();
 
     // Create and initialize all subsystems:
 
