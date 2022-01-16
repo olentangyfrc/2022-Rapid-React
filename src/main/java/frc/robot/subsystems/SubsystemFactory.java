@@ -7,6 +7,7 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj.PowerDistribution;
 
 // Subsystem imports:
+import frc.robot.subsystems.drivetrain.DrivetrainSubsystem;
 
 public class SubsystemFactory {
 
@@ -17,6 +18,7 @@ public class SubsystemFactory {
 
   // Variables for all subsystems:
   private PortManager portManager;
+  private DrivetrainSubsystem driveTrain;
 
   // Should not be used outside of this class!
   private SubsystemFactory() {}
@@ -37,12 +39,15 @@ public class SubsystemFactory {
   /**
    * Create and initialize all of the subsystems.
    */
-  public void init() {
+  public void init() throws Exception {
     pdp = new PowerDistribution();
 
     // Create and initialize all subsystems:
 
     portManager = new PortManager();
+
+    driveTrain = new DrivetrainSubsystem();
+    driveTrain.init();
 
   }
   

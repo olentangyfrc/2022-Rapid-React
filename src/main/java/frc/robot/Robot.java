@@ -7,7 +7,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
-import frc.robot.subsystems.drivetrain.SwerveModule;
+import frc.robot.subsystems.SubsystemFactory;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -17,15 +17,20 @@ import frc.robot.subsystems.drivetrain.SwerveModule;
  */
 public class Robot extends TimedRobot {
 
-  private SwerveModule test;
-
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
    */
+
   @Override
   public void robotInit() {
-    test = new SwerveModule(35, 34, 0, 0);
+
+    try {
+      SubsystemFactory.getInstance().init();
+    } catch (Exception exception) {
+      exception.printStackTrace();
+    }
+
   }
 
   @Override
