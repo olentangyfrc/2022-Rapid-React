@@ -7,6 +7,7 @@ import frc.robot.subsystems.SubsystemFactory;
 import frc.robot.subsystems.PortManager.PortType;
 import edu.wpi.first.wpilibj.AnalogEncoder;
 import edu.wpi.first.wpilibj.AnalogInput;
+import edu.wpi.first.wpilibj.I2C.Port;
 // WPI lib imports
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -33,9 +34,14 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
         PortManager portManager = SubsystemFactory.getInstance().getPortManager();
 
+        frontLeftModule = new SwerveModule(portManager.aquirePort(PortType.CAN, 35, "FL.SwerveMotor"),
+                                           portManager.aquirePort(PortType.CAN, 34, "FL.DriveMotor"),
+                                           portManager.aquirePort(PortType.PWM, 0, "FL.Encoder"),
+                                           FRONT_LEFT_ANGLE_OFFESET);
+
         frontRightModule = new SwerveModule(portManager.aquirePort(PortType.CAN, 32, "FR.SwerveMotor"),
-        portManager.aquirePort(PortType.CAN, 33, "FR.DriveMotor"),
-        portManager.aquirePort(PortType.PWM, 1, "FR.Encoder"),
-        FRONT_RIGHT_ANGLE_OFFSET);
+                                            portManager.aquirePort(PortType.CAN, 33, "FR.DriveMotor"),
+                                            portManager.aquirePort(PortType.PWM, 1, "FR.Encoder"),
+                                            FRONT_RIGHT_ANGLE_OFFSET);
     }
 }
