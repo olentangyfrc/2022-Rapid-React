@@ -4,17 +4,16 @@
 
 package frc.robot.subsystems.drivetrain;
 
-// WPI imports:
-import edu.wpi.first.wpilibj.AnalogEncoder;
-import edu.wpi.first.wpilibj.AnalogInput;
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
-
 // Rev Robotics imports:
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
+
+// WPI imports:
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.AnalogInput;
 
 /**
  * A swerve module with an angle motor and a drive motor.
@@ -25,6 +24,9 @@ public class SwerveModule {
     // Wheel radius in meters
     private static final double WHEEL_RADIUS = 0.09525;
 
+    // Ticks per revolution of the angle encoder.
+    public static final double ANGLE_ENCODER_TICKS = 4096;
+
     // The angle by which to offset the angle of the wheel
     private double angleOffset;
 
@@ -33,11 +35,11 @@ public class SwerveModule {
     private CANSparkMax driveMotor;
 
     // Encoders
-    private AnalogEncoder angleEncoder;
+    private AnalogInput angleEncoder;
     private RelativeEncoder driveEncoder;
 
     // PID controller for wheel angle
-    private PIDController anglePid = new PIDController(1, 0, 0); // Default values. Need to be tuned!!!
+    private PIDController anglePid = new PIDController(0.5, 0, 0.0001); // Default values. Need to be tuned!!!
 
     /**
      * Initialize a swerve module on the given ports
@@ -51,11 +53,10 @@ public class SwerveModule {
         angleMotor = new CANSparkMax(angleMotorChannel, MotorType.kBrushless);
         driveMotor = new CANSparkMax(driveMotorChannel, MotorType.kBrushless);
 
-        angleEncoder = new AnalogEncoder(new AnalogInput(angleEncoderChannel));
-        driveEncoder = driveMotor.getEncoder();
+        angleMotor.setInverted(true);
 
-        // Set the distance per rotation to one full rotation in radians.
-        angleEncoder.setDistancePerRotation(2 * Math.PI);
+        angleEncoder = new AnalogInput(angleEncoderChannel);
+        driveEncoder = driveMotor.getEncoder();
 
         // Set the position conversion factor to the circumference of the wheel.
         driveEncoder.setPositionConversionFactor(2 * Math.PI * WHEEL_RADIUS);
@@ -71,11 +72,11 @@ public class SwerveModule {
     /**
      * Set the angle of the module in radians
      * 
-     * @param angle angle in radians
+     * @param angle angle as a rotation2d
      */
     public void setAngle(Rotation2d angle) {
-        anglePid.setSetpoint(angle.getRadians());
-        angleMotor.set(anglePid.calculate(getAngle().getRadians()));
+        double output = anglePid.calculate(getAngle().getRadians(), angle.getRadians());
+        angleMotor.set(output);
     }
 
     /**
@@ -102,11 +103,12 @@ public class SwerveModule {
     /**
      * Get the angle of the swerve module
      * 
-     * @return the angle
+     * @return the angle as a rotation2D
      */
     public Rotation2d getAngle() {
         // Apply the angle offset and modulo the distance by 2Pi to make the output continuous
-        return new Rotation2d((angleEncoder.getDistance() + angleOffset * 180 / Math.PI) % (Math.PI * 2));
+        //return new Rotation2d((angleEncoder.getDistance() + (angleOffset * Math.PI / 180)) % (Math.PI * 2));
+        return new Rotation2d(angleEncoder.getValue() / ANGLE_ENCODER_TICKS * 2 * Math.PI);
     }
 
     /**
@@ -116,5 +118,14 @@ public class SwerveModule {
      */
     public double getSpeed() {
         return driveEncoder.getVelocity();
+    }
+
+    /**
+     * Get the current percent output of the drive motor
+     * 
+     * @return the percent output -1 to 1
+     */
+    public double getPercentOutput() {
+        return driveMotor.get();
     }
 }
