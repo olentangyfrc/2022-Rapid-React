@@ -39,9 +39,9 @@ public class IO extends OzoneSubsystem {
      */
     public double getStrafe() {
         if(inputMethod == InputMethod.XBOX) {
-            return xbox.getLeftX();
+            return curveInput(xbox.getLeftX());
         } else {
-            return leftStick.getX();
+            return curveInput(leftStick.getX());
         }
     }
 
@@ -52,9 +52,9 @@ public class IO extends OzoneSubsystem {
      */
     public double getForward() {
         if(inputMethod == InputMethod.XBOX) {
-            return xbox.getLeftY();
+            return curveInput(xbox.getLeftY());
         } else {
-            return leftStick.getY();
+            return curveInput(leftStick.getY());
         }
     }
 
@@ -65,9 +65,9 @@ public class IO extends OzoneSubsystem {
      */
     public double getRotation() {
         if(inputMethod == InputMethod.XBOX) {
-            return xbox.getRightX();
+            return curveInput(xbox.getRightX());
         } else {
-            return rightStick.getX();
+            return curveInput(rightStick.getX());
         }
     }
 
