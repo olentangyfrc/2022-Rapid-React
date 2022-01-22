@@ -8,6 +8,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 // Package imports
 import frc.robot.subsystems.PortManager;
 import frc.robot.subsystems.PortManager.PortType;
+import frc.robot.subsystems.drivetrain.commands.DriveCommand;
 import frc.robot.subsystems.SubsystemFactory;
 import frc.robot.subsystems.interfaces.OzoneSubsystem;
 
@@ -63,6 +64,8 @@ public class DrivetrainSubsystem extends OzoneSubsystem {
         } catch (Exception exception) {
             exception.printStackTrace();
         }
+
+        setDefaultCommand(new DriveCommand(this));
     }
 
     /**

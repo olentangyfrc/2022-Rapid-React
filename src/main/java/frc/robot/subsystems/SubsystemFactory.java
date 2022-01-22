@@ -18,6 +18,7 @@ public class SubsystemFactory {
 
   // Variables for all subsystems:
   private PortManager portManager;
+  private IO io;
   private DrivetrainSubsystem driveTrain;
 
   // Should not be used outside of this class!
@@ -45,6 +46,8 @@ public class SubsystemFactory {
     // Create and initialize all subsystems:
 
     portManager = new PortManager();
+    io = new IO();
+    io.init();
 
     driveTrain = new DrivetrainSubsystem();
     driveTrain.init();
@@ -55,5 +58,9 @@ public class SubsystemFactory {
 
   public PortManager getPortManager() {
     return portManager;
+  }
+
+  public IO getIO() {
+    return io;
   }
 }
