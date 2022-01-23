@@ -4,13 +4,24 @@
 
 package frc.robot.subsystems;
 
+// WPI imports:
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
+
+// Project imports
 import frc.robot.subsystems.interfaces.OzoneSubsystem;
 
-/** Add your docs here. */
+/**
+ * This subsytem handles all of the user input and output of the robot.
+ * 
+ * TODO: Add button binding functionality
+ */
 public class IO extends OzoneSubsystem {
+    public static final int XBOX_PORT = 0;
+    public static final int LEFT_STICK_PORT = 1;
+    public static final int RIGHT_STICK_PORT = 2;
+
     private InputMethod inputMethod;
 
     private XboxController xbox;
@@ -21,14 +32,12 @@ public class IO extends OzoneSubsystem {
     @Override
     public void init() {
         inputMethod = determineInputMethod();
-        
-        PortManager portManager = SubsystemFactory.getInstance().getPortManager();
 
-        if(inputMethod == InputMethod.XBOX) {
-            xbox = new XboxController(0);
+        if(inputMethod.equals(InputMethod.XBOX)) {
+            xbox = new XboxController(XBOX_PORT);
         } else {
-            leftStick = new Joystick(0);
-            rightStick = new Joystick(1);
+            leftStick = new Joystick(LEFT_STICK_PORT);
+            rightStick = new Joystick(RIGHT_STICK_PORT);
         }
     }
 
@@ -38,10 +47,10 @@ public class IO extends OzoneSubsystem {
      * @return the strafe input
      */
     public double getStrafe() {
-        if(inputMethod == InputMethod.XBOX) {
-            return curveInput(xbox.getLeftX());
+        if(inputMethod.equals(InputMethod.XBOX)) {
+            return curveInput(-xbox.getLeftX());
         } else {
-            return curveInput(leftStick.getX());
+            return curveInput(-leftStick.getX());
         }
     }
 
@@ -51,7 +60,7 @@ public class IO extends OzoneSubsystem {
      * @return the forward input
      */
     public double getForward() {
-        if(inputMethod == InputMethod.XBOX) {
+        if(inputMethod.equals(InputMethod.XBOX)) {
             return curveInput(xbox.getLeftY());
         } else {
             return curveInput(leftStick.getY());
@@ -64,10 +73,10 @@ public class IO extends OzoneSubsystem {
      * @return the rotation input
      */
     public double getRotation() {
-        if(inputMethod == InputMethod.XBOX) {
-            return curveInput(xbox.getRightX());
+        if(inputMethod.equals(InputMethod.XBOX)) {
+            return curveInput(-xbox.getRightX());
         } else {
-            return curveInput(rightStick.getX());
+            return curveInput(-rightStick.getX());
         }
     }
 

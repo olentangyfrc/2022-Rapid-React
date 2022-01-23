@@ -27,7 +27,7 @@ public class SwerveModule {
     // Ticks per revolution of the angle encoder.
     public static final double ANGLE_ENCODER_TICKS = 4096;
 
-    // The angle by which to offset the angle of the wheel
+    // The angle to offset this modules angle by in order to have the bot's forward and this module's forward match
     private double angleOffset;
 
     // Motors (Make sure these are set to percent output mode)
@@ -39,7 +39,7 @@ public class SwerveModule {
     private RelativeEncoder driveEncoder;
 
     // PID controller for wheel angle
-    private PIDController anglePid = new PIDController(0.5, 0, 0.0001); // Default values. Need to be tuned!!!
+    private PIDController anglePid = new PIDController(0.5, 0, 0.0001);
 
     /**
      * Initialize a swerve module on the given ports
@@ -53,6 +53,7 @@ public class SwerveModule {
         angleMotor = new CANSparkMax(angleMotorChannel, MotorType.kBrushless);
         driveMotor = new CANSparkMax(driveMotorChannel, MotorType.kBrushless);
 
+        // Make the angle motor turn clockwise with a positive input
         angleMotor.setInverted(true);
 
         angleEncoder = new AnalogInput(angleEncoderChannel);
@@ -106,15 +107,22 @@ public class SwerveModule {
      * @return the angle as a rotation2D
      */
     public Rotation2d getAngle() {
-        // Apply the angle offset and modulo the distance by 2Pi to make the output continuous
-        //return new Rotation2d((angleEncoder.getDistance() + (angleOffset * Math.PI / 180)) % (Math.PI * 2));
-        return new Rotation2d(angleEncoder.getValue() / ANGLE_ENCODER_TICKS * 2 * Math.PI);
+        // Raw angle
+        double angle = (angleEncoder.getValue() / ANGLE_ENCODER_TICKS * 2 * Math.PI); // Convert rotations to an angle in radians
+        // Convert the offset into radians and subtract it from the angle
+        angle -= angleOffset * Math.PI / 180;
+        // Add a full rotation in radians to make sure the angle is always positive
+        angle += 2 * Math.PI;
+        // modulo the angle by a full rotation in radians to restrict it to the range [0,2Pi)
+        angle %= 2 * Math.PI;
+
+        return new Rotation2d(angle);
     }
 
     /**
-     * Get the speed of the bot in meters per second
+     * Get the speed of the drive motor in meters per second
      * 
-     * @return the speed of the bot in meters per second
+     * @return the speed of the drive motor in meters per second
      */
     public double getSpeed() {
         return driveEncoder.getVelocity();

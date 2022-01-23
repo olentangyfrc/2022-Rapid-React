@@ -4,12 +4,18 @@
 
 package frc.robot.subsystems;
 
+// WPI imports
 import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 
-// Subsystem imports:
+// Project imports:
 import frc.robot.subsystems.drivetrain.DrivetrainSubsystem;
 
+/**
+ * This class instantiates and initializes all of the subsystems and stores references to them.
+ */
 public class SubsystemFactory {
+  public static final int PDP_PORT = 1;
 
   // SubsystemFactory is a singleton, so keep a static instance.
   private static SubsystemFactory instance;
@@ -41,7 +47,7 @@ public class SubsystemFactory {
    * Create and initialize all of the subsystems.
    */
   public void init() throws Exception {
-    pdp = new PowerDistribution();
+    pdp = new PowerDistribution(PDP_PORT, ModuleType.kCTRE);
 
     // Create and initialize all subsystems:
 

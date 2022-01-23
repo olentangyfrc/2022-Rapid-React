@@ -5,16 +5,18 @@
 package frc.robot.subsystems.drivetrain.commands;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import frc.robot.subsystems.IO;
 import frc.robot.subsystems.SubsystemFactory;
 import frc.robot.subsystems.drivetrain.DrivetrainSubsystem;
-import frc.robot.subsystems.IO;
 
-public class DriveCommand extends CommandBase {
-
+/**
+ * This command will grab user input from IO and call the drivetrain's drive method.
+ * This should be called periodically by the drivetrain.
+ */
+public class DriveCommand extends InstantCommand {
   private DrivetrainSubsystem drivetrain;
 
-  /** Creates a new DriveCommand. */
   public DriveCommand(DrivetrainSubsystem drivetrain) {
     this.drivetrain = drivetrain;
 
@@ -24,11 +26,7 @@ public class DriveCommand extends CommandBase {
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
-
-  // Called every time the scheduler runs while the command is scheduled.
-  @Override
-  public void execute() {
+  public void initialize() {
     IO io = SubsystemFactory.getInstance().getIO();
     ChassisSpeeds speeds = new ChassisSpeeds(
       io.getForward(),
@@ -37,15 +35,5 @@ public class DriveCommand extends CommandBase {
     );
 
     drivetrain.drive(speeds);
-  }
-
-  // Called once the command ends or is interrupted.
-  @Override
-  public void end(boolean interrupted) {}
-
-  // Always return false because this will be the drivetrain's default command.
-  @Override
-  public boolean isFinished() {
-    return false;
   }
 }
