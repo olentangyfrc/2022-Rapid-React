@@ -37,6 +37,7 @@ public class CANSparkMaxModule extends SwerveModule {
         driveMotor = new CANSparkMax(driveMotorChannel, MotorType.kBrushless);
 
         anglePid = new PIDController(0.5, 0, 0.0001);
+        anglePid.enableContinuousInput(0, 2 * Math.PI);
 
         // Make the angle motor turn clockwise with a positive input
         angleMotor.setInverted(true);
@@ -49,8 +50,6 @@ public class CANSparkMaxModule extends SwerveModule {
 
         // Set the velocity conversion factor to the circumference of the wheel
         driveEncoder.setVelocityConversionFactor(2 * Math.PI * WHEEL_RADIUS);
-
-        anglePid.enableContinuousInput(0, 2 * Math.PI);
 
         this.angleOffset = angleOffset;
     }
