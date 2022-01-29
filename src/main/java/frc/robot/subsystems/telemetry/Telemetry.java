@@ -1,4 +1,4 @@
-package frc.robot.subsystems.telemtry;
+package frc.robot.subsystems.telemetry;
 
 // Package imports
 import frc.robot.subsystems.SubsystemFactory.BotType;

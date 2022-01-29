@@ -13,7 +13,7 @@ import java.util.logging.Logger;
 
 // Project imports:
 import frc.robot.subsystems.drivetrain.DrivetrainSubsystem;
-import frc.robot.subsystems.telemtry.Telemetry;
+import frc.robot.subsystems.telemetry.Telemetry;
 
 /**
  * This class instantiates and initializes all of the subsystems and stores references to them.

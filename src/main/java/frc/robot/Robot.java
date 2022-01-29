@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 import frc.robot.subsystems.SubsystemFactory;
-import frc.robot.subsystems.telemtry.Pigeon;
+import frc.robot.subsystems.telemetry.Pigeon;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
