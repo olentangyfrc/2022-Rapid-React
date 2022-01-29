@@ -13,6 +13,7 @@ import java.util.logging.Logger;
 
 // Project imports:
 import frc.robot.subsystems.drivetrain.DrivetrainSubsystem;
+import frc.robot.subsystems.telemtry.Telemetry;
 
 /**
  * This class instantiates and initializes all of the subsystems and stores references to them.
@@ -24,6 +25,9 @@ public class SubsystemFactory {
 
   private Logger logger = Logger.getLogger("Subsystem Factory");
 
+  /**
+   * Map of known bot addresses and respective types
+   */
   private Map<String, BotType> allMACs = Map.of(
     "00:80:2F:30:DB:F8", BotType.COVID,
     "00:80:2F:30:DB:F9", BotType.COVID,
@@ -33,6 +37,7 @@ public class SubsystemFactory {
   );
 
   private BotType botType;
+  private Telemetry telemetry;
 
   // Variables for all subsystems:
   private PortManager portManager;
@@ -60,6 +65,7 @@ public class SubsystemFactory {
    */
   public void init() throws Exception {
     botType = getBotType();
+    telemetry = new Telemetry(botType);
     switch(botType) {
       case COVID:
         initCOVID();
@@ -75,12 +81,19 @@ public class SubsystemFactory {
     }
   }
 
+  /**
+   * Initializes common subsystems across all bots
+   */
   public void initCommon() {
     portManager = new PortManager();
     io = new IO();
     io.init();
   }
 
+  /**
+   * Initializes COVID subsystems
+   * @throws Exception
+   */
   public void initCOVID() throws Exception {
     HashMap<String, Integer> portAssignments = new HashMap<String, Integer>();
     portAssignments.put("FL.SwerveMotor", 35);
@@ -110,6 +123,10 @@ public class SubsystemFactory {
     driveTrain.init(portAssignments, wheelOffsets);
   }
 
+  /**
+   * Initializes Califorinia Bot subsystems
+   * @throws Exception
+   */
   public void initCALIFORNIA() throws Exception{
     HashMap<String, Integer> portAssignments = new HashMap<String, Integer>();
     portAssignments.put("FL.SwerveMotor", 17);
@@ -139,19 +156,39 @@ public class SubsystemFactory {
     driveTrain.init(portAssignments, wheelOffsets);
   }
 
+  /**
+   * Initializes the RIO99 subsystems
+   */
   public void initRIO99() {
   }
   
   // Getter methods for all of the subsystems:
 
+  /**
+   * @return The active portManager
+   */
   public PortManager getPortManager() {
     return portManager;
   }
 
+  /**
+   * @return The active IO
+   */
   public IO getIO() {
     return io;
   }
 
+  /**
+   * @return The active telemetry
+   */
+  public Telemetry getTelemetry() {
+    return telemetry;
+  }
+
+  /**
+   * @return The active bot type
+   * @throws Exception
+   */
   private BotType getBotType() throws Exception {
     Enumeration<NetworkInterface> networks;
     networks = NetworkInterface.getNetworkInterfaces();
@@ -191,6 +228,9 @@ public class SubsystemFactory {
     return mac.toString();
   }
 
+  /**
+   * Known bots to prevent user error
+   */
   public enum BotType {
     COVID,
     CALIFORNIA,
