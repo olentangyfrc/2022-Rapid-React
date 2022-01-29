@@ -1,6 +1,5 @@
 package frc.robot.subsystems.drivetrain;
 
-import java.util.HashMap;
 import java.util.Map;
 
 // WPILib imports
@@ -11,6 +10,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
 // Package imports
 import frc.robot.subsystems.PortManager;
 import frc.robot.subsystems.PortManager.PortType;
@@ -18,12 +18,6 @@ import frc.robot.subsystems.drivetrain.commands.DriveCommand;
 import frc.robot.subsystems.SubsystemFactory;
 
 public class DrivetrainSubsystem extends SubsystemBase {
-
-    // Angle offsets to intialize Swerve Modules in degrees
-    private static final double FRONT_LEFT_ANGLE_OFFESET = 121.46;
-    private static final double FRONT_RIGHT_ANGLE_OFFSET = 36.38;
-    private static final double BACK_LEFT_ANGLE_OFFSET = 218.4;
-    private static final double BACK_RIGHT_ANGLE_OFFSET = 105.08;
 
     // Declaring Swerve Modules
     private SwerveModule frontLeftModule;
@@ -46,7 +40,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
     /**
      * Initialize the drivetrain subsystem
      */
-    public void init(Map<String, Integer> portAssignments) throws Exception{
+    public void init(Map<String, Integer> portAssignments, Map<String, Double> wheelOffsets) throws Exception{
         PortManager portManager = SubsystemFactory.getInstance().getPortManager();
 
         // Initialize swerve modules
@@ -55,28 +49,28 @@ public class DrivetrainSubsystem extends SubsystemBase {
                 portManager.aquirePort(PortType.CAN, portAssignments.get("FL.SwerveMotor"), "FL.SwerveMotor"),
                 portManager.aquirePort(PortType.CAN, portAssignments.get("FL.DriveMotor"), "FL.DriveMotor"),
                 portManager.aquirePort(PortType.PWM, portAssignments.get("FL.Encoder"), "FL.Encoder"),
-                FRONT_LEFT_ANGLE_OFFESET
+                wheelOffsets.get("FL")
             );
 
             frontRightModule = new SwerveModule(
                 portManager.aquirePort(PortType.CAN, portAssignments.get("FR.SwerveMotor"), "FR.SwerveMotor"),
                 portManager.aquirePort(PortType.CAN, portAssignments.get("FR.DriveMotor"), "FR.DriveMotor"),
                 portManager.aquirePort(PortType.PWM, portAssignments.get("FR.Encoder"), "FR.Encoder"),
-                FRONT_RIGHT_ANGLE_OFFSET
+                wheelOffsets.get("FR")
             );
 
             backLeftModule = new SwerveModule(
                 portManager.aquirePort(PortType.CAN, portAssignments.get("BL.SwerveMotor"), "BL.SwerveMotor"),
                 portManager.aquirePort(PortType.CAN, portAssignments.get("BL.DriveMotor"), "BL.DriveMotor"),
                 portManager.aquirePort(PortType.PWM, portAssignments.get("BL.Encoder"), "BL.Encoder"),
-                BACK_LEFT_ANGLE_OFFSET
+                wheelOffsets.get("BL")
             );
 
             backRightModule = new SwerveModule(
                 portManager.aquirePort(PortType.CAN, portAssignments.get("BR.SwerveMotor"), "BR.SwerveMotor"),
                 portManager.aquirePort(PortType.CAN, portAssignments.get("BR.DriveMotor"), "BR.DriveMotor"),
                 portManager.aquirePort(PortType.PWM, portAssignments.get("BR.Encoder"), "BR.Encoder"),
-                BACK_RIGHT_ANGLE_OFFSET
+                wheelOffsets.get("BR")
             );
 
         } catch (Exception exception) {
