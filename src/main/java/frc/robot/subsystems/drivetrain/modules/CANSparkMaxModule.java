@@ -2,34 +2,20 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.subsystems.drivetrain;
+package frc.robot.subsystems.drivetrain.modules;
 
-// Rev Robotics imports:
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
-// WPI imports:
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.AnalogInput;
 
 /**
- * A swerve module with an angle motor and a drive motor.
- * <p>
- * These are used to form a swerve drivetrain.
+ * A swerve module using two CANSparkMax motor controllers and an encoder on analog input.
  */
-public class SwerveModule {
-    // Wheel radius in meters
-    private static final double WHEEL_RADIUS = 0.09525;
-
-    // Ticks per revolution of the angle encoder.
-    public static final double ANGLE_ENCODER_TICKS = 4096;
-
-    // The angle to offset this modules angle by in order to have the bot's forward and this module's forward match
-    private double angleOffset;
-
+public class CANSparkMaxModule extends SwerveModule {
     // Motors (Make sure these are set to percent output mode)
     private CANSparkMax angleMotor;
     private CANSparkMax driveMotor;
@@ -37,9 +23,6 @@ public class SwerveModule {
     // Encoders
     private AnalogInput angleEncoder;
     private RelativeEncoder driveEncoder;
-
-    // PID controller for wheel angle
-    private PIDController anglePid = new PIDController(0.5, 0, 0.0001);
 
     /**
      * Initialize a swerve module on the given ports
@@ -49,9 +32,11 @@ public class SwerveModule {
      * @param angleEncoderChannel Analog port for the angle encoder
      * @param angleOffset The angle in degrees by which to offset the angle of the wheel.
      */
-    public SwerveModule(int angleMotorChannel, int driveMotorChannel, int angleEncoderChannel, double angleOffset) {
+    public CANSparkMaxModule(int angleMotorChannel, int driveMotorChannel, int angleEncoderChannel, double angleOffset) {
         angleMotor = new CANSparkMax(angleMotorChannel, MotorType.kBrushless);
         driveMotor = new CANSparkMax(driveMotorChannel, MotorType.kBrushless);
+
+        anglePid = new PIDController(0.5, 0, 0.0001);
 
         // Make the angle motor turn clockwise with a positive input
         angleMotor.setInverted(true);
@@ -73,10 +58,9 @@ public class SwerveModule {
     /**
      * Set the angle of the module in radians
      * 
-     * @param angle angle as a rotation2d
+     * @param angle percent output for angle motor [-1, 1]
      */
-    public void setAngle(Rotation2d angle) {
-        double output = anglePid.calculate(getAngle().getRadians(), angle.getRadians());
+    public void setAnglePercentOutput(double output) {
         angleMotor.set(output);
     }
 
@@ -85,20 +69,8 @@ public class SwerveModule {
      * 
      * @param output Percent output for the drive motor [-1, 1]
      */
-    public void setPercentOutput(double output) {
+    public void setDrivePercentOutput(double output) {
         driveMotor.set(output);
-    }
-
-    /**
-     * Update the module with a new angle and speed.
-     * <p>
-     * This should be called periodically.
-     * 
-     * @param newState
-     */
-    public void updateState(SwerveModuleState newState) {
-        setAngle(newState.angle);
-        setPercentOutput(newState.speedMetersPerSecond);
     }
 
     /**
