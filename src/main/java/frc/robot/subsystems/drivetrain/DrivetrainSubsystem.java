@@ -1,5 +1,8 @@
 package frc.robot.subsystems.drivetrain;
 
+import java.util.HashMap;
+import java.util.Map;
+
 // WPILib imports
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -7,14 +10,14 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 // Package imports
 import frc.robot.subsystems.PortManager;
 import frc.robot.subsystems.PortManager.PortType;
 import frc.robot.subsystems.drivetrain.commands.DriveCommand;
 import frc.robot.subsystems.SubsystemFactory;
-import frc.robot.subsystems.interfaces.OzoneSubsystem;
 
-public class DrivetrainSubsystem extends OzoneSubsystem {
+public class DrivetrainSubsystem extends SubsystemBase {
 
     // Angle offsets to intialize Swerve Modules in degrees
     private static final double FRONT_LEFT_ANGLE_OFFESET = 121.46;
@@ -43,42 +46,42 @@ public class DrivetrainSubsystem extends OzoneSubsystem {
     /**
      * Initialize the drivetrain subsystem
      */
-    @Override
-    public void init() {
+    public void init(Map<String, Integer> portAssignments) throws Exception{
         PortManager portManager = SubsystemFactory.getInstance().getPortManager();
 
         // Initialize swerve modules
         try {
             frontLeftModule = new SwerveModule(
-                portManager.aquirePort(PortType.CAN, 35, "FL.SwerveMotor"),
-                portManager.aquirePort(PortType.CAN, 34, "FL.DriveMotor"),
-                portManager.aquirePort(PortType.PWM, 0, "FL.Encoder"),
+                portManager.aquirePort(PortType.CAN, portAssignments.get("FL.SwerveMotor"), "FL.SwerveMotor"),
+                portManager.aquirePort(PortType.CAN, portAssignments.get("FL.DriveMotor"), "FL.DriveMotor"),
+                portManager.aquirePort(PortType.PWM, portAssignments.get("FL.Encoder"), "FL.Encoder"),
                 FRONT_LEFT_ANGLE_OFFESET
             );
 
             frontRightModule = new SwerveModule(
-                portManager.aquirePort(PortType.CAN, 32, "FR.SwerveMotor"),
-                portManager.aquirePort(PortType.CAN, 33, "FR.DriveMotor"),
-                portManager.aquirePort(PortType.PWM, 1, "FR.Encoder"),
+                portManager.aquirePort(PortType.CAN, portAssignments.get("FR.SwerveMotor"), "FR.SwerveMotor"),
+                portManager.aquirePort(PortType.CAN, portAssignments.get("FR.DriveMotor"), "FR.DriveMotor"),
+                portManager.aquirePort(PortType.PWM, portAssignments.get("FR.Encoder"), "FR.Encoder"),
                 FRONT_RIGHT_ANGLE_OFFSET
             );
 
             backLeftModule = new SwerveModule(
-                portManager.aquirePort(PortType.CAN, 36, "BL.SwerveMotor"),
-                portManager.aquirePort(PortType.CAN, 37, "BL.DriveMotor"),
-                portManager.aquirePort(PortType.PWM, 2, "BL.Encoder"),
+                portManager.aquirePort(PortType.CAN, portAssignments.get("BL.SwerveMotor"), "BL.SwerveMotor"),
+                portManager.aquirePort(PortType.CAN, portAssignments.get("BL.DriveMotor"), "BL.DriveMotor"),
+                portManager.aquirePort(PortType.PWM, portAssignments.get("BL.Encoder"), "BL.Encoder"),
                 BACK_LEFT_ANGLE_OFFSET
             );
 
             backRightModule = new SwerveModule(
-                portManager.aquirePort(PortType.CAN, 31, "BR.SwerveMotor"),
-                portManager.aquirePort(PortType.CAN, 30, "BR.DriveMotor"),
-                portManager.aquirePort(PortType.PWM, 3, "BR.Encoder"),
+                portManager.aquirePort(PortType.CAN, portAssignments.get("BR.SwerveMotor"), "BR.SwerveMotor"),
+                portManager.aquirePort(PortType.CAN, portAssignments.get("BR.DriveMotor"), "BR.DriveMotor"),
+                portManager.aquirePort(PortType.PWM, portAssignments.get("BR.Encoder"), "BR.Encoder"),
                 BACK_RIGHT_ANGLE_OFFSET
             );
 
         } catch (Exception exception) {
-            exception.printStackTrace();
+            //exception.printStackTrace();
+            throw exception;
         }
 
         // Create a new drive command to be reused later

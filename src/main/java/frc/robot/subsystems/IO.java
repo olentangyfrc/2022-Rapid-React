@@ -4,20 +4,22 @@
 
 package frc.robot.subsystems;
 
+import java.util.logging.Logger;
+
 // WPI imports:
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 // Project imports
-import frc.robot.subsystems.interfaces.OzoneSubsystem;
 
 /**
  * This subsytem handles all of the user input and output of the robot.
  * 
  * TODO: Add button binding functionality
  */
-public class IO extends OzoneSubsystem {
+public class IO extends SubsystemBase {
     public static final int XBOX_PORT = 0;
     public static final int LEFT_STICK_PORT = 1;
     public static final int RIGHT_STICK_PORT = 2;
@@ -29,7 +31,8 @@ public class IO extends OzoneSubsystem {
     private Joystick leftStick;
     private Joystick rightStick;
 
-    @Override
+    private Logger logger = Logger.getLogger("IO");
+
     public void init() {
         inputMethod = determineInputMethod();
 
