@@ -5,6 +5,7 @@
 package frc.robot.subsystems.telemtry;
 import com.ctre.phoenix.sensors.WPI_PigeonIMU;
 import com.ctre.phoenix.sensors.PigeonIMU.CalibrationMode;
+import com.ctre.phoenix.sensors.PigeonIMU.PigeonState;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 
@@ -28,7 +29,7 @@ public class Pigeon {
      */
     public Rotation2d getAngle() {
         double angle = imu.getFusedHeading();
-        return Rotation2d.fromDegrees(angle);
+        return Rotation2d.fromDegrees(angle % 360);
     }
 
     /**
@@ -53,6 +54,7 @@ public class Pigeon {
      * Wait at least 4 seconds after calling this to move the bot.
      */
     public void calibrateGyro() {
+        while (!imu.getState().equals(PigeonState.Ready));
         imu.enterCalibrationMode(CalibrationMode.BootTareGyroAccel);
     }
 
@@ -62,6 +64,7 @@ public class Pigeon {
      * Make sure that the gyro is completely level and still for 10s after this is called.
      */
     public void calibrateAccelerometer() {
+        while (!imu.getState().equals(PigeonState.Ready));
         imu.enterCalibrationMode(CalibrationMode.Accelerometer);
     }
 
