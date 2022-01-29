@@ -15,6 +15,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.PortManager;
 import frc.robot.subsystems.PortManager.PortType;
 import frc.robot.subsystems.drivetrain.commands.DriveCommand;
+import frc.robot.subsystems.drivetrain.modules.CANSparkMaxModule;
+import frc.robot.subsystems.drivetrain.modules.SwerveModule;
 import frc.robot.subsystems.SubsystemFactory;
 
 public class DrivetrainSubsystem extends SubsystemBase {
@@ -45,28 +47,28 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
         // Initialize swerve modules
         try {
-            frontLeftModule = new SwerveModule(
+            frontLeftModule = new CANSparkMaxModule(
                 portManager.aquirePort(PortType.CAN, portAssignments.get("FL.SwerveMotor"), "FL.SwerveMotor"),
                 portManager.aquirePort(PortType.CAN, portAssignments.get("FL.DriveMotor"), "FL.DriveMotor"),
                 portManager.aquirePort(PortType.PWM, portAssignments.get("FL.Encoder"), "FL.Encoder"),
                 wheelOffsets.get("FL")
             );
 
-            frontRightModule = new SwerveModule(
+            frontRightModule = new CANSparkMaxModule(
                 portManager.aquirePort(PortType.CAN, portAssignments.get("FR.SwerveMotor"), "FR.SwerveMotor"),
                 portManager.aquirePort(PortType.CAN, portAssignments.get("FR.DriveMotor"), "FR.DriveMotor"),
                 portManager.aquirePort(PortType.PWM, portAssignments.get("FR.Encoder"), "FR.Encoder"),
                 wheelOffsets.get("FR")
             );
 
-            backLeftModule = new SwerveModule(
+            backLeftModule = new CANSparkMaxModule(
                 portManager.aquirePort(PortType.CAN, portAssignments.get("BL.SwerveMotor"), "BL.SwerveMotor"),
                 portManager.aquirePort(PortType.CAN, portAssignments.get("BL.DriveMotor"), "BL.DriveMotor"),
                 portManager.aquirePort(PortType.PWM, portAssignments.get("BL.Encoder"), "BL.Encoder"),
                 wheelOffsets.get("BL")
             );
 
-            backRightModule = new SwerveModule(
+            backRightModule = new CANSparkMaxModule(
                 portManager.aquirePort(PortType.CAN, portAssignments.get("BR.SwerveMotor"), "BR.SwerveMotor"),
                 portManager.aquirePort(PortType.CAN, portAssignments.get("BR.DriveMotor"), "BR.DriveMotor"),
                 portManager.aquirePort(PortType.PWM, portAssignments.get("BR.Encoder"), "BR.Encoder"),

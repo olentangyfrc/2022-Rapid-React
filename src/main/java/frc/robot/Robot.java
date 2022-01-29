@@ -63,11 +63,7 @@ public class Robot extends TimedRobot {
   private Pigeon pigeon;
 
   @Override
-  public void testInit() {
-    pigeon = new Pigeon(21);
-    pigeon.init();
-    Shuffleboard.getTab("Gyro").addNumber("Gyro angle", () -> pigeon.getAngle().getDegrees());
-  }
+  public void testInit() {}
 
   @Override
   public void testPeriodic() {
