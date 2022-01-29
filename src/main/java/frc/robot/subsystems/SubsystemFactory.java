@@ -11,26 +11,16 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import com.ctre.phoenix.sensors.PigeonIMU;
-
-// WPI imports
-import edu.wpi.first.wpilibj.PowerDistribution;
-import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
-
 // Project imports:
 import frc.robot.subsystems.drivetrain.DrivetrainSubsystem;
-import frc.robot.subsystems.telemtry.Pigeon;
 
 /**
  * This class instantiates and initializes all of the subsystems and stores references to them.
  */
 public class SubsystemFactory {
-  public static final int PDP_PORT = 1;
 
   // SubsystemFactory is a singleton, so keep a static instance.
   private static SubsystemFactory instance;
-
-  private PowerDistribution pdp;
 
   private Logger logger = Logger.getLogger("Subsystem Factory");
 
@@ -86,7 +76,6 @@ public class SubsystemFactory {
   }
 
   public void initCommon() {
-    pdp = new PowerDistribution(PDP_PORT, ModuleType.kCTRE);
     portManager = new PortManager();
     io = new IO();
     io.init();
@@ -110,9 +99,15 @@ public class SubsystemFactory {
     portAssignments.put("BR.DriveMotor", 30);
     portAssignments.put("BR.Encoder", 3);
 
+    HashMap<String, Double> wheelOffsets = new HashMap<String, Double>();
+    wheelOffsets.put("FL", 121.46);
+    wheelOffsets.put("FR", 36.38);
+    wheelOffsets.put("BL", 218.4);
+    wheelOffsets.put("BR", 105.08);
+
     // Create and initialize all subsystems:
     driveTrain = new DrivetrainSubsystem();
-    driveTrain.init(portAssignments);
+    driveTrain.init(portAssignments, wheelOffsets);
   }
 
   public void initCALIFORNIA() throws Exception{
@@ -133,9 +128,15 @@ public class SubsystemFactory {
     portAssignments.put("BR.DriveMotor", 60);
     portAssignments.put("BR.Encoder", 2);
 
+    HashMap<String, Double> wheelOffsets = new HashMap<String, Double>();
+    wheelOffsets.put("FL", 0.0);
+    wheelOffsets.put("FR", 0.0);
+    wheelOffsets.put("BL", 0.0);
+    wheelOffsets.put("BR", 0.0);
+
     // Create and initialize all subsystems:
     driveTrain = new DrivetrainSubsystem();
-    driveTrain.init(portAssignments);
+    driveTrain.init(portAssignments, wheelOffsets);
   }
 
   public void initRIO99() {
