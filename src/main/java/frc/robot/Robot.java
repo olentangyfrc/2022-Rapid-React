@@ -4,8 +4,12 @@
 
 package frc.robot;
 
+import com.ctre.phoenix.sensors.WPI_PigeonIMU;
+import com.ctre.phoenix.sensors.PigeonIMU.CalibrationMode;
+
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 import frc.robot.subsystems.SubsystemFactory;
@@ -27,11 +31,11 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
 
-    try {
-      SubsystemFactory.getInstance().init();
-    } catch (Exception exception) {
-      exception.printStackTrace();
-    }
+    // try {
+    //   SubsystemFactory.getInstance().init();
+    // } catch (Exception exception) {
+    //   exception.printStackTrace();
+    // }
 
   }
 
@@ -60,13 +64,21 @@ public class Robot extends TimedRobot {
   @Override
   public void disabledPeriodic() {}
 
-  private Pigeon pigeon;
+  private WPI_PigeonIMU pigeon;
 
   @Override
-  public void testInit() {}
+  public void testInit() {
+    pigeon = new WPI_PigeonIMU(21);
+  }
 
   @Override
   public void testPeriodic() {
     CommandScheduler.getInstance().run();
+    short[] magVals = new short[3];
+    pigeon.getRawMagnetometer(magVals);
+
+    SmartDashboard.putNumber("Mag X", magVals[0]);
+    SmartDashboard.putNumber("Mag Y", magVals[1]);
+    SmartDashboard.putNumber("Mag Z", magVals[2]);
   }
 }
