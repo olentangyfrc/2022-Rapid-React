@@ -1,8 +1,10 @@
 package frc.robot.subsystems.drivetrain;
 
 import java.util.Map;
+import java.util.logging.Logger;
 
 // WPILib imports
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -17,6 +19,7 @@ import frc.robot.subsystems.PortManager.PortType;
 import frc.robot.subsystems.drivetrain.commands.DriveCommand;
 import frc.robot.subsystems.drivetrain.modules.CANSparkMaxModule;
 import frc.robot.subsystems.drivetrain.modules.SwerveModule;
+import frc.robot.subsystems.telemetry.Pigeon;
 import frc.robot.subsystems.SubsystemFactory;
 
 public class DrivetrainSubsystem extends SubsystemBase {
@@ -37,14 +40,21 @@ public class DrivetrainSubsystem extends SubsystemBase {
     // Used to convert from ChassisSpeeds to SwerveModuleStates
     private SwerveDriveKinematics kinematics;
 
-    ShuffleboardTab tab = Shuffleboard.getTab("Drive");
+    private ShuffleboardTab tab = Shuffleboard.getTab("Drive");
+
+    private Logger logger = Logger.getLogger("DrivetrainSubsystem");
+
+    // PID controller to prevent unintentional rotation when there is no rotation input. Takes in degrees nd outputs percent output.
+    private PIDController anglePid = new PIDController(0.004, 0, 0);
+
+    // To be used as the setpoint for the angle PID controller. This is in degrees.
+    private double storedRotation;
 
     /**
      * Initialize the drivetrain subsystem
      */
     public void init(Map<String, Integer> portAssignments, Map<String, Double> wheelOffsets) throws Exception{
         PortManager portManager = SubsystemFactory.getInstance().getPortManager();
-
         // Initialize swerve modules
         try {
             frontLeftModule = new CANSparkMaxModule(
@@ -80,6 +90,8 @@ public class DrivetrainSubsystem extends SubsystemBase {
             throw exception;
         }
 
+        anglePid.enableContinuousInput(0.0, 360);
+
         // Create a new drive command to be reused later
         driveCommand = new DriveCommand(this);
 
@@ -100,8 +112,10 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        // Run the drivecommand periodically
-        driveCommand.schedule();
+        // Run the drive command periodically
+        if(driveCommand != null) {
+            driveCommand.schedule();
+        }
     }
 
     /** 
@@ -112,6 +126,18 @@ public class DrivetrainSubsystem extends SubsystemBase {
      * @param speeds Chasis speeds with vx and vy and omega between -1 and 1
     */
     public void drive(ChassisSpeeds speeds) {
+
+        Pigeon gyro = SubsystemFactory.getInstance().getTelemetry().getPigeon();
+
+        if(speeds.omegaRadiansPerSecond == 0) {
+            // Dont move if we have no input.
+            if(speeds.vxMetersPerSecond != 0 || speeds.vyMetersPerSecond != 0) {
+                speeds.omegaRadiansPerSecond = -anglePid.calculate(gyro.getAngle(), storedRotation);
+            }
+        } else {
+            storedRotation = gyro.getAngle();
+        }
+
         SwerveModuleState[] states = kinematics.toSwerveModuleStates(speeds);
         SwerveDriveKinematics.desaturateWheelSpeeds(states, 1); // Normalize wheel speeds so we don't go faster than 100%
 

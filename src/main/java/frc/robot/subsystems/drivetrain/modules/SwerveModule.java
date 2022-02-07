@@ -56,7 +56,7 @@ public abstract class SwerveModule {
      * <p>
      * This should be called periodically.
      * 
-     * @param newState
+     * @param newState forward, strafe, and rotation should be [-1, 1]
      */
     public void updateState(SwerveModuleState newState) {
         setAngle(newState.angle);

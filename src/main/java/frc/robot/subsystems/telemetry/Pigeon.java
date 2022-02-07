@@ -8,35 +8,63 @@ import com.ctre.phoenix.sensors.PigeonIMU.CalibrationMode;
 import com.ctre.phoenix.sensors.PigeonIMU.PigeonState;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.interfaces.Gyro;
 
-/** Add your docs here. */
-public class Pigeon {
+/**
+ * A Pigeon IMU gyroscope
+ */
+public class Pigeon implements Gyro{
     private WPI_PigeonIMU imu;
 
     public Pigeon(int deviceId) {
         this.imu = new WPI_PigeonIMU(deviceId);
     }
 
+    /**
+     * Initialize the pigeon
+     */
     public void init() {
-        imu.configFactoryDefault();
         imu.setFusedHeading(0.0);
+        Shuffleboard.getTab("Drive").addNumber("Gyro angle", this::getAngle);
     }
 
     /**
      * Get the current rotation of the robot
      * 
-     * @return the angle of the robot as a rotation2d
+     * @return the current heading of the robot in degrees.
      */
-    public Rotation2d getAngle() {
-        double angle = imu.getFusedHeading();
-        return Rotation2d.fromDegrees(angle % 360);
+    @Override
+    public double getAngle() {
+        return imu.getFusedHeading() % 360;
+    }
+
+    /**
+     * Get the heading of the robot as a rotation2d
+     * 
+     * @return the heading of the robot as a rotation2d
+     */
+    @Override
+    public Rotation2d getRotation2d() {
+        return Rotation2d.fromDegrees(getAngle());
+    }
+
+    /**
+     * Get the rotational velocity of the bot in degrees per second.
+     * 
+     * @return
+     */
+    @Override
+    public double getRate() {
+        return imu.getRate();
     }
 
     /**
      * Reset the angle to 0 degrees
      */
-    public void resetAngle() {
-        resetAngle(Rotation2d.fromDegrees(0.0));
+    @Override
+    public void reset() {
+        reset(Rotation2d.fromDegrees(0.0));
     }
 
     /**
@@ -44,7 +72,7 @@ public class Pigeon {
      * 
      * @param angle the angle to reset to as a rotation2d
      */
-    public void resetAngle(Rotation2d angle) {
+    public void reset(Rotation2d angle) {
         imu.setFusedHeading(angle.getDegrees());
     }
 
@@ -53,7 +81,8 @@ public class Pigeon {
      * <p>
      * Wait at least 4 seconds after calling this to move the bot.
      */
-    public void calibrateGyro() {
+    @Override
+    public void calibrate() {
         while (!imu.getState().equals(PigeonState.Ready));
         imu.enterCalibrationMode(CalibrationMode.BootTareGyroAccel);
     }
@@ -66,6 +95,11 @@ public class Pigeon {
     public void calibrateAccelerometer() {
         while (!imu.getState().equals(PigeonState.Ready));
         imu.enterCalibrationMode(CalibrationMode.Accelerometer);
+    }
+
+    @Override
+    public void close() throws Exception {
+        imu.close();
     }
 
 }

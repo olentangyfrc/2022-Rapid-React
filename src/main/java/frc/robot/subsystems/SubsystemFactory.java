@@ -11,9 +11,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import edu.wpi.first.wpilibj.XboxController.Button;
 // Project imports:
 import frc.robot.subsystems.drivetrain.DrivetrainSubsystem;
 import frc.robot.subsystems.telemetry.Telemetry;
+import frc.robot.subsystems.telemetry.commands.ZeroGyro;
+import frc.robot.subsystems.IO.ButtonActionType;
+import frc.robot.subsystems.IO.StickButton;
+import frc.robot.subsystems.telemetry.commands.ZeroGyro;
 
 /**
  * This class instantiates and initializes all of the subsystems and stores references to them.
@@ -65,7 +70,11 @@ public class SubsystemFactory {
    */
   public void init() throws Exception {
     botType = getBotType();
+    portManager = new PortManager();
     telemetry = new Telemetry(botType);
+    telemetry.init();
+    io = new IO();
+    io.init(botType);
     switch(botType) {
       case COVID:
         initCOVID();
@@ -79,15 +88,6 @@ public class SubsystemFactory {
       default:
         logger.info("Unrecognized bot");
     }
-  }
-
-  /**
-   * Initializes common subsystems across all bots
-   */
-  public void initCommon() {
-    portManager = new PortManager();
-    io = new IO();
-    io.init();
   }
 
   /**
@@ -132,28 +132,32 @@ public class SubsystemFactory {
     portAssignments.put("FL.SwerveMotor", 17);
     portAssignments.put("FL.DriveMotor", 6);
     portAssignments.put("FL.Encoder", 0);
+    
 
     portAssignments.put("FR.SwerveMotor", 14);
     portAssignments.put("FR.DriveMotor", 9);
-    portAssignments.put("FR.Encoder", 3);
+    portAssignments.put("FR.Encoder", 1);
 
     portAssignments.put("BL.SwerveMotor", 15);
     portAssignments.put("BL.DriveMotor", 10);
-    portAssignments.put("BL.Encoder", 1);
+    portAssignments.put("BL.Encoder", 2);
 
     portAssignments.put("BR.SwerveMotor", 59);
     portAssignments.put("BR.DriveMotor", 60);
-    portAssignments.put("BR.Encoder", 2);
+    portAssignments.put("BR.Encoder", 3);
 
     HashMap<String, Double> wheelOffsets = new HashMap<String, Double>();
-    wheelOffsets.put("FL", 0.0);
-    wheelOffsets.put("FR", 0.0);
-    wheelOffsets.put("BL", 0.0);
-    wheelOffsets.put("BR", 0.0);
+    wheelOffsets.put("FL", 149.58);
+    wheelOffsets.put("FR", 47.109);
+    wheelOffsets.put("BL", 87.45);
+    wheelOffsets.put("BR", 96.76);
 
+    
     // Create and initialize all subsystems:
     driveTrain = new DrivetrainSubsystem();
     driveTrain.init(portAssignments, wheelOffsets);
+    
+    io.bind(new ZeroGyro(telemetry.getPigeon()), Button.kY, StickButton.RIGHT_2, ButtonActionType.WHEN_PRESSED);
   }
 
   /**
@@ -183,6 +187,10 @@ public class SubsystemFactory {
    */
   public Telemetry getTelemetry() {
     return telemetry;
+  }
+
+  public DrivetrainSubsystem getDrivetrain() {
+    return driveTrain;
   }
 
   /**

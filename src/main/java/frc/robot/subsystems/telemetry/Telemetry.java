@@ -1,5 +1,8 @@
 package frc.robot.subsystems.telemetry;
 
+import frc.robot.subsystems.PortManager;
+import frc.robot.subsystems.SubsystemFactory;
+import frc.robot.subsystems.PortManager.PortType;
 // Package imports
 import frc.robot.subsystems.SubsystemFactory.BotType;
 
@@ -53,14 +56,20 @@ public class Telemetry extends SubsystemBase {
     /**
      *  Initializes California Bot sensors
      */
-    private void initCALIFORNIA() {}
+    private void initCALIFORNIA() throws Exception {
+        PortManager pm = SubsystemFactory.getInstance().getPortManager();
+        pigeon = new Pigeon(pm.aquirePort(PortType.CAN, 21, "Pigeon IMU"));
+        pigeon.init();
+    }
 
 
     /**
      *  Initializes RIO99 sensors
      */
-    private void initRIO99() {
-        pigeon = new Pigeon(21);
+    private void initRIO99() throws Exception {
+        PortManager pm = SubsystemFactory.getInstance().getPortManager();
+        pigeon = new Pigeon(pm.aquirePort(PortType.CAN, 21, "Pigeon IMU"));
+        pigeon.init();
     }
 
     /**
