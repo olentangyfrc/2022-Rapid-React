@@ -22,7 +22,6 @@ import edu.wpi.first.wpilibj.AnalogInput;
  */
 public class SingleFalconModule extends SwerveModule {
     // Top speed of drive motor in m/s. May need to be adjusted.
-    public static final double MAX_DRIVE_SPEED = 8;
 
     private WPI_TalonFX driveMotor;
     private CANSparkMax angleMotor;
@@ -36,16 +35,6 @@ public class SingleFalconModule extends SwerveModule {
         angleMotor.setInverted(true);
 
         driveMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
-
-        driveMotor.config_kP(0, 1);
-        driveMotor.config_kI(0, 0);
-        driveMotor.config_kD(0, 0);
-        driveMotor.config_kF(0, 0);
-
-        driveMotor.configNominalOutputForward(0);
-		driveMotor.configNominalOutputReverse(0);
-		driveMotor.configPeakOutputForward(1);
-		driveMotor.configPeakOutputReverse(-1);
     
         anglePid.setTolerance(0.001);
 
@@ -57,16 +46,31 @@ public class SingleFalconModule extends SwerveModule {
         this.angleOffset = angleOffset;
     }
 
+    /**
+     * Set the percent output for the drive motor
+     * 
+     * @param output Percent output for the drive motor [-1, 1]
+     */
     @Override
     public void setDrivePercentOutput(double output) {
-        driveMotor.set(TalonFXControlMode.Velocity, output * MAX_DRIVE_SPEED);
+        driveMotor.set(TalonFXControlMode.PercentOutput, output);
     }
 
+    /**
+     * Set the percent output for the angle motor
+     * 
+     * @param output Percent output for the angle motor [-1, 1]
+     */
     @Override
-    protected void setAnglePercentOutput(double output) {
+    public void setAnglePercentOutput(double output) {
         angleMotor.set(output);
     }
 
+    /**
+     * Get the angle of the swerve module
+     * 
+     * @return the angle as a rotation2D
+     */
     @Override
     public Rotation2d getAngle() {
         // Raw angle
@@ -81,19 +85,24 @@ public class SingleFalconModule extends SwerveModule {
         return new Rotation2d(angle);
     }
 
+    /**
+     * Get the speed of the drive motor in meters per second
+     * 
+     * @return the speed of the drive motor in meters per second
+     */
     @Override
     public double getSpeed() {
         return driveMotor.getSelectedSensorVelocity(0);
     }
 
     /**
-     * Do not call this method! It is here to satisfy SwerveModule class.
+     * Get the current percent output of the drive motor
      * 
-     * @hidden
+     * @return the percent output -1 to 1
      */
     @Override
     public double getPercentOutput() {
-        return Double.NaN;
+        return driveMotor.get();
     }
 
 }

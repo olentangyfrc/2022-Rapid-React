@@ -4,16 +4,11 @@
 
 package frc.robot;
 
-import com.ctre.phoenix.sensors.WPI_PigeonIMU;
-import com.ctre.phoenix.sensors.PigeonIMU.CalibrationMode;
 
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 import frc.robot.subsystems.SubsystemFactory;
-import frc.robot.subsystems.telemetry.Pigeon;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -31,8 +26,6 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     
-    Shuffleboard.getTab("Diagnostic Info").addNumber("Periodic rate", this::getPeriod);
-
     try {
       SubsystemFactory.getInstance().init();
     } catch (Exception exception) {

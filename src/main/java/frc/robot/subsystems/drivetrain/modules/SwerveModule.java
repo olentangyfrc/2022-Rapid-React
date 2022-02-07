@@ -16,16 +16,16 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
  */
 public abstract class SwerveModule {
     // Wheel radius in meters
-    protected static final double WHEEL_RADIUS = 0.09525;
+    public static final double WHEEL_RADIUS = 0.09525;
 
     // Ticks per revolution of the angle encoder.
-    protected static final double ANGLE_ENCODER_TICKS = 4096;
+    public static final double ANGLE_ENCODER_TICKS = 4096;
 
     // The angle to offset this modules angle by in order to have the bot's forward and this module's forward match
-    protected double angleOffset;
+    public double angleOffset;
 
     // PID controller for wheel angle
-    protected PIDController anglePid;
+    public PIDController anglePid;
 
     /**
      * Set the angle of the module in radians
@@ -49,7 +49,7 @@ public abstract class SwerveModule {
      * 
      * @param output Percent output for the angle motor [-1, 1]
      */
-    protected abstract void setAnglePercentOutput(double output);
+    public abstract void setAnglePercentOutput(double output);
 
     /**
      * Update the module with a new angle and speed.

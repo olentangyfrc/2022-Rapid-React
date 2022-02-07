@@ -6,8 +6,6 @@ package frc.robot.subsystems.telemetry.commands;
 
 import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import frc.robot.subsystems.drivetrain.DrivetrainSubsystem;
-import frc.robot.subsystems.telemetry.Telemetry;
 
 /**
  * For zeroing angle with a drivetrain, use frc.robot.subsystems.drivetrain.commands.ZeroAngle instead.

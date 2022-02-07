@@ -14,11 +14,10 @@ import java.util.logging.Logger;
 import edu.wpi.first.wpilibj.XboxController.Button;
 // Project imports:
 import frc.robot.subsystems.drivetrain.DrivetrainSubsystem;
+import frc.robot.subsystems.drivetrain.commands.ZeroAngle;
 import frc.robot.subsystems.telemetry.Telemetry;
-import frc.robot.subsystems.telemetry.commands.ZeroGyro;
 import frc.robot.subsystems.IO.ButtonActionType;
 import frc.robot.subsystems.IO.StickButton;
-import frc.robot.subsystems.telemetry.commands.ZeroGyro;
 
 /**
  * This class instantiates and initializes all of the subsystems and stores references to them.
@@ -157,7 +156,7 @@ public class SubsystemFactory {
     driveTrain = new DrivetrainSubsystem();
     driveTrain.init(portAssignments, wheelOffsets);
     
-    io.bind(new ZeroGyro(telemetry.getPigeon()), Button.kY, StickButton.RIGHT_2, ButtonActionType.WHEN_PRESSED);
+    io.bind(new ZeroAngle(telemetry.getPigeon(), driveTrain), Button.kY, StickButton.RIGHT_2, ButtonActionType.WHEN_PRESSED);
   }
 
   /**

@@ -147,4 +147,11 @@ public class DrivetrainSubsystem extends SubsystemBase {
         backLeftModule.updateState(states[2]);
         backRightModule.updateState(states[3]);
     }
+
+    /**
+     * Reset the stored angle of the anglePid
+     */
+    public void resetAngleController() {
+        storedRotation = 0.0;
+    }
 }
