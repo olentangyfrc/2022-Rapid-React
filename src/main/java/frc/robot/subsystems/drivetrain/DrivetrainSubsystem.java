@@ -3,6 +3,7 @@ package frc.robot.subsystems.drivetrain;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import edu.wpi.first.math.MathUtil;
 // WPILib imports
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -50,10 +51,12 @@ public class DrivetrainSubsystem extends SubsystemBase {
     // To be used as the setpoint for the angle PID controller. This is in degrees.
     private double storedRotation;
 
+    private boolean isFieldOriented = true;
+
     /**
      * Initialize the drivetrain subsystem
      */
-    public void init(Map<String, Integer> portAssignments, Map<String, Double> wheelOffsets) throws Exception{
+    public void init(Map<String, Integer> portAssignments, Map<String, Double> wheelOffsets) throws Exception {
         PortManager portManager = SubsystemFactory.getInstance().getPortManager();
         // Initialize swerve modules
         try {
@@ -126,13 +129,22 @@ public class DrivetrainSubsystem extends SubsystemBase {
      * @param speeds Chasis speeds with vx and vy and omega between -1 and 1
     */
     public void drive(ChassisSpeeds speeds) {
-
+        
         Pigeon gyro = SubsystemFactory.getInstance().getTelemetry().getPigeon();
+        logger.info(gyro.getRotation2d().getDegrees() + "");
+        if(isFieldOriented) {
+            speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+                speeds.vxMetersPerSecond, 
+                speeds.vyMetersPerSecond,
+                speeds.omegaRadiansPerSecond, 
+                gyro.getRotation2d()
+            );
+        }
 
         if(speeds.omegaRadiansPerSecond == 0) {
             // Dont move if we have no input.
             if(speeds.vxMetersPerSecond != 0 || speeds.vyMetersPerSecond != 0) {
-                speeds.omegaRadiansPerSecond = -anglePid.calculate(gyro.getAngle(), storedRotation);
+                speeds.omegaRadiansPerSecond = MathUtil.clamp(anglePid.calculate(gyro.getAngle(), storedRotation), -1, 1);
             }
         } else {
             storedRotation = gyro.getAngle();
@@ -153,5 +165,24 @@ public class DrivetrainSubsystem extends SubsystemBase {
      */
     public void resetAngleController() {
         storedRotation = 0.0;
+        anglePid.reset();
+    }
+
+    /**
+     * Turn field oriented on or off
+     * 
+     * @param val true to turn field oriented on, false to turn it off.
+     */
+    public void setFieldOriented(boolean val) {
+        isFieldOriented = val;
+    }
+
+    /**
+     * Determine if the bot is in field oriented drive mode
+     * 
+     * @return Returns true if in field oriented, otherwise, false.
+     */
+    public boolean getFieldOriented() {
+        return isFieldOriented;
     }
 }

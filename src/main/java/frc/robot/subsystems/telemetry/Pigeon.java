@@ -14,7 +14,7 @@ import edu.wpi.first.wpilibj.interfaces.Gyro;
 /**
  * A Pigeon IMU gyroscope
  */
-public class Pigeon implements Gyro{
+public class Pigeon implements Gyro {
     private WPI_PigeonIMU imu;
 
     public Pigeon(int deviceId) {
@@ -36,7 +36,8 @@ public class Pigeon implements Gyro{
      */
     @Override
     public double getAngle() {
-        return imu.getFusedHeading() % 360;
+        // Negate it to make it clockwise.
+        return -(imu.getFusedHeading() % 360);
     }
 
     /**
