@@ -4,8 +4,12 @@
 
 package frc.robot;
 
+
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+
+
+import frc.robot.subsystems.SubsystemFactory;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -19,8 +23,18 @@ public class Robot extends TimedRobot {
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
    */
+
   @Override
   public void robotInit() {
+
+    
+    try {
+      SubsystemFactory.getInstance().init();
+    } catch (Exception exception) {
+      exception.printStackTrace();
+    }
+
+
   }
 
   @Override
@@ -49,7 +63,8 @@ public class Robot extends TimedRobot {
   public void disabledPeriodic() {}
 
   @Override
-  public void testInit() {}
+  public void testInit() {
+  }
 
   @Override
   public void testPeriodic() {

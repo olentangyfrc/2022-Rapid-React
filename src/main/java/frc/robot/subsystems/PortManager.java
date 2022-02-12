@@ -4,8 +4,6 @@
 
 package frc.robot.subsystems;
 
-import frc.robot.subsystems.interfaces.OzoneSubsystem;
-
 /**
  * Portman provides a control mechanism for subsystems to acquire ports for their
  * devices. It does it my keeping track of ports that have been allocated and throws
