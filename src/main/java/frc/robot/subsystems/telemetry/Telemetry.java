@@ -1,9 +1,9 @@
 package frc.robot.subsystems.telemetry;
 
+// Package imports
 import frc.robot.subsystems.PortManager;
 import frc.robot.subsystems.SubsystemFactory;
 import frc.robot.subsystems.PortManager.PortType;
-// Package imports
 import frc.robot.subsystems.SubsystemFactory.BotType;
 
 // Java imports
