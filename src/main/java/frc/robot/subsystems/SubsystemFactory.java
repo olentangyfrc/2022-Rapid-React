@@ -5,6 +5,7 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.PowerDistribution;
+import frc.robot.subsystems.Climber.Climber;
 
 // Subsystem imports:
 
@@ -14,6 +15,7 @@ public class SubsystemFactory {
   private static SubsystemFactory instance;
 
   private PowerDistribution pdp;
+  private Climber climber;
 
   // Variables for all subsystems:
   private PortManager portManager;
