@@ -8,6 +8,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
+
 import frc.robot.subsystems.SubsystemFactory;
 
 /**
@@ -25,12 +26,14 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotInit() {
+
     
     try {
       SubsystemFactory.getInstance().init();
     } catch (Exception exception) {
       exception.printStackTrace();
     }
+
 
   }
 
