@@ -6,6 +6,7 @@ package frc.robot.subsystems.drivetrain.modules;
 
 // WPI imports:
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 
@@ -27,6 +28,9 @@ public abstract class SwerveModule {
     // PID controller for wheel angle
     public PIDController anglePid;
 
+    public SimpleMotorFeedforward velocityFeedforward;
+    public PIDController velocityController;
+
     /**
      * Set the angle of the module in radians
      * 
@@ -37,12 +41,12 @@ public abstract class SwerveModule {
         setAnglePercentOutput(output);
     }
 
-    /**
-     * Set the percent output for the drive motor
-     * 
-     * @param output Percent output for the drive motor [-1, 1]
-     */
-    public abstract void setDrivePercentOutput(double output);
+    // /**
+    //  * Set the percent output for the drive motor
+    //  * 
+    //  * @param output Percent output for the drive motor [-1, 1]
+    //  */
+    // public abstract void setDrivePercentOutput(double output);
 
     /**
      * Set the percent output for the angle motor
@@ -52,15 +56,33 @@ public abstract class SwerveModule {
     public abstract void setAnglePercentOutput(double output);
 
     /**
+     * Set the velocity of the drive motor
+     * 
+     * @param velocity
+     */
+    public void setDriveVelocity(double velocity) {
+        setDriveVoltage(velocityController.calculate(getVelocity(), velocity) + velocityFeedforward.calculate(velocity));
+    }
+
+    /**
+     * Set the voltage of the drive motor
+     * <p>
+     * Use setDriveVelocity to set the speed, not this!
+     * 
+     * @param voltage
+     */
+    public abstract void setDriveVoltage(double voltage);
+
+    /**
      * Update the module with a new angle and speed.
      * <p>
      * This should be called periodically.
      * 
-     * @param newState forward, strafe, and rotation should be [-1, 1]
+     * @param newState The new swerve module state
      */
     public void updateState(SwerveModuleState newState) {
         setAngle(newState.angle);
-        setDrivePercentOutput(newState.speedMetersPerSecond);
+        setDriveVelocity(newState.speedMetersPerSecond);
     }
 
     /**
@@ -71,16 +93,16 @@ public abstract class SwerveModule {
     public abstract Rotation2d getAngle();
 
     /**
-     * Get the speed of the drive motor in meters per second
+     * Get the velocity of the drive motor in meters per second
      * 
      * @return the speed of the drive motor in meters per second
      */
-    public abstract double getSpeed();
+    public abstract double getVelocity();
 
-    /**
-     * Get the current percent output of the drive motor
-     * 
-     * @return the percent output -1 to 1
-     */
-    public abstract double getPercentOutput();
+    // /**
+    //  * Get the current percent output of the drive motor
+    //  * 
+    //  * @return the percent output -1 to 1
+    //  */
+    // public abstract double getPercentOutput();
 }

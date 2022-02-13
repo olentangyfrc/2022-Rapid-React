@@ -3,9 +3,14 @@ package frc.robot.subsystems.drivetrain;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.Nat;
 // WPILib imports
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -23,13 +28,13 @@ import frc.robot.subsystems.drivetrain.modules.SwerveModule;
 import frc.robot.subsystems.telemetry.Pigeon;
 import frc.robot.subsystems.SubsystemFactory;
 
-public class DrivetrainSubsystem extends SubsystemBase {
+public abstract class DrivetrainSubsystem extends SubsystemBase {
 
     // Declaring Swerve Modules
-    private SwerveModule frontLeftModule;
-    private SwerveModule frontRightModule;
-    private SwerveModule backLeftModule;
-    private SwerveModule backRightModule;
+    public SwerveModule frontLeftModule;
+    public SwerveModule frontRightModule;
+    public SwerveModule backLeftModule;
+    public SwerveModule backRightModule;
 
     // Distance from center of wheel to center of wheel across the side of the bot in meters
     public static final double WHEEL_BASE = 0.4445;
@@ -53,45 +58,17 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
     private boolean isFieldOriented = true;
 
+    private SwerveDrivePoseEstimator poseEstimator = new SwerveDrivePoseEstimator(new Rotation2d(), new Pose2d(), kinematics,
+        new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0.02, 0.02, 0.01), 
+        new MatBuilder<>(Nat.N1(), Nat.N1()).fill(0.02),
+        new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0.1, 0.1, 0.01)
+    );
+
     /**
      * Initialize the drivetrain subsystem
      */
     public void init(Map<String, Integer> portAssignments, Map<String, Double> wheelOffsets) throws Exception {
-        PortManager portManager = SubsystemFactory.getInstance().getPortManager();
-        // Initialize swerve modules
-        try {
-            frontLeftModule = new CANSparkMaxModule(
-                portManager.aquirePort(PortType.CAN, portAssignments.get("FL.SwerveMotor"), "FL.SwerveMotor"),
-                portManager.aquirePort(PortType.CAN, portAssignments.get("FL.DriveMotor"), "FL.DriveMotor"),
-                portManager.aquirePort(PortType.PWM, portAssignments.get("FL.Encoder"), "FL.Encoder"),
-                wheelOffsets.get("FL")
-            );
-
-            frontRightModule = new CANSparkMaxModule(
-                portManager.aquirePort(PortType.CAN, portAssignments.get("FR.SwerveMotor"), "FR.SwerveMotor"),
-                portManager.aquirePort(PortType.CAN, portAssignments.get("FR.DriveMotor"), "FR.DriveMotor"),
-                portManager.aquirePort(PortType.PWM, portAssignments.get("FR.Encoder"), "FR.Encoder"),
-                wheelOffsets.get("FR")
-            );
-
-            backLeftModule = new CANSparkMaxModule(
-                portManager.aquirePort(PortType.CAN, portAssignments.get("BL.SwerveMotor"), "BL.SwerveMotor"),
-                portManager.aquirePort(PortType.CAN, portAssignments.get("BL.DriveMotor"), "BL.DriveMotor"),
-                portManager.aquirePort(PortType.PWM, portAssignments.get("BL.Encoder"), "BL.Encoder"),
-                wheelOffsets.get("BL")
-            );
-
-            backRightModule = new CANSparkMaxModule(
-                portManager.aquirePort(PortType.CAN, portAssignments.get("BR.SwerveMotor"), "BR.SwerveMotor"),
-                portManager.aquirePort(PortType.CAN, portAssignments.get("BR.DriveMotor"), "BR.DriveMotor"),
-                portManager.aquirePort(PortType.PWM, portAssignments.get("BR.Encoder"), "BR.Encoder"),
-                wheelOffsets.get("BR")
-            );
-
-        } catch (Exception exception) {
-            //exception.printStackTrace();
-            throw exception;
-        }
+        initializeSwerveModules(portAssignments, wheelOffsets);
 
         anglePid.enableContinuousInput(0.0, 360);
 
@@ -113,6 +90,8 @@ public class DrivetrainSubsystem extends SubsystemBase {
         tab.addNumber("BR angle", () -> backRightModule.getAngle().getDegrees());
     }
 
+    public abstract void initializeSwerveModules(Map<String, Integer> portAssignments, Map<String, Double> wheelOffsets) throws Exception;
+
     @Override
     public void periodic() {
         // Run the drive command periodically
@@ -131,7 +110,6 @@ public class DrivetrainSubsystem extends SubsystemBase {
     public void drive(ChassisSpeeds speeds) {
         
         Pigeon gyro = SubsystemFactory.getInstance().getTelemetry().getPigeon();
-        logger.info(gyro.getRotation2d().getDegrees() + "");
         if(isFieldOriented) {
             speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
                 speeds.vxMetersPerSecond, 
@@ -152,6 +130,8 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
         SwerveModuleState[] states = kinematics.toSwerveModuleStates(speeds);
         SwerveDriveKinematics.desaturateWheelSpeeds(states, 1); // Normalize wheel speeds so we don't go faster than 100%
+
+        poseEstimator.update(gyro.getRotation2d(), states);
 
         // Update SwerveModule states
         frontLeftModule.updateState(states[0]);

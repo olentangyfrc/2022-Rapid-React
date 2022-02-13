@@ -11,6 +11,7 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.AnalogInput;
 
@@ -21,7 +22,6 @@ import edu.wpi.first.wpilibj.AnalogInput;
  * 
  */
 public class SingleFalconModule extends SwerveModule {
-    // Top speed of drive motor in m/s. May need to be adjusted.
 
     private WPI_TalonFX driveMotor;
     private CANSparkMax angleMotor;
@@ -34,6 +34,9 @@ public class SingleFalconModule extends SwerveModule {
 
         angleMotor.setInverted(true);
 
+        velocityController = new PIDController(1, 0, 0);
+        velocityFeedforward = new SimpleMotorFeedforward(0, 0, 0);
+
         driveMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
     
         anglePid.setTolerance(0.001);
@@ -44,16 +47,6 @@ public class SingleFalconModule extends SwerveModule {
         anglePid.enableContinuousInput(0.0, 2 * Math.PI);
 
         this.angleOffset = angleOffset;
-    }
-
-    /**
-     * Set the percent output for the drive motor
-     * 
-     * @param output Percent output for the drive motor [-1, 1]
-     */
-    @Override
-    public void setDrivePercentOutput(double output) {
-        driveMotor.set(TalonFXControlMode.PercentOutput, output);
     }
 
     /**
@@ -91,18 +84,13 @@ public class SingleFalconModule extends SwerveModule {
      * @return the speed of the drive motor in meters per second
      */
     @Override
-    public double getSpeed() {
+    public double getVelocity() {
         return driveMotor.getSelectedSensorVelocity(0);
     }
 
-    /**
-     * Get the current percent output of the drive motor
-     * 
-     * @return the percent output -1 to 1
-     */
     @Override
-    public double getPercentOutput() {
-        return driveMotor.get();
+    public void setDriveVoltage(double voltage) {
+        driveMotor.setVoltage(voltage);
     }
 
 }

@@ -14,6 +14,8 @@ import java.util.logging.Logger;
 import edu.wpi.first.wpilibj.XboxController.Button;
 // Project imports:
 import frc.robot.subsystems.drivetrain.DrivetrainSubsystem;
+import frc.robot.subsystems.drivetrain.SingleFalconDrivetrain;
+import frc.robot.subsystems.drivetrain.SparkMaxDrivetrain;
 import frc.robot.subsystems.drivetrain.commands.ZeroAngle;
 import frc.robot.subsystems.telemetry.Telemetry;
 import frc.robot.subsystems.IO.ButtonActionType;
@@ -118,7 +120,7 @@ public class SubsystemFactory {
     wheelOffsets.put("BR", 105.08);
 
     // Create and initialize all subsystems:
-    driveTrain = new DrivetrainSubsystem();
+    driveTrain = new SparkMaxDrivetrain();
     driveTrain.init(portAssignments, wheelOffsets);
   }
 
@@ -153,7 +155,7 @@ public class SubsystemFactory {
 
     
     // Create and initialize all subsystems:
-    driveTrain = new DrivetrainSubsystem();
+    driveTrain = new SingleFalconDrivetrain();
     driveTrain.init(portAssignments, wheelOffsets);
     
     io.bind(new ZeroAngle(telemetry.getPigeon(), driveTrain), Button.kY, StickButton.RIGHT_2, ButtonActionType.WHEN_PRESSED);

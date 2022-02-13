@@ -9,6 +9,7 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.AnalogInput;
 
@@ -39,6 +40,9 @@ public class CANSparkMaxModule extends SwerveModule {
         anglePid = new PIDController(0.5, 0, 0.0001);
         anglePid.enableContinuousInput(0, 2 * Math.PI);
 
+        velocityController = new PIDController(1, 0, 0);
+        velocityFeedforward = new SimpleMotorFeedforward(0, 0, 0);
+
         // Make the angle motor turn clockwise with a positive input
         angleMotor.setInverted(true);
 
@@ -64,15 +68,6 @@ public class CANSparkMaxModule extends SwerveModule {
     }
 
     /**
-     * Set the percent output for the drive motor
-     * 
-     * @param output Percent output for the drive motor [-1, 1]
-     */
-    public void setDrivePercentOutput(double output) {
-        driveMotor.set(output);
-    }
-
-    /**
      * Get the angle of the swerve module
      * 
      * @return the angle as a rotation2D
@@ -95,7 +90,8 @@ public class CANSparkMaxModule extends SwerveModule {
      * 
      * @return the speed of the drive motor in meters per second
      */
-    public double getSpeed() {
+    @Override
+    public double getVelocity() {
         return driveEncoder.getVelocity();
     }
 
@@ -106,5 +102,11 @@ public class CANSparkMaxModule extends SwerveModule {
      */
     public double getPercentOutput() {
         return driveMotor.get();
+    }
+
+    @Override
+    public void setDriveVoltage(double voltage) {
+        // TODO Auto-generated method stub
+        driveMotor.setVoltage(voltage);
     }
 }
