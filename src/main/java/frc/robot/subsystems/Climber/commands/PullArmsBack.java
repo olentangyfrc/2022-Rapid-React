@@ -5,7 +5,6 @@ import frc.robot.subsystems.Climber.Climber;
 
 public class PullArmsBack extends CommandBase{
     private Climber climber;
-    private boolean stop;
 
     public PullArmsBack(Climber cb) {
         climber = cb;
@@ -14,7 +13,6 @@ public class PullArmsBack extends CommandBase{
 
     @Override
     public void initialize(){
-        stop = false;
     }
 
     @Override
@@ -24,16 +22,12 @@ public class PullArmsBack extends CommandBase{
 
     @Override
     public void end(boolean interrupted){
-        stop = true;
+        climber.stopRightLinearActuator();
+        climber.stopLeftLinearActuator();
     }
 
     @Override
     public boolean isFinished(){
-        if(Math.abs(climber.getRightPotentiometerPosition() - climber.getMinBackPosition()) < 0.2){
-            climber.stopRightLinearActuator();
-            climber.stopLeftLinearActuator();
-            return true;
-        }
-        return false;
+        return (Math.abs(climber.getRightPotentiometerPosition() - climber.getRightMinBackPosition()) < 0.2 && Math.abs(climber.getLeftPotentiometerPosition() - climber.getLeftMinBackPosition()) < 0.2);
     }
 }

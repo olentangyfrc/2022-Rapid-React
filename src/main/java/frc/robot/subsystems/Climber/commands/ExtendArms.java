@@ -5,7 +5,6 @@ import frc.robot.subsystems.Climber.Climber;
 
 public class ExtendArms extends CommandBase{
     private Climber climber;
-    private boolean stop;
 
     public ExtendArms(Climber cb) {
         climber = cb;
@@ -14,7 +13,6 @@ public class ExtendArms extends CommandBase{
 
     @Override
     public void initialize(){
-        stop = false;
     }
 
     @Override
@@ -24,15 +22,11 @@ public class ExtendArms extends CommandBase{
 
     @Override
     public void end(boolean interrupted){
-        stop = true;
+        climber.stopWinch();
     }
 
     @Override
     public boolean isFinished(){
-        if(Math.abs(climber.getMaxHeight() - climber.getWinchPosition()) <= 0.1) {
-            climber.stopWinch();
-            return true;
-        }
-        return false;
+        return Math.abs(climber.getMaxHeight() - climber.getWinchPosition()) <= 0.1;
     }
 }

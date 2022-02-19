@@ -12,6 +12,8 @@ import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import java.util.logging.Logger;
@@ -20,9 +22,9 @@ public class Climber extends SubsystemBase{
     private static Logger logger = Logger.getLogger(Climber.class.getName());
 
     private CANSparkMax rightLinearActuator;
-    private final int LIN_ACT1_CAN = 61;
+    private final int RIGHT_LIN_ACT_CAN = 61;
     private CANSparkMax leftLinearActuator;
-    private final int LIN_ACT2_CAN = 6;
+    private final int LEFT_LIN_ACT_CAN = 6;
     private final CANSparkMaxLowLevel.MotorType MOTOR_TYPE = CANSparkMaxLowLevel.MotorType.kBrushless;
     private final CANSparkMax.IdleMode MOTOR_MODE = CANSparkMax.IdleMode.kBrake;
     private final SparkMaxAnalogSensor.Mode POTENTIOMETER_MODE = SparkMaxAnalogSensor.Mode.kAbsolute;
@@ -31,8 +33,11 @@ public class Climber extends SubsystemBase{
     private SparkMaxPIDController rightPidController, leftPidController;
     private double kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM, maxVel, minVel, maxAcc;
 
-    private int maxForwardPosition;
-    private int minBackPosition;
+    private int maxRightForwardPosition;
+    private int minRightBackPosition;
+
+    private int maxLeftForwardPosition;
+    private int minLeftBackPosition;
 
     private WPI_TalonFX talon;
     private final int TALON_CAN = 10;
@@ -43,7 +48,8 @@ public class Climber extends SubsystemBase{
     private double minHeight;
 
     private double actuatorLengthInPercent;
-    private double actuatorLengthInPosition;
+    private double rightActuatorLengthInPosition;
+    private double leftActuatorLengthInPosition;
 
     private Compressor compressor;
     private final int PCMCANID = 0;
@@ -54,9 +60,11 @@ public class Climber extends SubsystemBase{
     private int leftPinForward;
     private int leftPinReverse;
 
+    private ShuffleboardTab tab = Shuffleboard.getTab("Climber");
+
     public void init() {
-        rightLinearActuator = new CANSparkMax(LIN_ACT1_CAN, MOTOR_TYPE);
-        leftLinearActuator = new CANSparkMax(LIN_ACT2_CAN, MOTOR_TYPE);
+        rightLinearActuator = new CANSparkMax(RIGHT_LIN_ACT_CAN, MOTOR_TYPE);
+        leftLinearActuator = new CANSparkMax(LEFT_LIN_ACT_CAN, MOTOR_TYPE);
         rightLinearActuator.setIdleMode(MOTOR_MODE);
         leftLinearActuator.setIdleMode(MOTOR_MODE);
         rightPotentiometer = rightLinearActuator.getAnalog(POTENTIOMETER_MODE);
@@ -68,8 +76,6 @@ public class Climber extends SubsystemBase{
         rightPidController = rightLinearActuator.getPIDController();
         leftPidController = leftLinearActuator.getPIDController();
 
-        leftLinearActuator.follow(rightLinearActuator);
-
         kP = 0.2;
         kI = 0;
         kD = 0;
@@ -79,8 +85,11 @@ public class Climber extends SubsystemBase{
         kMaxOutput = 1;
         kMinOutput = -1;
 
-        maxForwardPosition = 4;
-        minBackPosition = 1;
+        maxRightForwardPosition = 4;
+        minRightBackPosition = 1;
+
+        maxLeftForwardPosition = 4;
+        minLeftBackPosition = 1;
 
         //maxVel = 0;
         //maxAcc = 0;
@@ -107,10 +116,11 @@ public class Climber extends SubsystemBase{
         maxHeight = 10;
         minHeight = 0.5;
 
-        verticalPercentOutput = 0.05;
+        verticalPercentOutput = 0.1;
         
         actuatorLengthInPercent = 0.5;
-        actuatorLengthInPosition = 2;
+        rightActuatorLengthInPosition = 2;
+        leftActuatorLengthInPosition = 2;
 
         rightPinForward = 0;
         rightPinReverse = 1;
@@ -122,26 +132,27 @@ public class Climber extends SubsystemBase{
         leftPin = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, rightPinForward, rightPinReverse);
         rightPin.set(Value.kOff);
         leftPin.set(Value.kOff);
+
+        tab.addNumber("Right Potentiometer Position", () -> getRightPotentiometerPosition());
+        tab.addNumber("Left Potentiometer Position", () -> getLeftPotentiometerPosition());
     }
 
     public void pushArmsForward() {
-        rightPidController.setReference(maxForwardPosition, CANSparkMax.ControlType.kPosition);
+        rightPidController.setReference(maxRightForwardPosition, CANSparkMax.ControlType.kPosition);
+        rightPidController.setReference(maxLeftForwardPosition, CANSparkMax.ControlType.kPosition);
     }
 
     public void pullArmsBack() {
-        rightPidController.setReference(minBackPosition, CANSparkMax.ControlType.kPosition);
+        rightPidController.setReference(minRightBackPosition, CANSparkMax.ControlType.kPosition);
+        rightPidController.setReference(minLeftBackPosition, CANSparkMax.ControlType.kPosition);
     }
 
     public void extendArms() {
-        while(getWinchPosition() < maxHeight) {
-            talon.set(verticalPercentOutput);
-        }
+        talon.set(verticalPercentOutput);
     }
 
     public void retractArms() {
-        while(getWinchPosition() > minHeight) {
-            talon.set(verticalPercentOutput);
-        }
+        talon.set(-verticalPercentOutput);
     }
 
     public void latchOntoBar(){
@@ -196,12 +207,20 @@ public class Climber extends SubsystemBase{
         return minHeight;
     }
 
-    public double getMaxForwardPosition() {
-        return maxForwardPosition;
+    public double getRightMaxForwardPosition() {
+        return maxRightForwardPosition;
     }
 
-    public double getMinBackPosition() {
-        return minBackPosition;
+    public double getLeftMaxForwardPosition() {
+        return maxLeftForwardPosition;
+    }
+
+    public double getRightMinBackPosition() {
+        return minRightBackPosition;
+    }
+
+    public double getLeftMinBackPosition() {
+        return minLeftBackPosition;
     }
 
     public void setLinearActuatorLengthInPercent(double percent){
@@ -214,12 +233,21 @@ public class Climber extends SubsystemBase{
         return actuatorLengthInPercent;
     }
 
-    public double setAndGetLinearActuatorPositionFromPercent(){
-        actuatorLengthInPosition = actuatorLengthInPercent * (maxForwardPosition - minBackPosition) + minBackPosition;
-        return actuatorLengthInPosition;
+    public double setAndGetRightLinearActuatorPositionFromPercent(){
+        rightActuatorLengthInPosition = actuatorLengthInPercent * (maxRightForwardPosition - minRightBackPosition) + minRightBackPosition;
+        return rightActuatorLengthInPosition;
     }
 
-    public double getLinearActuatorLengthInPosition(){
-        return actuatorLengthInPosition;
+    public double setAndGetLeftLinearActuatorPositionFromPercent(){
+        leftActuatorLengthInPosition = actuatorLengthInPercent * (maxLeftForwardPosition - minLeftBackPosition) + minLeftBackPosition;
+        return leftActuatorLengthInPosition;
+    }
+
+    public double getRightLinearActuatorLengthInPosition(){
+        return rightActuatorLengthInPosition;
+    }
+
+    public double getLeftLinearActuatorLengthInPosition(){
+        return leftActuatorLengthInPosition;
     }
 }

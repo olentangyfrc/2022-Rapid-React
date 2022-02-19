@@ -50,7 +50,10 @@ public class SubsystemFactory {
     "00:80:2F:25:B4:CA", BotType.CALIFORNIA,
     "00:80:2F:28:64:39", BotType.RIO99,
     "00:80:2F:28:64:38", BotType.RIO99,
-    "00:80:2F:17:F8:3F", BotType.RIO1
+    "00:80:2F:17:F8:3F", BotType.RIO1,
+    "00:80:2F:17:D7:4B", BotType.RIO2,
+    "00:80:2F:27:04:C7", BotType.RIO3,
+    "00:80:2F:27:04:C6", BotType.RIO3
   );
 
   private BotType botType;
@@ -183,6 +186,20 @@ public class SubsystemFactory {
   }
 
   /**
+   * Initializes the RIO2 subsystems
+   */
+  public void initRIO2() {
+    
+  }
+
+  /**
+   * Initializes the RIO3 subsystems
+   */
+  public void initRIO3() {
+    
+  }
+
+  /**
    * Initializes the RIO1 subsystems
    * @throws Exception
    */
@@ -191,12 +208,12 @@ public class SubsystemFactory {
     driveTrain = new DrivetrainSubsystem();
 
     climber.init();
-    io.bind(new PushArmsForward(climber), Button.kLeftBumper, StickButton.LEFT_6, ButtonActionType.WHEN_PRESSED);
-    io.bind(new PullArmsBack(climber), Button.kLeftStick, StickButton.LEFT_7, ButtonActionType.WHEN_PRESSED);
-    io.bind(new ExtendArms(climber), Button.kRightBumper, StickButton.LEFT_8, ButtonActionType.WHEN_PRESSED);
-    io.bind(new RetractArms(climber), Button.kRightStick, StickButton.LEFT_9, ButtonActionType.WHEN_PRESSED);
-    io.bind(new LatchOntoBar(climber), Button.kX, StickButton.LEFT_10, ButtonActionType.WHEN_PRESSED);
-    io.bind(new LetGoOfBar(climber), Button.kB, StickButton.LEFT_11, ButtonActionType.WHEN_PRESSED);
+    io.bind(new PushArmsForward(climber), Button.kLeftBumper, StickButton.LEFT_6, ButtonActionType.WHEN_HELD);
+    io.bind(new PullArmsBack(climber), Button.kLeftStick, StickButton.LEFT_7, ButtonActionType.WHEN_HELD);
+    io.bind(new ExtendArms(climber), Button.kRightBumper, StickButton.LEFT_8, ButtonActionType.WHEN_HELD);
+    io.bind(new RetractArms(climber), Button.kRightStick, StickButton.LEFT_9, ButtonActionType.WHEN_HELD);
+    io.bind(new LatchOntoBar(climber), Button.kX, StickButton.LEFT_10, ButtonActionType.WHEN_HELD);
+    io.bind(new LetGoOfBar(climber), Button.kB, StickButton.LEFT_11, ButtonActionType.WHEN_HELD);
 
     //climb command group
     //io.bind(new Climb(climber), Button.kX, StickButton.RIGHT_11, ButtonActionType.WHEN_PRESSED);
@@ -280,6 +297,8 @@ public class SubsystemFactory {
     CALIFORNIA,
     RIO99,
     RIO1,
+    RIO2, 
+    RIO3,
     UNRECOGNIZED
   }
 }

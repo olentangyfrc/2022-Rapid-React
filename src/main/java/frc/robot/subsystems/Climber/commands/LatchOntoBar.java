@@ -5,7 +5,6 @@ import frc.robot.subsystems.Climber.Climber;
 
 public class LatchOntoBar extends CommandBase{
     private Climber climber;
-    private boolean stop;
 
     public LatchOntoBar(Climber cb) {
         climber = cb;
@@ -14,7 +13,6 @@ public class LatchOntoBar extends CommandBase{
 
     @Override
     public void initialize(){
-        stop = false;
     }
 
     @Override
@@ -24,7 +22,6 @@ public class LatchOntoBar extends CommandBase{
 
     @Override
     public void end(boolean interrupted){
-        stop = true;
     }
 
     @Override

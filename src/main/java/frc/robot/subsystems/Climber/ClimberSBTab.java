@@ -21,6 +21,10 @@ public class ClimberSBTab {
 
         rightPotentiometerPosition = tab.add("Right Potentiometer Position", 0.0).getEntry();
         leftPotentiometerPosition = tab.add("Left Potentiometer Position", 0.0).getEntry();
+
+        tab.addNumber("Right Potentiometer Position", climber::getRightPotentiometerPosition);
+        tab.addNumber("Left Potentiometer Position", climber::getLeftPotentiometerPosition);
+
         winchPercentOutput = tab.add("Set Winch Percent Output (-1 to 1)", 0.05).getEntry();
         percentActuatorLength = tab.add("Set Actuator Length Target with Percentage", 0.0).getEntry();
         positionActuatorLength = tab.add("Actuator Length Target in Position", 0.0).getEntry();
@@ -32,6 +36,5 @@ public class ClimberSBTab {
         leftPotentiometerPosition.setDouble(climber.getLeftPotentiometerPosition());
         climber.setVerticalPercentOutput(winchPercentOutput.getDouble(0.0));
         climber.setLinearActuatorLengthInPercent(percentActuatorLength.getDouble(0.0));
-        positionActuatorLength.setDouble(climber.setAndGetLinearActuatorPositionFromPercent());
     }
 }
