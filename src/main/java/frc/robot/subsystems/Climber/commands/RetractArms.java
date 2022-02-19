@@ -29,7 +29,8 @@ public class RetractArms extends CommandBase{
 
     @Override
     public boolean isFinished(){
-        if(climber.getMinHeight() == climber.getWinchPosition()) {
+        if(Math.abs(climber.getMinHeight() - climber.getWinchPosition()) <= 0.1) {
+            climber.stopWinch();
             return true;
         }
         return false;

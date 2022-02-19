@@ -4,17 +4,22 @@
 
 package frc.robot.subsystems;
 
-<<<<<<< HEAD
 import edu.wpi.first.wpilibj.PowerDistribution;
 import frc.robot.subsystems.Climber.Climber;
-=======
+import frc.robot.subsystems.Climber.commands.Climb;
+import frc.robot.subsystems.Climber.commands.ExtendArms;
+import frc.robot.subsystems.Climber.commands.LatchOntoBar;
+import frc.robot.subsystems.Climber.commands.LetGoOfBar;
+import frc.robot.subsystems.Climber.commands.PullArmsBack;
+import frc.robot.subsystems.Climber.commands.PushArmsForward;
+import frc.robot.subsystems.Climber.commands.RetractArms;
+
 import java.net.NetworkInterface;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
->>>>>>> e89104b4b2c8f44eca4332e968d907dec585ad94
 
 import edu.wpi.first.wpilibj.XboxController.Button;
 // Project imports:
@@ -32,10 +37,8 @@ public class SubsystemFactory {
   // SubsystemFactory is a singleton, so keep a static instance.
   private static SubsystemFactory instance;
 
-<<<<<<< HEAD
   private PowerDistribution pdp;
   private Climber climber;
-=======
   private Logger logger = Logger.getLogger("Subsystem Factory");
 
   /**
@@ -46,12 +49,12 @@ public class SubsystemFactory {
     "00:80:2F:30:DB:F9", BotType.COVID,
     "00:80:2F:25:B4:CA", BotType.CALIFORNIA,
     "00:80:2F:28:64:39", BotType.RIO99,
-    "00:80:2F:28:64:38", BotType.RIO99
+    "00:80:2F:28:64:38", BotType.RIO99,
+    "00:80:2F:17:F8:3F", BotType.RIO1
   );
 
   private BotType botType;
   private Telemetry telemetry;
->>>>>>> e89104b4b2c8f44eca4332e968d907dec585ad94
 
   // Variables for all subsystems:
   private PortManager portManager;
@@ -93,6 +96,9 @@ public class SubsystemFactory {
         break;
       case RIO99:
         initRIO99();
+        break;
+      case RIO1:
+        initRIO1();
         break;
       default:
         logger.info("Unrecognized bot");
@@ -173,6 +179,27 @@ public class SubsystemFactory {
    * Initializes the RIO99 subsystems
    */
   public void initRIO99() {
+    
+  }
+
+  /**
+   * Initializes the RIO1 subsystems
+   * @throws Exception
+   */
+  public void initRIO1() throws Exception{
+    climber = new Climber();
+    driveTrain = new DrivetrainSubsystem();
+
+    climber.init();
+    io.bind(new PushArmsForward(climber), Button.kLeftBumper, StickButton.LEFT_6, ButtonActionType.WHEN_PRESSED);
+    io.bind(new PullArmsBack(climber), Button.kLeftStick, StickButton.LEFT_7, ButtonActionType.WHEN_PRESSED);
+    io.bind(new ExtendArms(climber), Button.kRightBumper, StickButton.LEFT_8, ButtonActionType.WHEN_PRESSED);
+    io.bind(new RetractArms(climber), Button.kRightStick, StickButton.LEFT_9, ButtonActionType.WHEN_PRESSED);
+    io.bind(new LatchOntoBar(climber), Button.kX, StickButton.LEFT_10, ButtonActionType.WHEN_PRESSED);
+    io.bind(new LetGoOfBar(climber), Button.kB, StickButton.LEFT_11, ButtonActionType.WHEN_PRESSED);
+
+    //climb command group
+    //io.bind(new Climb(climber), Button.kX, StickButton.RIGHT_11, ButtonActionType.WHEN_PRESSED);
   }
   
   // Getter methods for all of the subsystems:
@@ -252,6 +279,7 @@ public class SubsystemFactory {
     COVID,
     CALIFORNIA,
     RIO99,
+    RIO1,
     UNRECOGNIZED
   }
 }

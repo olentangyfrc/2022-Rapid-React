@@ -29,7 +29,8 @@ public class ExtendArms extends CommandBase{
 
     @Override
     public boolean isFinished(){
-        if(climber.getMaxHeight() == climber.getWinchPosition()) {
+        if(Math.abs(climber.getMaxHeight() - climber.getWinchPosition()) <= 0.1) {
+            climber.stopWinch();
             return true;
         }
         return false;

@@ -29,7 +29,9 @@ public class PullArmsBack extends CommandBase{
 
     @Override
     public boolean isFinished(){
-        if(climber.getMinBackPosition() == climber.getPotentiometer1Position() && climber.getMinBackPosition() == climber.getPotentiometer2Position()){
+        if(Math.abs(climber.getRightPotentiometerPosition() - climber.getMinBackPosition()) < 0.2){
+            climber.stopRightLinearActuator();
+            climber.stopLeftLinearActuator();
             return true;
         }
         return false;
