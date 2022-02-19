@@ -131,27 +131,27 @@ public class SubsystemFactory {
   public void initCALIFORNIA() throws Exception{
     HashMap<String, Integer> portAssignments = new HashMap<String, Integer>();
     portAssignments.put("FL.SwerveMotor", 17);
-    portAssignments.put("FL.DriveMotor", 6);
+    portAssignments.put("FL.DriveMotor", 42);
     portAssignments.put("FL.Encoder", 0);
     
 
     portAssignments.put("FR.SwerveMotor", 14);
-    portAssignments.put("FR.DriveMotor", 9);
+    portAssignments.put("FR.DriveMotor", 41);
     portAssignments.put("FR.Encoder", 1);
 
     portAssignments.put("BL.SwerveMotor", 15);
-    portAssignments.put("BL.DriveMotor", 10);
+    portAssignments.put("BL.DriveMotor", 43);
     portAssignments.put("BL.Encoder", 2);
 
     portAssignments.put("BR.SwerveMotor", 59);
-    portAssignments.put("BR.DriveMotor", 60);
+    portAssignments.put("BR.DriveMotor", 40);
     portAssignments.put("BR.Encoder", 3);
 
     HashMap<String, Double> wheelOffsets = new HashMap<String, Double>();
-    wheelOffsets.put("FL", 149.58);
-    wheelOffsets.put("FR", 47.109);
-    wheelOffsets.put("BL", 87.45);
-    wheelOffsets.put("BR", 96.76);
+    wheelOffsets.put("FL", 51.59);
+    wheelOffsets.put("FR", 322.2);
+    wheelOffsets.put("BL", 292.23);
+    wheelOffsets.put("BR", 247.93);
 
     
     // Create and initialize all subsystems:

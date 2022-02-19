@@ -15,8 +15,11 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 // Package imports
@@ -41,6 +44,10 @@ public abstract class DrivetrainSubsystem extends SubsystemBase {
     // Distance from center of wheel to center of wheel across the front of the bot in meters
     public static final double TRACK_WIDTH = 0.4445;
 
+    public static final double MAX_LINEAR_SPEED = 5;
+    // In radians per second
+    public static final double MAX_ROTATION_SPEED = 8;
+
     private DriveCommand driveCommand;
 
     // Used to convert from ChassisSpeeds to SwerveModuleStates
@@ -51,18 +58,14 @@ public abstract class DrivetrainSubsystem extends SubsystemBase {
     private Logger logger = Logger.getLogger("DrivetrainSubsystem");
 
     // PID controller to prevent unintentional rotation when there is no rotation input. Takes in degrees nd outputs percent output.
-    private PIDController anglePid = new PIDController(0.004, 0, 0);
+    private PIDController anglePid = new PIDController(0.04, 0, 0);
 
     // To be used as the setpoint for the angle PID controller. This is in degrees.
     private double storedRotation;
 
     private boolean isFieldOriented = true;
 
-    private SwerveDrivePoseEstimator poseEstimator = new SwerveDrivePoseEstimator(new Rotation2d(), new Pose2d(), kinematics,
-        new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0.02, 0.02, 0.01), 
-        new MatBuilder<>(Nat.N1(), Nat.N1()).fill(0.02),
-        new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0.1, 0.1, 0.01)
-    );
+    private SwerveDrivePoseEstimator poseEstimator;
 
     /**
      * Initialize the drivetrain subsystem
@@ -81,6 +84,12 @@ public abstract class DrivetrainSubsystem extends SubsystemBase {
             new Translation2d(WHEEL_BASE / 2, TRACK_WIDTH / 2), // FR
             new Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2), // BL
             new Translation2d(-WHEEL_BASE / 2, TRACK_WIDTH / 2) // BR
+        );
+
+        poseEstimator = new SwerveDrivePoseEstimator(new Rotation2d(), new Pose2d(), kinematics,
+            new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0.02, 0.02, 0.01), 
+            new MatBuilder<>(Nat.N1(), Nat.N1()).fill(0.02),
+            new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0.1, 0.1, 0.01)
         );
 
         // Add the encoder readings to shuffleboard
@@ -105,7 +114,7 @@ public abstract class DrivetrainSubsystem extends SubsystemBase {
      * <p>
      * This should be called periodically even if the input is not changing.
      * 
-     * @param speeds Chasis speeds with vx and vy and omega between -1 and 1
+     * @param speeds Chassis speeds with vx and vy <= max linear speed and omega < max rotation speed
     */
     public void drive(ChassisSpeeds speeds) {
         
@@ -122,16 +131,21 @@ public abstract class DrivetrainSubsystem extends SubsystemBase {
         if(speeds.omegaRadiansPerSecond == 0) {
             // Dont move if we have no input.
             if(speeds.vxMetersPerSecond != 0 || speeds.vyMetersPerSecond != 0) {
-                speeds.omegaRadiansPerSecond = MathUtil.clamp(anglePid.calculate(gyro.getAngle(), storedRotation), -1, 1);
+                speeds.omegaRadiansPerSecond = MathUtil.clamp(anglePid.calculate(gyro.getAngle(), storedRotation), -MAX_ROTATION_SPEED, MAX_ROTATION_SPEED);
             }
         } else {
             storedRotation = gyro.getAngle();
         }
 
         SwerveModuleState[] states = kinematics.toSwerveModuleStates(speeds);
-        SwerveDriveKinematics.desaturateWheelSpeeds(states, 1); // Normalize wheel speeds so we don't go faster than 100%
+        SwerveDriveKinematics.desaturateWheelSpeeds(states, MAX_LINEAR_SPEED); // Normalize wheel speeds so we don't go faster than 100%
 
         poseEstimator.update(gyro.getRotation2d(), states);
+
+        SmartDashboard.putNumber("FL Error", frontLeftModule.getVelocity() - states[0].speedMetersPerSecond);
+        SmartDashboard.putNumber("FR Error", frontRightModule.getVelocity() - states[1].speedMetersPerSecond);
+        SmartDashboard.putNumber("BL Error", backLeftModule.getVelocity() - states[2].speedMetersPerSecond);
+        SmartDashboard.putNumber("BR Error", backRightModule.getVelocity() - states[3].speedMetersPerSecond);
 
         // Update SwerveModule states
         frontLeftModule.updateState(states[0]);

@@ -33,15 +33,12 @@ public class CANSparkMaxModule extends SwerveModule {
      * @param angleEncoderChannel Analog port for the angle encoder
      * @param angleOffset The angle in degrees by which to offset the angle of the wheel.
      */
-    public CANSparkMaxModule(int angleMotorChannel, int driveMotorChannel, int angleEncoderChannel, double angleOffset) {
+    public CANSparkMaxModule(int angleMotorChannel, int driveMotorChannel, int angleEncoderChannel, double angleOffset, double maxSpeed) {
         angleMotor = new CANSparkMax(angleMotorChannel, MotorType.kBrushless);
         driveMotor = new CANSparkMax(driveMotorChannel, MotorType.kBrushless);
 
         anglePid = new PIDController(0.5, 0, 0.0001);
         anglePid.enableContinuousInput(0, 2 * Math.PI);
-
-        velocityController = new PIDController(1, 0, 0);
-        velocityFeedforward = new SimpleMotorFeedforward(0, 0, 0);
 
         // Make the angle motor turn clockwise with a positive input
         angleMotor.setInverted(true);
@@ -55,6 +52,12 @@ public class CANSparkMaxModule extends SwerveModule {
         // Set the velocity conversion factor to the circumference of the wheel
         driveEncoder.setVelocityConversionFactor(2 * Math.PI * WHEEL_RADIUS);
 
+        velocityFactorPID = new PIDController(0.01, 0, 0);
+        velocityFactorPID.setSetpoint(0); // We want the error to be 0
+
+        velocityConversionFactor = 1.7799;
+        velocityConversionOffset = -0.4126;
+        this.maxSpeed = maxSpeed;
         this.angleOffset = angleOffset;
     }
 

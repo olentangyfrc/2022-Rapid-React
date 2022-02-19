@@ -5,6 +5,7 @@
 package frc.robot.subsystems.drivetrain.modules;
 
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.revrobotics.CANSparkMax;
@@ -14,6 +15,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.AnalogInput;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 
 /**
  * A swerve module using a Falcon 500 as drive motor, a NEO as angle motor, and an encoder for angle.
@@ -28,24 +30,28 @@ public class SingleFalconModule extends SwerveModule {
 
     private AnalogInput angleEncoder;
 
-    public SingleFalconModule(int angleMotorChannel, int driveMotorChannel, int angleEncoderChannel, double angleOffset) {
+    public SingleFalconModule(int angleMotorChannel, int driveMotorChannel, int angleEncoderChannel, double angleOffset, double maxSpeed) {
         angleMotor = new CANSparkMax(angleMotorChannel, MotorType.kBrushless);
         driveMotor = new WPI_TalonFX(driveMotorChannel);
 
         angleMotor.setInverted(true);
 
-        velocityController = new PIDController(1, 0, 0);
-        velocityFeedforward = new SimpleMotorFeedforward(0, 0, 0);
-
+        driveMotor.configFactoryDefault();
         driveMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
-    
-        anglePid.setTolerance(0.001);
+        driveMotor.setNeutralMode(NeutralMode.Brake);
+
 
         angleEncoder = new AnalogInput(angleEncoderChannel);
 
-        anglePid = new PIDController(0.5, 0, 0.0001);
+        anglePid = new PIDController(0.5, 0, 0);
         anglePid.enableContinuousInput(0.0, 2 * Math.PI);
 
+        velocityFactorPID = new PIDController(0.01, 0, 0);
+        velocityFactorPID.setSetpoint(0); // We want the error to be 0
+
+        velocityConversionFactor = 1.8;
+        velocityConversionOffset = -0.5;
+        this.maxSpeed = maxSpeed;
         this.angleOffset = angleOffset;
     }
 
@@ -85,7 +91,7 @@ public class SingleFalconModule extends SwerveModule {
      */
     @Override
     public double getVelocity() {
-        return driveMotor.getSelectedSensorVelocity(0);
+        return driveMotor.getSelectedSensorVelocity(0) / 2048 * 2 * WHEEL_RADIUS * Math.PI;
     }
 
     @Override

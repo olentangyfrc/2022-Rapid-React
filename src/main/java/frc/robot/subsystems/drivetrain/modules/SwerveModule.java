@@ -4,11 +4,13 @@
 
 package frc.robot.subsystems.drivetrain.modules;
 
+import edu.wpi.first.math.MathUtil;
 // WPI imports:
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * A swerve module with an angle motor and a drive motor.
@@ -22,14 +24,21 @@ public abstract class SwerveModule {
     // Ticks per revolution of the angle encoder.
     public static final double ANGLE_ENCODER_TICKS = 4096;
 
+    // Any voltage bellow this will be set to this.
+    public static final double NOMINAL_VOLTAGE = 0.9;
+    public static final double CORRECTION_LIMIT = 0.001;
+
     // The angle to offset this modules angle by in order to have the bot's forward and this module's forward match
     public double angleOffset;
 
     // PID controller for wheel angle
     public PIDController anglePid;
 
-    public SimpleMotorFeedforward velocityFeedforward;
-    public PIDController velocityController;
+    public double velocityConversionFactor;
+    public double velocityConversionOffset;
+    public PIDController velocityFactorPID;
+
+    public double maxSpeed;
 
     /**
      * Set the angle of the module in radians
@@ -61,7 +70,19 @@ public abstract class SwerveModule {
      * @param velocity
      */
     public void setDriveVelocity(double velocity) {
-        setDriveVoltage(velocityController.calculate(getVelocity(), velocity) + velocityFeedforward.calculate(velocity));
+        velocity = MathUtil.clamp(velocity, -maxSpeed, maxSpeed);
+        SmartDashboard.putNumber("Conversion Factor", velocityConversionFactor);
+
+        double voltage = velocity * velocityConversionFactor + Math.copySign(velocityConversionOffset, velocity);
+
+        if(Math.abs(voltage) < NOMINAL_VOLTAGE) {
+            voltage = 0;
+        } else {
+            // Do not affect conversion factor if bellow nominal voltage.
+            velocityConversionFactor += velocityFactorPID.calculate(MathUtil.clamp(Math.abs(getVelocity()) - Math.abs(velocity), -CORRECTION_LIMIT, CORRECTION_LIMIT));
+        }
+
+        setDriveVoltage(voltage);
     }
 
     /**

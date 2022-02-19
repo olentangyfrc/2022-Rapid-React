@@ -5,11 +5,19 @@
 package frc.robot;
 
 
+import java.util.Map;
+
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 
 import frc.robot.subsystems.SubsystemFactory;
+import frc.robot.subsystems.drivetrain.SingleFalconDrivetrain;
+import frc.robot.subsystems.drivetrain.modules.SingleFalconModule;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -18,22 +26,22 @@ import frc.robot.subsystems.SubsystemFactory;
  * project.
  */
 public class Robot extends TimedRobot {
-
+  
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
    */
-
+  
   @Override
   public void robotInit() {
 
     
     try {
-      SubsystemFactory.getInstance().init();
-    } catch (Exception exception) {
-      exception.printStackTrace();
+        SubsystemFactory.getInstance().init();
+      } catch (Exception exception) {
+          exception.printStackTrace();
     }
-
+    
 
   }
 
@@ -68,6 +76,5 @@ public class Robot extends TimedRobot {
 
   @Override
   public void testPeriodic() {
-    CommandScheduler.getInstance().run();
   }
 }
