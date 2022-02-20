@@ -24,7 +24,7 @@ import frc.robot.subsystems.drivetrain.commands.DriveCommand;
 import frc.robot.subsystems.drivetrain.modules.SwerveModule;
 import frc.robot.subsystems.telemetry.Pigeon;
 
-public abstract class DrivetrainSubsystem extends SubsystemBase {
+public abstract class SwerveDrivetrain extends SubsystemBase {
 
     // Declaring Swerve Modules
     public SwerveModule frontLeftModule;
@@ -45,7 +45,7 @@ public abstract class DrivetrainSubsystem extends SubsystemBase {
 
     // Used to convert from ChassisSpeeds to SwerveModuleStates
     private SwerveDriveKinematics kinematics;
-    
+
     private Logger logger = Logger.getLogger("DrivetrainSubsystem");
     
     // Odometry
