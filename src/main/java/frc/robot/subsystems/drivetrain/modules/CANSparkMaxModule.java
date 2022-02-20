@@ -5,11 +5,10 @@
 package frc.robot.subsystems.drivetrain.modules;
 
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.RelativeEncoder;
 
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.AnalogInput;
 
@@ -111,5 +110,37 @@ public class CANSparkMaxModule extends SwerveModule {
     public void setDriveVoltage(double voltage) {
         // TODO Auto-generated method stub
         driveMotor.setVoltage(voltage);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        CANSparkMaxModule other = (CANSparkMaxModule) obj;
+        if (angleEncoder == null) {
+            if (other.angleEncoder != null)
+                return false;
+        } else if (!angleEncoder.equals(other.angleEncoder))
+            return false;
+        if (angleMotor == null) {
+            if (other.angleMotor != null)
+                return false;
+        } else if (!angleMotor.equals(other.angleMotor))
+            return false;
+        if (driveEncoder == null) {
+            if (other.driveEncoder != null)
+                return false;
+        } else if (!driveEncoder.equals(other.driveEncoder))
+            return false;
+        if (driveMotor == null) {
+            if (other.driveMotor != null)
+                return false;
+        } else if (!driveMotor.equals(other.driveMotor))
+            return false;
+        return true;
     }
 }

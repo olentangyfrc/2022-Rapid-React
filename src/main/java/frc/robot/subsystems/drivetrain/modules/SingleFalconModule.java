@@ -6,16 +6,13 @@ package frc.robot.subsystems.drivetrain.modules;
 
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.AnalogInput;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 
 /**
  * A swerve module using a Falcon 500 as drive motor, a NEO as angle motor, and an encoder for angle.
@@ -99,4 +96,31 @@ public class SingleFalconModule extends SwerveModule {
         driveMotor.setVoltage(voltage);
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        SingleFalconModule other = (SingleFalconModule) obj;
+        if (angleEncoder == null) {
+            if (other.angleEncoder != null)
+                return false;
+        } else if (!angleEncoder.equals(other.angleEncoder))
+            return false;
+        if (angleMotor == null) {
+            if (other.angleMotor != null)
+                return false;
+        } else if (!angleMotor.equals(other.angleMotor))
+            return false;
+        if (driveMotor == null) {
+            if (other.driveMotor != null)
+                return false;
+        } else if (!driveMotor.equals(other.driveMotor))
+            return false;
+        return true;
+    }
+    
 }

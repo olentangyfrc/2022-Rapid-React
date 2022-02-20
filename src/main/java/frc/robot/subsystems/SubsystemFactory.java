@@ -16,8 +16,8 @@ import edu.wpi.first.wpilibj.XboxController.Button;
 import frc.robot.subsystems.drivetrain.DrivetrainSubsystem;
 import frc.robot.subsystems.drivetrain.SingleFalconDrivetrain;
 import frc.robot.subsystems.drivetrain.SparkMaxDrivetrain;
-import frc.robot.subsystems.drivetrain.commands.ZeroAngle;
 import frc.robot.subsystems.telemetry.Telemetry;
+import frc.robot.subsystems.telemetry.commands.ZeroGyro;
 import frc.robot.subsystems.IO.ButtonActionType;
 import frc.robot.subsystems.IO.StickButton;
 
@@ -131,34 +131,34 @@ public class SubsystemFactory {
   public void initCALIFORNIA() throws Exception{
     HashMap<String, Integer> portAssignments = new HashMap<String, Integer>();
     portAssignments.put("FL.SwerveMotor", 17);
-    portAssignments.put("FL.DriveMotor", 42);
+    portAssignments.put("FL.DriveMotor", 41);
     portAssignments.put("FL.Encoder", 0);
     
 
     portAssignments.put("FR.SwerveMotor", 14);
-    portAssignments.put("FR.DriveMotor", 41);
+    portAssignments.put("FR.DriveMotor", 40);
     portAssignments.put("FR.Encoder", 1);
 
     portAssignments.put("BL.SwerveMotor", 15);
-    portAssignments.put("BL.DriveMotor", 43);
+    portAssignments.put("BL.DriveMotor", 42);
     portAssignments.put("BL.Encoder", 2);
 
     portAssignments.put("BR.SwerveMotor", 59);
-    portAssignments.put("BR.DriveMotor", 40);
+    portAssignments.put("BR.DriveMotor", 43);
     portAssignments.put("BR.Encoder", 3);
 
     HashMap<String, Double> wheelOffsets = new HashMap<String, Double>();
-    wheelOffsets.put("FL", 51.59);
-    wheelOffsets.put("FR", 322.2);
-    wheelOffsets.put("BL", 292.23);
-    wheelOffsets.put("BR", 247.93);
+    wheelOffsets.put("FL", 229.7);
+    wheelOffsets.put("FR", 142.77);
+    wheelOffsets.put("BL", 114.2);
+    wheelOffsets.put("BR", 70.84);
 
     
     // Create and initialize all subsystems:
     driveTrain = new SingleFalconDrivetrain();
     driveTrain.init(portAssignments, wheelOffsets);
     
-    io.bind(new ZeroAngle(telemetry.getPigeon(), driveTrain), Button.kY, StickButton.RIGHT_2, ButtonActionType.WHEN_PRESSED);
+    io.bind(new ZeroGyro(telemetry.getPigeon()), Button.kY, StickButton.RIGHT_2, ButtonActionType.WHEN_PRESSED);
   }
 
   /**

@@ -7,9 +7,8 @@ package frc.robot.subsystems.drivetrain;
 import java.util.Map;
 
 import frc.robot.subsystems.PortManager;
-import frc.robot.subsystems.SubsystemFactory;
 import frc.robot.subsystems.PortManager.PortType;
-import frc.robot.subsystems.drivetrain.modules.CANSparkMaxModule;
+import frc.robot.subsystems.SubsystemFactory;
 import frc.robot.subsystems.drivetrain.modules.SingleFalconModule;
 
 /** Add your docs here. */

@@ -21,7 +21,7 @@ import frc.robot.subsystems.SubsystemFactory.BotType;
 // Project imports
 
 /**
- * This subsytem handles all of the user input and output of the robot.
+ * This subsystem handles all of the user input and output of the robot.
  * 
  * TODO: Add button binding functionality
  */
@@ -60,7 +60,7 @@ public class IO extends SubsystemBase {
      */
     public double getStrafe() {
         if(inputMethod.equals(InputMethod.XBOX)) {
-            return filterInput(xbox.getLeftX());
+            return filterInput(-xbox.getLeftX());
         } else {
             return filterInput(leftStick.getX());
         }
@@ -73,7 +73,7 @@ public class IO extends SubsystemBase {
      */
     public double getForward() {
         if(inputMethod.equals(InputMethod.XBOX)) {
-            return filterInput(-xbox.getLeftY());
+            return filterInput(xbox.getLeftY());
         } else {
             return filterInput(-leftStick.getY());
         }
@@ -86,7 +86,7 @@ public class IO extends SubsystemBase {
      */
     public double getRotation() {
         if(inputMethod.equals(InputMethod.XBOX)) {
-            return filterInput(xbox.getRightX());
+            return filterInput(-xbox.getRightX());
         } else {
             return filterInput(rightStick.getX());
         }

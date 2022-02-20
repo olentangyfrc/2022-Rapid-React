@@ -7,10 +7,8 @@ package frc.robot.subsystems.drivetrain.modules;
 import edu.wpi.first.math.MathUtil;
 // WPI imports:
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * A swerve module with an angle motor and a drive motor.
@@ -50,13 +48,6 @@ public abstract class SwerveModule {
         setAnglePercentOutput(output);
     }
 
-    // /**
-    //  * Set the percent output for the drive motor
-    //  * 
-    //  * @param output Percent output for the drive motor [-1, 1]
-    //  */
-    // public abstract void setDrivePercentOutput(double output);
-
     /**
      * Set the percent output for the angle motor
      * 
@@ -70,15 +61,16 @@ public abstract class SwerveModule {
      * @param velocity
      */
     public void setDriveVelocity(double velocity) {
+        // Make sure we don't go faster than we can.
         velocity = MathUtil.clamp(velocity, -maxSpeed, maxSpeed);
-        SmartDashboard.putNumber("Conversion Factor", velocityConversionFactor);
-
+        // Calculate voltage to apply in order to achieve the desired velocity
         double voltage = velocity * velocityConversionFactor + Math.copySign(velocityConversionOffset, velocity);
 
+        // Don't apply voltage less than a certain value.
         if(Math.abs(voltage) < NOMINAL_VOLTAGE) {
             voltage = 0;
         } else {
-            // Do not affect conversion factor if bellow nominal voltage.
+            // Do not affect conversion factor if below nominal voltage.
             velocityConversionFactor += velocityFactorPID.calculate(MathUtil.clamp(Math.abs(getVelocity()) - Math.abs(velocity), -CORRECTION_LIMIT, CORRECTION_LIMIT));
         }
 
@@ -119,11 +111,4 @@ public abstract class SwerveModule {
      * @return the speed of the drive motor in meters per second
      */
     public abstract double getVelocity();
-
-    // /**
-    //  * Get the current percent output of the drive motor
-    //  * 
-    //  * @return the percent output -1 to 1
-    //  */
-    // public abstract double getPercentOutput();
 }

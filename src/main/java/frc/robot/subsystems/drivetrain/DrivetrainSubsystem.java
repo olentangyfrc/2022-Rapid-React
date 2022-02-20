@@ -3,11 +3,9 @@ package frc.robot.subsystems.drivetrain;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import edu.wpi.first.math.MatBuilder;
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.Nat;
 // WPILib imports
-import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.MatBuilder;
+import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -19,17 +17,12 @@ import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
-// Package imports
-import frc.robot.subsystems.PortManager;
-import frc.robot.subsystems.PortManager.PortType;
+import frc.robot.subsystems.SubsystemFactory;
 import frc.robot.subsystems.drivetrain.commands.DriveCommand;
-import frc.robot.subsystems.drivetrain.modules.CANSparkMaxModule;
 import frc.robot.subsystems.drivetrain.modules.SwerveModule;
 import frc.robot.subsystems.telemetry.Pigeon;
-import frc.robot.subsystems.SubsystemFactory;
 
 public abstract class DrivetrainSubsystem extends SubsystemBase {
 
@@ -44,36 +37,29 @@ public abstract class DrivetrainSubsystem extends SubsystemBase {
     // Distance from center of wheel to center of wheel across the front of the bot in meters
     public static final double TRACK_WIDTH = 0.4445;
 
-    public static final double MAX_LINEAR_SPEED = 5;
-    // In radians per second
-    public static final double MAX_ROTATION_SPEED = 8;
+    public static final double MAX_LINEAR_SPEED = 6; // Meters per second
+    public static final double MAX_ROTATION_SPEED = 15.1; // Radians per second
 
+    // Command that calls drive method with user input.
     private DriveCommand driveCommand;
 
     // Used to convert from ChassisSpeeds to SwerveModuleStates
     private SwerveDriveKinematics kinematics;
-
-    private ShuffleboardTab tab = Shuffleboard.getTab("Drive");
-
+    
     private Logger logger = Logger.getLogger("DrivetrainSubsystem");
-
-    // PID controller to prevent unintentional rotation when there is no rotation input. Takes in degrees nd outputs percent output.
-    private PIDController anglePid = new PIDController(0.04, 0, 0);
-
-    // To be used as the setpoint for the angle PID controller. This is in degrees.
-    private double storedRotation;
-
-    private boolean isFieldOriented = true;
-
+    
+    // Odometry
     private SwerveDrivePoseEstimator poseEstimator;
+    private Field2d field = new Field2d();
+    
+    private ShuffleboardTab tab = Shuffleboard.getTab("Drive");
+    private NetworkTableEntry fieldOrientedToggle = tab.add("Field Oriented", true).withWidget(BuiltInWidgets.kToggleButton).getEntry();
 
     /**
      * Initialize the drivetrain subsystem
      */
     public void init(Map<String, Integer> portAssignments, Map<String, Double> wheelOffsets) throws Exception {
         initializeSwerveModules(portAssignments, wheelOffsets);
-
-        anglePid.enableContinuousInput(0.0, 360);
 
         // Create a new drive command to be reused later
         driveCommand = new DriveCommand(this);
@@ -97,8 +83,19 @@ public abstract class DrivetrainSubsystem extends SubsystemBase {
         tab.addNumber("FR angle", () -> frontRightModule.getAngle().getDegrees());
         tab.addNumber("BL angle", () -> backLeftModule.getAngle().getDegrees());
         tab.addNumber("BR angle", () -> backRightModule.getAngle().getDegrees());
+        tab.add(field);
+
     }
 
+    /**
+     * Do not call this from outside of drivetrain!
+     * <p>
+     * Initialize the swerve modules
+     * 
+     * @param portAssignments The ports for the swerve modules
+     * @param wheelOffsets The offsets for the modules
+     * @throws Exception If there is an issue acquiring a port.
+     */
     public abstract void initializeSwerveModules(Map<String, Integer> portAssignments, Map<String, Double> wheelOffsets) throws Exception;
 
     @Override
@@ -119,7 +116,7 @@ public abstract class DrivetrainSubsystem extends SubsystemBase {
     public void drive(ChassisSpeeds speeds) {
         
         Pigeon gyro = SubsystemFactory.getInstance().getTelemetry().getPigeon();
-        if(isFieldOriented) {
+        if(getFieldOriented()) {
             speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
                 speeds.vxMetersPerSecond, 
                 speeds.vyMetersPerSecond,
@@ -128,38 +125,21 @@ public abstract class DrivetrainSubsystem extends SubsystemBase {
             );
         }
 
-        if(speeds.omegaRadiansPerSecond == 0) {
-            // Dont move if we have no input.
-            if(speeds.vxMetersPerSecond != 0 || speeds.vyMetersPerSecond != 0) {
-                speeds.omegaRadiansPerSecond = MathUtil.clamp(anglePid.calculate(gyro.getAngle(), storedRotation), -MAX_ROTATION_SPEED, MAX_ROTATION_SPEED);
-            }
-        } else {
-            storedRotation = gyro.getAngle();
-        }
-
         SwerveModuleState[] states = kinematics.toSwerveModuleStates(speeds);
         SwerveDriveKinematics.desaturateWheelSpeeds(states, MAX_LINEAR_SPEED); // Normalize wheel speeds so we don't go faster than 100%
-
+        
         poseEstimator.update(gyro.getRotation2d(), states);
-
-        SmartDashboard.putNumber("FL Error", frontLeftModule.getVelocity() - states[0].speedMetersPerSecond);
-        SmartDashboard.putNumber("FR Error", frontRightModule.getVelocity() - states[1].speedMetersPerSecond);
-        SmartDashboard.putNumber("BL Error", backLeftModule.getVelocity() - states[2].speedMetersPerSecond);
-        SmartDashboard.putNumber("BR Error", backRightModule.getVelocity() - states[3].speedMetersPerSecond);
+        field.setRobotPose(
+            poseEstimator.getEstimatedPosition().getX(),
+            poseEstimator.getEstimatedPosition().getY(),
+            gyro.getRotation2d()
+        );
 
         // Update SwerveModule states
-        frontLeftModule.updateState(states[0]);
-        frontRightModule.updateState(states[1]);
-        backLeftModule.updateState(states[2]);
-        backRightModule.updateState(states[3]);
-    }
-
-    /**
-     * Reset the stored angle of the anglePid
-     */
-    public void resetAngleController() {
-        storedRotation = 0.0;
-        anglePid.reset();
+        frontLeftModule.updateState(SwerveModuleState.optimize(states[0], frontLeftModule.getAngle()));
+        frontRightModule.updateState(SwerveModuleState.optimize(states[1], frontRightModule.getAngle()));
+        backLeftModule.updateState(SwerveModuleState.optimize(states[2], backLeftModule.getAngle()));
+        backRightModule.updateState(SwerveModuleState.optimize(states[3], backRightModule.getAngle()));
     }
 
     /**
@@ -168,7 +148,7 @@ public abstract class DrivetrainSubsystem extends SubsystemBase {
      * @param val true to turn field oriented on, false to turn it off.
      */
     public void setFieldOriented(boolean val) {
-        isFieldOriented = val;
+        fieldOrientedToggle.setBoolean(val);
     }
 
     /**
@@ -177,6 +157,6 @@ public abstract class DrivetrainSubsystem extends SubsystemBase {
      * @return Returns true if in field oriented, otherwise, false.
      */
     public boolean getFieldOriented() {
-        return isFieldOriented;
+        return fieldOrientedToggle.getBoolean(true);
     }
 }
