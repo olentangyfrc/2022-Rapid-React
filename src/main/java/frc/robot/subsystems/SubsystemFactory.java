@@ -51,6 +51,7 @@ public class SubsystemFactory {
     "00:80:2F:28:64:39", BotType.RIO99,
     "00:80:2F:28:64:38", BotType.RIO99,
     "00:80:2F:17:F8:3F", BotType.RIO1,
+    "00:80:2F:17:F8:40", BotType.RIO1, //usb
     "00:80:2F:17:D7:4B", BotType.RIO2,
     "00:80:2F:27:04:C7", BotType.RIO3,
     "00:80:2F:27:04:C6", BotType.RIO3
@@ -204,12 +205,24 @@ public class SubsystemFactory {
    * @throws Exception
    */
   public void initRIO1() throws Exception{
+    logger.info("Initializing Rio1");
+    logger.info("Initializing Rio1");
+    logger.info("Initializing Rio1");
+    logger.info("Initializing Rio1");
+    logger.info("Initializing Rio1");
+    logger.info("Initializing Rio1");
+    logger.info("Initializing Rio1");
+    logger.info("Initializing Rio1");
+    logger.info("Initializing Rio1");
+    logger.info("Initializing Rio1");
+
     climber = new Climber();
     driveTrain = new DrivetrainSubsystem();
 
+    logger.info("Initializing Climber Subsystem");
     climber.init();
-    io.bind(new PushArmsForward(climber), Button.kLeftBumper, StickButton.LEFT_6, ButtonActionType.WHEN_HELD);
-    io.bind(new PullArmsBack(climber), Button.kLeftStick, StickButton.LEFT_7, ButtonActionType.WHEN_HELD);
+    io.bind(new PushArmsForward(climber), Button.kLeftBumper, StickButton.LEFT_6, ButtonActionType.WHEN_PRESSED);
+    io.bind(new PullArmsBack(climber), Button.kLeftStick, StickButton.LEFT_7, ButtonActionType.WHEN_PRESSED);
     io.bind(new ExtendArms(climber), Button.kRightBumper, StickButton.LEFT_8, ButtonActionType.WHEN_HELD);
     io.bind(new RetractArms(climber), Button.kRightStick, StickButton.LEFT_9, ButtonActionType.WHEN_HELD);
     io.bind(new LatchOntoBar(climber), Button.kX, StickButton.LEFT_10, ButtonActionType.WHEN_HELD);

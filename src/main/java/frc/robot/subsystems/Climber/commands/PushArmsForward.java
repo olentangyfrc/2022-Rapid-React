@@ -3,8 +3,12 @@ package frc.robot.subsystems.Climber.commands;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Climber.Climber;
 
+import java.util.logging.Logger;
+
 public class PushArmsForward extends CommandBase{
     private Climber climber;
+
+    private static Logger logger = Logger.getLogger(PushArmsForward.class.getName());
 
     public PushArmsForward(Climber cb) {
         climber = cb;
@@ -13,6 +17,7 @@ public class PushArmsForward extends CommandBase{
 
     @Override
     public void initialize(){
+        logger.info("Push Arms Forward");
     }
 
     @Override

@@ -24,7 +24,7 @@ public class Climber extends SubsystemBase{
     private CANSparkMax rightLinearActuator;
     private final int RIGHT_LIN_ACT_CAN = 61;
     private CANSparkMax leftLinearActuator;
-    private final int LEFT_LIN_ACT_CAN = 6;
+    private final int LEFT_LIN_ACT_CAN = 7;
     private final CANSparkMaxLowLevel.MotorType MOTOR_TYPE = CANSparkMaxLowLevel.MotorType.kBrushless;
     private final CANSparkMax.IdleMode MOTOR_MODE = CANSparkMax.IdleMode.kBrake;
     private final SparkMaxAnalogSensor.Mode POTENTIOMETER_MODE = SparkMaxAnalogSensor.Mode.kAbsolute;
@@ -33,14 +33,14 @@ public class Climber extends SubsystemBase{
     private SparkMaxPIDController rightPidController, leftPidController;
     private double kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM, maxVel, minVel, maxAcc;
 
-    private int maxRightForwardPosition;
-    private int minRightBackPosition;
+    private double maxRightForwardPosition;
+    private double minRightBackPosition;
 
-    private int maxLeftForwardPosition;
-    private int minLeftBackPosition;
+    private double maxLeftForwardPosition;
+    private double minLeftBackPosition;
 
     private WPI_TalonFX talon;
-    private final int TALON_CAN = 10;
+    private final int TALON_CAN = 28;
     private double verticalPercentOutput;
 
     private DutyCycleEncoder winchEncoder;
@@ -52,17 +52,22 @@ public class Climber extends SubsystemBase{
     private double leftActuatorLengthInPosition;
 
     private Compressor compressor;
-    private final int PCMCANID = 0;
-    private DoubleSolenoid rightPin;
-    private DoubleSolenoid leftPin;
-    private int rightPinForward;
-    private int rightPinReverse;
-    private int leftPinForward;
-    private int leftPinReverse;
+    private final int PCMCANID = 2;
+    private DoubleSolenoid pins;
+    private int pinsForward;
+    private int pinsReverse;
 
     private ShuffleboardTab tab = Shuffleboard.getTab("Climber");
 
     public void init() {
+        logger.info("Setting Up Climber");
+        logger.info("Setting Up Climber");
+        logger.info("Setting Up Climber");
+        logger.info("Setting Up Climber");
+        logger.info("Setting Up Climber");
+        logger.info("Setting Up Climber");
+        logger.info("Setting Up Climber");
+        logger.info("Setting Up Climber");
         rightLinearActuator = new CANSparkMax(RIGHT_LIN_ACT_CAN, MOTOR_TYPE);
         leftLinearActuator = new CANSparkMax(LEFT_LIN_ACT_CAN, MOTOR_TYPE);
         rightLinearActuator.setIdleMode(MOTOR_MODE);
@@ -76,7 +81,7 @@ public class Climber extends SubsystemBase{
         rightPidController = rightLinearActuator.getPIDController();
         leftPidController = leftLinearActuator.getPIDController();
 
-        kP = 0.2;
+        kP = 0.15;
         kI = 0;
         kD = 0;
         kIz = 0;
@@ -85,11 +90,11 @@ public class Climber extends SubsystemBase{
         kMaxOutput = 1;
         kMinOutput = -1;
 
-        maxRightForwardPosition = 4;
-        minRightBackPosition = 1;
+        maxRightForwardPosition = 3.62;
+        minRightBackPosition = 1.68;
 
-        maxLeftForwardPosition = 4;
-        minLeftBackPosition = 1;
+        maxLeftForwardPosition = 3.03;
+        minLeftBackPosition = 1.23;
 
         //maxVel = 0;
         //maxAcc = 0;
@@ -122,29 +127,26 @@ public class Climber extends SubsystemBase{
         rightActuatorLengthInPosition = 2;
         leftActuatorLengthInPosition = 2;
 
-        rightPinForward = 0;
-        rightPinReverse = 1;
-        leftPinForward = 2;
-        leftPinReverse = 3;
+        pinsForward = 0;
+        pinsReverse = 1;
+
         compressor = new Compressor(PCMCANID, PneumaticsModuleType.CTREPCM);
         compressor.enableDigital();
-        rightPin = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, rightPinForward, rightPinReverse);
-        leftPin = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, rightPinForward, rightPinReverse);
-        rightPin.set(Value.kOff);
-        leftPin.set(Value.kOff);
+        pins = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, pinsForward, pinsReverse);
+        pins.set(Value.kOff);
 
         tab.addNumber("Right Potentiometer Position", () -> getRightPotentiometerPosition());
         tab.addNumber("Left Potentiometer Position", () -> getLeftPotentiometerPosition());
     }
 
     public void pushArmsForward() {
-        rightPidController.setReference(maxRightForwardPosition, CANSparkMax.ControlType.kPosition);
-        rightPidController.setReference(maxLeftForwardPosition, CANSparkMax.ControlType.kPosition);
+        rightPidController.setReference(3.62, CANSparkMax.ControlType.kPosition);
+        rightPidController.setReference(3.03, CANSparkMax.ControlType.kPosition);
     }
 
     public void pullArmsBack() {
-        rightPidController.setReference(minRightBackPosition, CANSparkMax.ControlType.kPosition);
-        rightPidController.setReference(minLeftBackPosition, CANSparkMax.ControlType.kPosition);
+        rightPidController.setReference(1.68, CANSparkMax.ControlType.kPosition);
+        rightPidController.setReference(1.23, CANSparkMax.ControlType.kPosition);
     }
 
     public void extendArms() {
@@ -156,13 +158,11 @@ public class Climber extends SubsystemBase{
     }
 
     public void latchOntoBar(){
-        rightPin.set(Value.kForward);
-        leftPin.set(Value.kForward);
+        pins.set(Value.kForward);
     }
 
     public void letGoOfBar(){
-        rightPin.set(Value.kReverse);
-        leftPin.set(Value.kReverse);
+        pins.set(Value.kReverse);
     }
 
     public void stopWinch(){
