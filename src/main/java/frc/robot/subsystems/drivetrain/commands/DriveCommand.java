@@ -29,9 +29,9 @@ public class DriveCommand extends InstantCommand {
   public void initialize() {
     IO io = SubsystemFactory.getInstance().getIO();
     ChassisSpeeds speeds = new ChassisSpeeds(
-      io.getForward(),
-      io.getStrafe(),
-      io.getRotation()
+      io.getForward() * DrivetrainSubsystem.MAX_LINEAR_SPEED,
+      io.getStrafe() * DrivetrainSubsystem.MAX_LINEAR_SPEED,
+      io.getRotation() * DrivetrainSubsystem.MAX_ROTATION_SPEED
     );
 
     drivetrain.drive(speeds);

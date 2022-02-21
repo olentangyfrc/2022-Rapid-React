@@ -5,7 +5,7 @@
 package frc.robot.subsystems.drivetrain.modules;
 
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
-import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
@@ -21,39 +21,35 @@ import edu.wpi.first.wpilibj.AnalogInput;
  * 
  */
 public class SingleFalconModule extends SwerveModule {
-    // Top speed of drive motor in m/s. May need to be adjusted.
 
     private WPI_TalonFX driveMotor;
     private CANSparkMax angleMotor;
 
     private AnalogInput angleEncoder;
 
-    public SingleFalconModule(int angleMotorChannel, int driveMotorChannel, int angleEncoderChannel, double angleOffset) {
+    public SingleFalconModule(int angleMotorChannel, int driveMotorChannel, int angleEncoderChannel, double angleOffset, double maxSpeed) {
         angleMotor = new CANSparkMax(angleMotorChannel, MotorType.kBrushless);
         driveMotor = new WPI_TalonFX(driveMotorChannel);
 
         angleMotor.setInverted(true);
 
+        driveMotor.configFactoryDefault();
         driveMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
-    
-        anglePid.setTolerance(0.001);
+        driveMotor.setNeutralMode(NeutralMode.Brake);
+
 
         angleEncoder = new AnalogInput(angleEncoderChannel);
 
-        anglePid = new PIDController(0.5, 0, 0.0001);
+        anglePid = new PIDController(0.5, 0, 0);
         anglePid.enableContinuousInput(0.0, 2 * Math.PI);
 
-        this.angleOffset = angleOffset;
-    }
+        velocityFactorPID = new PIDController(0.01, 0, 0);
+        velocityFactorPID.setSetpoint(0); // We want the error to be 0
 
-    /**
-     * Set the percent output for the drive motor
-     * 
-     * @param output Percent output for the drive motor [-1, 1]
-     */
-    @Override
-    public void setDrivePercentOutput(double output) {
-        driveMotor.set(TalonFXControlMode.PercentOutput, output);
+        velocityConversionFactor = 1.8;
+        velocityConversionOffset = -0.5;
+        this.maxSpeed = maxSpeed;
+        this.angleOffset = angleOffset;
     }
 
     /**
@@ -91,18 +87,40 @@ public class SingleFalconModule extends SwerveModule {
      * @return the speed of the drive motor in meters per second
      */
     @Override
-    public double getSpeed() {
-        return driveMotor.getSelectedSensorVelocity(0);
+    public double getVelocity() {
+        return driveMotor.getSelectedSensorVelocity(0) / 2048 * 2 * WHEEL_RADIUS * Math.PI;
     }
 
-    /**
-     * Get the current percent output of the drive motor
-     * 
-     * @return the percent output -1 to 1
-     */
     @Override
-    public double getPercentOutput() {
-        return driveMotor.get();
+    public void setDriveVoltage(double voltage) {
+        driveMotor.setVoltage(voltage);
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        SingleFalconModule other = (SingleFalconModule) obj;
+        if (angleEncoder == null) {
+            if (other.angleEncoder != null)
+                return false;
+        } else if (!angleEncoder.equals(other.angleEncoder))
+            return false;
+        if (angleMotor == null) {
+            if (other.angleMotor != null)
+                return false;
+        } else if (!angleMotor.equals(other.angleMotor))
+            return false;
+        if (driveMotor == null) {
+            if (other.driveMotor != null)
+                return false;
+        } else if (!driveMotor.equals(other.driveMotor))
+            return false;
+        return true;
+    }
+    
 }

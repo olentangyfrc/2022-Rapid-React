@@ -5,8 +5,8 @@
 package frc.robot.subsystems.drivetrain.modules;
 
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.RelativeEncoder;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -32,7 +32,7 @@ public class CANSparkMaxModule extends SwerveModule {
      * @param angleEncoderChannel Analog port for the angle encoder
      * @param angleOffset The angle in degrees by which to offset the angle of the wheel.
      */
-    public CANSparkMaxModule(int angleMotorChannel, int driveMotorChannel, int angleEncoderChannel, double angleOffset) {
+    public CANSparkMaxModule(int angleMotorChannel, int driveMotorChannel, int angleEncoderChannel, double angleOffset, double maxSpeed) {
         angleMotor = new CANSparkMax(angleMotorChannel, MotorType.kBrushless);
         driveMotor = new CANSparkMax(driveMotorChannel, MotorType.kBrushless);
 
@@ -51,6 +51,12 @@ public class CANSparkMaxModule extends SwerveModule {
         // Set the velocity conversion factor to the circumference of the wheel
         driveEncoder.setVelocityConversionFactor(2 * Math.PI * WHEEL_RADIUS);
 
+        velocityFactorPID = new PIDController(0.01, 0, 0);
+        velocityFactorPID.setSetpoint(0); // We want the error to be 0
+
+        velocityConversionFactor = 1.7799;
+        velocityConversionOffset = -0.4126;
+        this.maxSpeed = maxSpeed;
         this.angleOffset = angleOffset;
     }
 
@@ -61,15 +67,6 @@ public class CANSparkMaxModule extends SwerveModule {
      */
     public void setAnglePercentOutput(double output) {
         angleMotor.set(output);
-    }
-
-    /**
-     * Set the percent output for the drive motor
-     * 
-     * @param output Percent output for the drive motor [-1, 1]
-     */
-    public void setDrivePercentOutput(double output) {
-        driveMotor.set(output);
     }
 
     /**
@@ -95,7 +92,8 @@ public class CANSparkMaxModule extends SwerveModule {
      * 
      * @return the speed of the drive motor in meters per second
      */
-    public double getSpeed() {
+    @Override
+    public double getVelocity() {
         return driveEncoder.getVelocity();
     }
 
@@ -106,5 +104,43 @@ public class CANSparkMaxModule extends SwerveModule {
      */
     public double getPercentOutput() {
         return driveMotor.get();
+    }
+
+    @Override
+    public void setDriveVoltage(double voltage) {
+        // TODO Auto-generated method stub
+        driveMotor.setVoltage(voltage);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        CANSparkMaxModule other = (CANSparkMaxModule) obj;
+        if (angleEncoder == null) {
+            if (other.angleEncoder != null)
+                return false;
+        } else if (!angleEncoder.equals(other.angleEncoder))
+            return false;
+        if (angleMotor == null) {
+            if (other.angleMotor != null)
+                return false;
+        } else if (!angleMotor.equals(other.angleMotor))
+            return false;
+        if (driveEncoder == null) {
+            if (other.driveEncoder != null)
+                return false;
+        } else if (!driveEncoder.equals(other.driveEncoder))
+            return false;
+        if (driveMotor == null) {
+            if (other.driveMotor != null)
+                return false;
+        } else if (!driveMotor.equals(other.driveMotor))
+            return false;
+        return true;
     }
 }
