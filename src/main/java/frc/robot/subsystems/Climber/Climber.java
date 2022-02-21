@@ -15,6 +15,9 @@ import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.PortManager;
+import frc.robot.subsystems.SubsystemFactory;
+import frc.robot.subsystems.PortManager.PortType;
 
 import java.util.logging.Logger;
 
@@ -22,7 +25,7 @@ public class Climber extends SubsystemBase{
     private static Logger logger = Logger.getLogger(Climber.class.getName());
 
     private CANSparkMax rightLinearActuator;
-    private final int RIGHT_LIN_ACT_CAN = 61;
+    private final int RIGHT_LIN_ACT_CAN = 20;
     private CANSparkMax leftLinearActuator;
     private final int LEFT_LIN_ACT_CAN = 7;
     private final CANSparkMaxLowLevel.MotorType MOTOR_TYPE = CANSparkMaxLowLevel.MotorType.kBrushless;
@@ -39,7 +42,7 @@ public class Climber extends SubsystemBase{
     private double maxLeftForwardPosition;
     private double minLeftBackPosition;
 
-    private WPI_TalonFX talon;
+    private WPI_TalonFX winchMotor;
     private final int TALON_CAN = 28;
     private double verticalPercentOutput;
 
@@ -59,7 +62,7 @@ public class Climber extends SubsystemBase{
 
     private ShuffleboardTab tab = Shuffleboard.getTab("Climber");
 
-    public void init() {
+    public void init() throws Exception {
         logger.info("Setting Up Climber");
         logger.info("Setting Up Climber");
         logger.info("Setting Up Climber");
@@ -68,8 +71,9 @@ public class Climber extends SubsystemBase{
         logger.info("Setting Up Climber");
         logger.info("Setting Up Climber");
         logger.info("Setting Up Climber");
-        rightLinearActuator = new CANSparkMax(RIGHT_LIN_ACT_CAN, MOTOR_TYPE);
-        leftLinearActuator = new CANSparkMax(LEFT_LIN_ACT_CAN, MOTOR_TYPE);
+        PortManager pm = SubsystemFactory.getInstance().getPortManager();
+        rightLinearActuator = new CANSparkMax(pm.aquirePort(PortType.CAN, 20, "Right Linear Actuator"), MOTOR_TYPE);
+        leftLinearActuator = new CANSparkMax(pm.aquirePort(PortType.CAN, 7, "Left Linear Actuator"), MOTOR_TYPE);
         rightLinearActuator.setIdleMode(MOTOR_MODE);
         leftLinearActuator.setIdleMode(MOTOR_MODE);
         rightPotentiometer = rightLinearActuator.getAnalog(POTENTIOMETER_MODE);
@@ -77,7 +81,7 @@ public class Climber extends SubsystemBase{
         rightLinearActuator.restoreFactoryDefaults();
         leftLinearActuator.restoreFactoryDefaults();
         rightPotentiometer.setPositionConversionFactor(4);
-        rightPotentiometer.setPositionConversionFactor(4);
+        leftPotentiometer.setPositionConversionFactor(4);
         rightPidController = rightLinearActuator.getPIDController();
         leftPidController = leftLinearActuator.getPIDController();
 
@@ -113,13 +117,13 @@ public class Climber extends SubsystemBase{
         leftPidController.setFF(kFF);
         leftPidController.setOutputRange(kMinOutput, kMaxOutput);
 
-        talon = new WPI_TalonFX(TALON_CAN);
+        winchMotor = new WPI_TalonFX(pm.aquirePort(PortType.CAN, 28, "Winch Motor"));
 
-        winchEncoder = new DutyCycleEncoder(0);
+        winchEncoder = new DutyCycleEncoder(pm.aquirePort(PortType.DIGITAL, 0, "Winch Encoder"));
         winchEncoder.reset();
         winchEncoder.setDistancePerRotation(1);
-        maxHeight = 10;
-        minHeight = 0.5;
+        maxHeight = -2;
+        minHeight = -0.5;
 
         verticalPercentOutput = 0.1;
         
@@ -130,14 +134,20 @@ public class Climber extends SubsystemBase{
         pinsForward = 0;
         pinsReverse = 1;
 
-        compressor = new Compressor(PCMCANID, PneumaticsModuleType.CTREPCM);
-        compressor.enableDigital();
-        pins = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, pinsForward, pinsReverse);
+        compressor = new Compressor(pm.aquirePort(PortType.CAN, 2, "Compressor"), PneumaticsModuleType.CTREPCM);
+        //compressor.enableDigital();
+        pins = new DoubleSolenoid(2, PneumaticsModuleType.CTREPCM, 1, 0);
         pins.set(Value.kOff);
+    }
 
+    /*@Override
+    public void periodic(){
         tab.addNumber("Right Potentiometer Position", () -> getRightPotentiometerPosition());
         tab.addNumber("Left Potentiometer Position", () -> getLeftPotentiometerPosition());
+        tab.addNumber("Right Position Conversion Factor", () -> getRightPositionConversionFactor());
+        tab.addNumber("Left Position Conversion Fact", () -> getLeftPositionConversionFactor());
     }
+    */
 
     public void pushArmsForward() {
         rightPidController.setReference(3.62, CANSparkMax.ControlType.kPosition);
@@ -150,11 +160,11 @@ public class Climber extends SubsystemBase{
     }
 
     public void extendArms() {
-        talon.set(verticalPercentOutput);
+        winchMotor.set(verticalPercentOutput);
     }
 
     public void retractArms() {
-        talon.set(-verticalPercentOutput);
+        winchMotor.set(-verticalPercentOutput);
     }
 
     public void latchOntoBar(){
@@ -166,7 +176,7 @@ public class Climber extends SubsystemBase{
     }
 
     public void stopWinch(){
-        talon.stopMotor();
+        winchMotor.stopMotor();
     }
 
     public void stopRightLinearActuator(){
@@ -184,7 +194,7 @@ public class Climber extends SubsystemBase{
     }
 
     public void getVerticalPercentOutput() {
-        talon.get();
+        winchMotor.get();
     }
 
     public double getRightPotentiometerPosition() {
@@ -249,5 +259,13 @@ public class Climber extends SubsystemBase{
 
     public double getLeftLinearActuatorLengthInPosition(){
         return leftActuatorLengthInPosition;
+    }
+
+    public double getRightPositionConversionFactor(){
+        return 4;
+    }
+
+    public double getLeftPositionConversionFactor(){
+        return 4;
     }
 }
