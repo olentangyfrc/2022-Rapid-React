@@ -7,6 +7,7 @@ package frc.robot.subsystems;
 import java.util.HashMap;
 import java.util.logging.Logger;
 
+import edu.wpi.first.networktables.NetworkTableEntry;
 // WPI imports:
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -15,8 +16,11 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj.XboxController.Button;
+import edu.wpi.first.wpilibj.command.InstantCommand;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import frc.robot.subsystems.SubsystemFactory.BotType;
 
 // Project imports
 
@@ -41,8 +45,41 @@ public class IO extends SubsystemBase {
     private Joystick rightStick;
 
     private Logger logger = Logger.getLogger("IO");
+    private ShuffleboardTab ioTab = Shuffleboard.getTab("IO");
 
-    public void init(BotType bot) throws Exception{
+    
+    private NetworkTableEntry invertForwards = ioTab.add("Invert Forwards", false).withWidget(BuiltInWidgets.kToggleSwitch).getEntry();
+    private NetworkTableEntry invertStrafe = ioTab.add("Invert Strafe", false).withWidget(BuiltInWidgets.kToggleSwitch).getEntry();
+    private NetworkTableEntry invertRotation = ioTab.add("Invert Rotation", false).withWidget(BuiltInWidgets.kToggleSwitch).getEntry();
+    
+    public IO() {
+        // Add a command to reset IO
+        ioTab.add("Reset IO", new InstantCommand() {
+            private IO io;
+
+            public InstantCommand with(IO io) {
+                this.io = io;
+                return this;
+            }
+
+            @Override
+            public void initialize() {
+                try {
+                    io.init();
+                } catch(Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+
+            @Override
+            public String toString() {
+                return "Reset";
+            }
+
+        }.with(this));
+    }
+
+    public void init() throws Exception{
         inputMethod = determineInputMethod();
 
         if(inputMethod.equals(InputMethod.XBOX)) {
@@ -59,10 +96,18 @@ public class IO extends SubsystemBase {
      * @return the strafe input
      */
     public double getStrafe() {
-        if(inputMethod.equals(InputMethod.XBOX)) {
-            return filterInput(-xbox.getLeftX());
+        if(invertStrafe.getBoolean(false)) {
+            if(inputMethod.equals(InputMethod.XBOX)) {
+                return filterInput(-xbox.getLeftX());
+            } else {
+                return filterInput(-leftStick.getX());
+            }
         } else {
-            return filterInput(leftStick.getX());
+            if(inputMethod.equals(InputMethod.XBOX)) {
+                return filterInput(xbox.getLeftX());
+            } else {
+                return filterInput(leftStick.getX());
+            }
         }
     }
 
@@ -72,11 +117,19 @@ public class IO extends SubsystemBase {
      * @return the forward input
      */
     public double getForward() {
-        if(inputMethod.equals(InputMethod.XBOX)) {
-            return filterInput(xbox.getLeftY());
+        if(invertForwards.getBoolean(false)) {
+            if(inputMethod.equals(InputMethod.XBOX)) {
+                return filterInput(-xbox.getLeftY());
+            } else {
+                return filterInput(-leftStick.getY());
+            }
         } else {
-            return filterInput(-leftStick.getY());
-        }
+            if(inputMethod.equals(InputMethod.XBOX)) {
+                return filterInput(xbox.getLeftY());
+            } else {
+                return filterInput(leftStick.getY());
+            }
+        } 
     }
 
     /**
@@ -85,10 +138,18 @@ public class IO extends SubsystemBase {
      * @return the rotation input
      */
     public double getRotation() {
-        if(inputMethod.equals(InputMethod.XBOX)) {
-            return filterInput(-xbox.getRightX());
+        if(invertRotation.getBoolean(false)) {
+            if(inputMethod.equals(InputMethod.XBOX)) {
+                return filterInput(-xbox.getRightX());
+            } else {
+                return filterInput(-rightStick.getX());
+            }
         } else {
-            return filterInput(rightStick.getX());
+            if(inputMethod.equals(InputMethod.XBOX)) {
+                return filterInput(xbox.getRightX());
+            } else {
+                return filterInput(rightStick.getX());
+            }
         }
     }
 
@@ -113,10 +174,12 @@ public class IO extends SubsystemBase {
      * @return the input method
      */
     public InputMethod determineInputMethod() {
-        if(DriverStation.getJoystickIsXbox(0)) {
+        if(DriverStation.getJoystickIsXbox(XBOX_PORT)) {
             return InputMethod.XBOX;
-        } else {
+        } else if(DriverStation.isJoystickConnected(LEFT_STICK_PORT) && DriverStation.isJoystickConnected(RIGHT_STICK_PORT)) {
             return InputMethod.JOYSTICKS;
+        } else {
+            return InputMethod.UNKNOWN;
         }
     }
 
@@ -177,7 +240,8 @@ public class IO extends SubsystemBase {
      */
     private enum InputMethod {
         XBOX, // An xbox controller on port 0
-        JOYSTICKS // Two joysticks, left connected to port 0 and right to port 1
+        JOYSTICKS, // Two joysticks, left connected to port 0 and right to port 1
+        UNKNOWN
     }
 
     /**

@@ -11,8 +11,7 @@ import frc.robot.subsystems.SubsystemFactory;
 import frc.robot.subsystems.PortManager.PortType;
 import frc.robot.subsystems.drivetrain.modules.CANSparkMaxModule;
 
-/** Add your docs here. */
-public class SparkMaxDrivetrain extends DrivetrainSubsystem {
+public class SparkMaxDrivetrain extends SwerveDrivetrain {
 
     @Override
     public void initializeSwerveModules(Map<String, Integer> portAssignments, Map<String, Double> wheelOffsets) throws Exception {
