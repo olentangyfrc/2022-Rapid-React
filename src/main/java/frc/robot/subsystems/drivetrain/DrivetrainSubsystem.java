@@ -6,6 +6,8 @@ import java.util.logging.Logger;
 // WPILib imports
 import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.Nat;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -18,6 +20,7 @@ import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj2.command.ProfiledPIDCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.SubsystemFactory;
 import frc.robot.subsystems.drivetrain.commands.DriveCommand;
@@ -39,6 +42,11 @@ public abstract class DrivetrainSubsystem extends SubsystemBase {
 
     public static final double MAX_LINEAR_SPEED = 6; // Meters per second
     public static final double MAX_ROTATION_SPEED = 15.1; // Radians per second
+    public static final double MAX_ROTATION_ACCELERATION = Math.PI;
+
+    public PIDController xController;
+    public PIDController yController;
+    public ProfiledPIDController thetaController;
 
     // Command that calls drive method with user input.
     private DriveCommand driveCommand;
@@ -158,5 +166,16 @@ public abstract class DrivetrainSubsystem extends SubsystemBase {
      */
     public boolean getFieldOriented() {
         return fieldOrientedToggle.getBoolean(true);
+    }
+
+    /**
+     * Get the current estimated position of the robot in meters.
+     * <p>
+     * x+ is forwards, y+ is right.
+     * 
+     * @return The estimated position of the bot.
+     */
+    public Pose2d getLocation() {
+        return poseEstimator.getEstimatedPosition();
     }
 }
