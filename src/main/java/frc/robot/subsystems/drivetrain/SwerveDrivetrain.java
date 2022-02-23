@@ -14,6 +14,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -115,7 +116,7 @@ public abstract class SwerveDrivetrain extends SubsystemBase {
     */
     public void drive(ChassisSpeeds speeds) {
         
-        Pigeon gyro = SubsystemFactory.getInstance().getTelemetry().getPigeon();
+        Gyro gyro = SubsystemFactory.getInstance().getTelemetry().getGyro();
         if(getFieldOriented()) {
             speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
                 speeds.vxMetersPerSecond, 

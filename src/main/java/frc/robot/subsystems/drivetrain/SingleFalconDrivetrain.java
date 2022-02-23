@@ -12,7 +12,7 @@ import frc.robot.subsystems.SubsystemFactory;
 import frc.robot.subsystems.drivetrain.modules.SingleFalconModule;
 
 /** Add your docs here. */
-public class SingleFalconDrivetrain extends DrivetrainSubsystem {
+public class SingleFalconDrivetrain extends SwerveDrivetrain {
 
     @Override
     public void initializeSwerveModules(Map<String, Integer> portAssignments, Map<String, Double> wheelOffsets) throws Exception {
@@ -21,7 +21,7 @@ public class SingleFalconDrivetrain extends DrivetrainSubsystem {
         frontLeftModule = new SingleFalconModule(
             portManager.aquirePort(PortType.CAN, portAssignments.get("FL.SwerveMotor"), "FL.SwerveMotor"),
             portManager.aquirePort(PortType.CAN, portAssignments.get("FL.DriveMotor"), "FL.DriveMotor"),
-            portManager.aquirePort(PortType.PWM, portAssignments.get("FL.Encoder"), "FL.Encoder"),
+            portManager.aquirePort(PortType.ANALOG, portAssignments.get("FL.Encoder"), "FL.Encoder"),
             wheelOffsets.get("FL"),
             MAX_LINEAR_SPEED
         );
@@ -29,7 +29,7 @@ public class SingleFalconDrivetrain extends DrivetrainSubsystem {
         frontRightModule = new SingleFalconModule(
             portManager.aquirePort(PortType.CAN, portAssignments.get("FR.SwerveMotor"), "FR.SwerveMotor"),
             portManager.aquirePort(PortType.CAN, portAssignments.get("FR.DriveMotor"), "FR.DriveMotor"),
-            portManager.aquirePort(PortType.PWM, portAssignments.get("FR.Encoder"), "FR.Encoder"),
+            portManager.aquirePort(PortType.ANALOG, portAssignments.get("FR.Encoder"), "FR.Encoder"),
             wheelOffsets.get("FR"),
             MAX_LINEAR_SPEED
         );
@@ -37,7 +37,7 @@ public class SingleFalconDrivetrain extends DrivetrainSubsystem {
         backLeftModule = new SingleFalconModule(
             portManager.aquirePort(PortType.CAN, portAssignments.get("BL.SwerveMotor"), "BL.SwerveMotor"),
             portManager.aquirePort(PortType.CAN, portAssignments.get("BL.DriveMotor"), "BL.DriveMotor"),
-            portManager.aquirePort(PortType.PWM, portAssignments.get("BL.Encoder"), "BL.Encoder"),
+            portManager.aquirePort(PortType.ANALOG, portAssignments.get("BL.Encoder"), "BL.Encoder"),
             wheelOffsets.get("BL"),
             MAX_LINEAR_SPEED
         );
