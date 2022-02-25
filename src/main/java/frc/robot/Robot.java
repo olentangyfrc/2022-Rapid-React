@@ -5,9 +5,20 @@
 package frc.robot;
 
 
+import java.util.ArrayList;
+import java.util.List;
+
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.trajectory.TrajectoryConfig;
+import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.subsystems.SubsystemFactory;
+import frc.robot.subsystems.auton.commands.FollowTrajectoryCommand;
+import frc.robot.subsystems.drivetrain.DrivetrainSubsystem;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -39,7 +50,16 @@ public class Robot extends TimedRobot {
   public void robotPeriodic() {}
 
   @Override
-  public void autonomousInit() {}
+  public void autonomousInit() {
+    Trajectory trajectory = TrajectoryGenerator.generateTrajectory(
+      new Pose2d(),
+      new ArrayList<Translation2d>(),
+      new Pose2d(3, 0, new Rotation2d()),
+      new TrajectoryConfig(DrivetrainSubsystem.MAX_LINEAR_SPEED, DrivetrainSubsystem.MAX_LINEAR_ACCELERATION)
+    );
+    
+    (new FollowTrajectoryCommand(SubsystemFactory.getInstance().getDrivetrain(), trajectory, new Rotation2d())).schedule();
+  }
 
   @Override
   public void autonomousPeriodic() {
