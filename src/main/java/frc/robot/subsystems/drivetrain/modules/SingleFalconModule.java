@@ -42,6 +42,7 @@ public class SingleFalconModule extends SwerveModule {
 
         anglePid = new PIDController(0.5, 0, 0);
         anglePid.enableContinuousInput(0.0, 2 * Math.PI);
+        anglePid.setTolerance(0.005);
 
         velocityFactorPID = new PIDController(0.01, 0, 0);
         velocityFactorPID.setSetpoint(0); // We want the error to be 0
