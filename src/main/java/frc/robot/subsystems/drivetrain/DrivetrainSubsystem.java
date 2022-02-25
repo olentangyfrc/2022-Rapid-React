@@ -16,6 +16,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -41,8 +42,9 @@ public abstract class DrivetrainSubsystem extends SubsystemBase {
     public static final double TRACK_WIDTH = 0.4445;
 
     public static final double MAX_LINEAR_SPEED = 6; // Meters per second
+    public static final double MAX_LINEAR_ACCELERATION = 2; // Meters per second squared
     public static final double MAX_ROTATION_SPEED = 15.1; // Radians per second
-    public static final double MAX_ROTATION_ACCELERATION = Math.PI;
+    public static final double MAX_ROTATION_ACCELERATION = Math.PI; // Radians per second squared
 
     public PIDController xController;
     public PIDController yController;
@@ -109,7 +111,7 @@ public abstract class DrivetrainSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         // Run the drive command periodically
-        if(driveCommand != null) {
+        if(driveCommand != null && DriverStation.isTeleopEnabled()) {
             driveCommand.schedule();
         }
     }
