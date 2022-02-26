@@ -25,6 +25,11 @@ public class ClimberSBTab {
         tab.addNumber("Right Potentiometer Position", climber::getRightPotentiometerPosition);
         tab.addNumber("Left Potentiometer Position", climber::getLeftPotentiometerPosition);
         tab.addNumber("Winch Rotations", climber::getWinchPosition);
+        tab.addNumber("Max Right Potentiometer Position", climber::getRightMaxForwardPosition);
+        tab.addNumber("Max Left Potentiometer Position", climber::getLeftMaxForwardPosition);
+        tab.addNumber("Min Right Potentiometer Position", climber::getRightMinBackPosition);
+        tab.addNumber("Min Left Potentiometer Position", climber::getLeftMinBackPosition);
+
 
         //winchPercentOutput = tab.add("Set Winch Percent Output (-1 to 1)", 0.05).getEntry();
         //percentActuatorLength = tab.add("Set Actuator Length Target with Percentage", 0.0).getEntry();

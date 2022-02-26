@@ -1,5 +1,6 @@
 package frc.robot.subsystems.Climber;
 
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.revrobotics.CANSparkMax;
@@ -49,6 +50,7 @@ public class Climber extends SubsystemBase{
     private DutyCycleEncoder winchEncoder;
     private double maxHeight;
     private double minHeight;
+    private double targetHeight;
 
     private double actuatorLengthInPercent;
     private double rightActuatorLengthInPosition;
@@ -80,12 +82,12 @@ public class Climber extends SubsystemBase{
         leftPotentiometer = leftLinearActuator.getAnalog(POTENTIOMETER_MODE);
         rightLinearActuator.restoreFactoryDefaults();
         leftLinearActuator.restoreFactoryDefaults();
-        rightPotentiometer.setPositionConversionFactor(4);
-        leftPotentiometer.setPositionConversionFactor(4);
+        rightPotentiometer.setPositionConversionFactor(1);
+        leftPotentiometer.setPositionConversionFactor(1);
         rightPidController = rightLinearActuator.getPIDController();
         leftPidController = leftLinearActuator.getPIDController();
 
-        kP = 0.15;
+        kP = 0.5;
         kI = 0;
         kD = 0;
         kIz = 0;
@@ -94,11 +96,11 @@ public class Climber extends SubsystemBase{
         kMaxOutput = 1;
         kMinOutput = -1;
 
-        maxRightForwardPosition = 3.62;
-        minRightBackPosition = 1.68;
+        maxRightForwardPosition = 0.9;
+        minRightBackPosition = 0.3;
 
-        maxLeftForwardPosition = 3.03;
-        minLeftBackPosition = 1.23;
+        maxLeftForwardPosition = 0.82;
+        minLeftBackPosition = 0.19;
 
         //maxVel = 0;
         //maxAcc = 0;
@@ -117,26 +119,28 @@ public class Climber extends SubsystemBase{
         leftPidController.setFF(kFF);
         leftPidController.setOutputRange(kMinOutput, kMaxOutput);
 
-        winchMotor = new WPI_TalonFX(pm.aquirePort(PortType.CAN, 28, "Winch Motor"));
+        winchMotor = new WPI_TalonFX(pm.aquirePort(PortType.CAN, TALON_CAN, "Winch Motor"));
+        winchMotor.setNeutralMode(NeutralMode.Brake);
 
         winchEncoder = new DutyCycleEncoder(pm.aquirePort(PortType.DIGITAL, 0, "Winch Encoder"));
         winchEncoder.reset();
         winchEncoder.setDistancePerRotation(1);
-        maxHeight = -2;
-        minHeight = -0.5;
+        maxHeight = -10;
+        minHeight = 0;
 
-        verticalPercentOutput = 0.1;
+        verticalPercentOutput = 0.75;
         
-        actuatorLengthInPercent = 0.5;
+        /*actuatorLengthInPercent = 0.5;
         rightActuatorLengthInPosition = 2;
         leftActuatorLengthInPosition = 2;
+        */
 
-        pinsForward = 0;
-        pinsReverse = 1;
+        pinsForward = 1;
+        pinsReverse = 0;
 
-        compressor = new Compressor(pm.aquirePort(PortType.CAN, 2, "Compressor"), PneumaticsModuleType.CTREPCM);
-        //compressor.enableDigital();
-        pins = new DoubleSolenoid(2, PneumaticsModuleType.CTREPCM, 1, 0);
+        compressor = new Compressor(pm.aquirePort(PortType.CAN, PCMCANID, "Compressor"), PneumaticsModuleType.CTREPCM);
+        compressor.enableDigital();
+        pins = new DoubleSolenoid(PCMCANID, PneumaticsModuleType.CTREPCM, pinsForward, pinsReverse);
         pins.set(Value.kOff);
     }
 
@@ -150,13 +154,23 @@ public class Climber extends SubsystemBase{
     */
 
     public void pushArmsForward() {
-        rightPidController.setReference(3.62, CANSparkMax.ControlType.kPosition);
-        rightPidController.setReference(3.03, CANSparkMax.ControlType.kPosition);
+        rightPidController.setReference(maxRightForwardPosition, CANSparkMax.ControlType.kPosition);
+        leftPidController.setReference(maxLeftForwardPosition, CANSparkMax.ControlType.kPosition);
     }
 
     public void pullArmsBack() {
-        rightPidController.setReference(1.68, CANSparkMax.ControlType.kPosition);
-        rightPidController.setReference(1.23, CANSparkMax.ControlType.kPosition);
+        rightPidController.setReference(minRightBackPosition, CANSparkMax.ControlType.kPosition);
+        leftPidController.setReference(minLeftBackPosition, CANSparkMax.ControlType.kPosition);
+    }
+
+    public void pushArmsForwardWithPercent(){
+        rightLinearActuator.set(0.4);
+        leftLinearActuator.set(0.4);
+    }
+
+    public void pullArmsBackWithPercent(){
+        rightLinearActuator.set(-0.4);
+        leftLinearActuator.set(-0.4);
     }
 
     public void extendArms() {

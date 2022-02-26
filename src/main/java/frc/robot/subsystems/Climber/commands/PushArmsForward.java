@@ -22,7 +22,7 @@ public class PushArmsForward extends CommandBase{
 
     @Override
     public void execute(){
-        climber.pushArmsForward();
+        climber.pushArmsForwardWithPercent();
     }
 
     @Override
@@ -33,6 +33,6 @@ public class PushArmsForward extends CommandBase{
 
     @Override
     public boolean isFinished(){
-        return (Math.abs(climber.getRightPotentiometerPosition() - climber.getRightMaxForwardPosition()) < 0.2 && Math.abs(climber.getLeftPotentiometerPosition() - climber.getLeftMaxForwardPosition()) < 0.2);
+        return (Math.abs(climber.getRightPotentiometerPosition() - climber.getRightMaxForwardPosition()) < 0.01 && Math.abs(climber.getLeftPotentiometerPosition() - climber.getLeftMaxForwardPosition()) < 0.01);
     }
 }
