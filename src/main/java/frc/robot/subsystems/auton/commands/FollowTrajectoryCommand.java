@@ -8,11 +8,11 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.auton.AutonTrajectoryFollower;
-import frc.robot.subsystems.drivetrain.DrivetrainSubsystem;
+import frc.robot.subsystems.drivetrain.SwerveDrivetrain;
 
 public class FollowTrajectoryCommand extends CommandBase {
   
-  private DrivetrainSubsystem drivetrain;
+  private SwerveDrivetrain drivetrain;
   private Trajectory trajectory;
   private AutonTrajectoryFollower follower;
   private Rotation2d targetAngle;
@@ -27,7 +27,7 @@ public class FollowTrajectoryCommand extends CommandBase {
    * @param trajectory the trajectory to follow
    * @param targetAngle the desired angle at the end of the trajectory
    */
-  public FollowTrajectoryCommand(DrivetrainSubsystem drivetrain, Trajectory trajectory, Rotation2d targetAngle) {
+  public FollowTrajectoryCommand(SwerveDrivetrain drivetrain, Trajectory trajectory, Rotation2d targetAngle) {
 
     this.drivetrain = drivetrain;
     this.trajectory = trajectory;

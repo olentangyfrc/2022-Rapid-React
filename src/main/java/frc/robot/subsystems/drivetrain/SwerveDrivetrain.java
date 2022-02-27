@@ -57,7 +57,7 @@ public abstract class SwerveDrivetrain extends SubsystemBase {
     // Used to convert from ChassisSpeeds to SwerveModuleStates
     private SwerveDriveKinematics kinematics;
 
-    private Logger logger = Logger.getLogger("DrivetrainSubsystem");
+    private Logger logger = Logger.getLogger("SwerveDrivetrain");
     
     // Odometry
     private SwerveDrivePoseEstimator poseEstimator;

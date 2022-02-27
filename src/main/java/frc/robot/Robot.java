@@ -18,7 +18,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.subsystems.SubsystemFactory;
 import frc.robot.subsystems.auton.commands.FollowTrajectoryCommand;
-import frc.robot.subsystems.drivetrain.DrivetrainSubsystem;
+import frc.robot.subsystems.drivetrain.SwerveDrivetrain;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -55,7 +55,7 @@ public class Robot extends TimedRobot {
       new Pose2d(),
       new ArrayList<Translation2d>(),
       new Pose2d(3, 0, new Rotation2d()),
-      new TrajectoryConfig(DrivetrainSubsystem.MAX_LINEAR_SPEED, DrivetrainSubsystem.MAX_LINEAR_ACCELERATION)
+      new TrajectoryConfig(SwerveDrivetrain.MAX_LINEAR_SPEED, SwerveDrivetrain.MAX_LINEAR_ACCELERATION)
     );
     
     (new FollowTrajectoryCommand(SubsystemFactory.getInstance().getDrivetrain(), trajectory, new Rotation2d())).schedule();
