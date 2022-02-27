@@ -16,11 +16,8 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.networktables.NetworkTableEntry;
-<<<<<<< HEAD:src/main/java/frc/robot/subsystems/drivetrain/DrivetrainSubsystem.java
 import edu.wpi.first.wpilibj.DriverStation;
-=======
 import edu.wpi.first.wpilibj.interfaces.Gyro;
->>>>>>> origin/main:src/main/java/frc/robot/subsystems/drivetrain/SwerveDrivetrain.java
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
