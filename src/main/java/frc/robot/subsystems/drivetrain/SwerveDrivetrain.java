@@ -16,7 +16,11 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.networktables.NetworkTableEntry;
+<<<<<<< HEAD:src/main/java/frc/robot/subsystems/drivetrain/DrivetrainSubsystem.java
 import edu.wpi.first.wpilibj.DriverStation;
+=======
+import edu.wpi.first.wpilibj.interfaces.Gyro;
+>>>>>>> origin/main:src/main/java/frc/robot/subsystems/drivetrain/SwerveDrivetrain.java
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -28,7 +32,7 @@ import frc.robot.subsystems.drivetrain.commands.DriveCommand;
 import frc.robot.subsystems.drivetrain.modules.SwerveModule;
 import frc.robot.subsystems.telemetry.Pigeon;
 
-public abstract class DrivetrainSubsystem extends SubsystemBase {
+public abstract class SwerveDrivetrain extends SubsystemBase {
 
     // Declaring Swerve Modules
     public SwerveModule frontLeftModule;
@@ -55,7 +59,7 @@ public abstract class DrivetrainSubsystem extends SubsystemBase {
 
     // Used to convert from ChassisSpeeds to SwerveModuleStates
     private SwerveDriveKinematics kinematics;
-    
+
     private Logger logger = Logger.getLogger("DrivetrainSubsystem");
     
     // Odometry
@@ -125,7 +129,7 @@ public abstract class DrivetrainSubsystem extends SubsystemBase {
     */
     public void drive(ChassisSpeeds speeds) {
         
-        Pigeon gyro = SubsystemFactory.getInstance().getTelemetry().getPigeon();
+        Gyro gyro = SubsystemFactory.getInstance().getTelemetry().getGyro();
         if(getFieldOriented()) {
             speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
                 speeds.vxMetersPerSecond, 

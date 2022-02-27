@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj.AnalogInput;
  * 
  */
 public class SingleFalconModule extends SwerveModule {
+    static int num;
 
     private WPI_TalonFX driveMotor;
     private CANSparkMax angleMotor;
@@ -37,11 +38,11 @@ public class SingleFalconModule extends SwerveModule {
         driveMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
         driveMotor.setNeutralMode(NeutralMode.Brake);
 
-
         angleEncoder = new AnalogInput(angleEncoderChannel);
 
         anglePid = new PIDController(0.5, 0, 0);
         anglePid.enableContinuousInput(0.0, 2 * Math.PI);
+        anglePid.setTolerance(0.005);
 
         velocityFactorPID = new PIDController(0.01, 0, 0);
         velocityFactorPID.setSetpoint(0); // We want the error to be 0
@@ -77,7 +78,6 @@ public class SingleFalconModule extends SwerveModule {
         angle += 2 * Math.PI;
         // modulo the angle by a full rotation in radians to restrict it to the range [0,2Pi)
         angle %= 2 * Math.PI;
-
         return new Rotation2d(angle);
     }
 

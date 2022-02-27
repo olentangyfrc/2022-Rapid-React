@@ -14,8 +14,7 @@ import frc.robot.subsystems.drivetrain.modules.CANSparkMaxModule;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 
-/** Add your docs here. */
-public class SparkMaxDrivetrain extends DrivetrainSubsystem {
+public class SparkMaxDrivetrain extends SwerveDrivetrain {
 
     @Override
     public void initializeSwerveModules(Map<String, Integer> portAssignments, Map<String, Double> wheelOffsets) throws Exception {

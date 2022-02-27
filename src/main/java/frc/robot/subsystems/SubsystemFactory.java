@@ -13,7 +13,7 @@ import java.util.logging.Logger;
 
 import edu.wpi.first.wpilibj.XboxController.Button;
 // Project imports:
-import frc.robot.subsystems.drivetrain.DrivetrainSubsystem;
+import frc.robot.subsystems.drivetrain.SwerveDrivetrain;
 import frc.robot.subsystems.drivetrain.SingleFalconDrivetrain;
 import frc.robot.subsystems.drivetrain.SparkMaxDrivetrain;
 import frc.robot.subsystems.telemetry.Telemetry;
@@ -39,7 +39,9 @@ public class SubsystemFactory {
     "00:80:2F:30:DB:F9", BotType.COVID,
     "00:80:2F:25:B4:CA", BotType.CALIFORNIA,
     "00:80:2F:28:64:39", BotType.RIO99,
-    "00:80:2F:28:64:38", BotType.RIO99
+    "00:80:2F:28:64:38", BotType.RIO99,
+    "00:80:2F:17:F8:3F", BotType.RIO1,
+    "00:80:2F:17:F8:40", BotType.RIO1 //usb
   );
 
   private BotType botType;
@@ -48,7 +50,7 @@ public class SubsystemFactory {
   // Variables for all subsystems:
   private PortManager portManager;
   private IO io;
-  private DrivetrainSubsystem driveTrain;
+  private SwerveDrivetrain driveTrain;
 
   // Should not be used outside of this class!
   private SubsystemFactory() {}
@@ -75,7 +77,7 @@ public class SubsystemFactory {
     telemetry = new Telemetry(botType);
     telemetry.init();
     io = new IO();
-    io.init(botType);
+    io.init();
     switch(botType) {
       case COVID:
         initCOVID();
@@ -86,9 +88,45 @@ public class SubsystemFactory {
       case RIO99:
         initRIO99();
         break;
+      case RIO1:
+        initRIO1();
+        break;
       default:
         logger.info("Unrecognized bot");
     }
+  }
+
+  private void initRIO1() throws Exception {
+    HashMap<String, Integer> portAssignments = new HashMap<String, Integer>();
+    portAssignments.put("FL.SwerveMotor", 9);
+    portAssignments.put("FL.DriveMotor", 32);
+    portAssignments.put("FL.Encoder", 0);
+    
+
+    portAssignments.put("FR.SwerveMotor", 11);
+    portAssignments.put("FR.DriveMotor", 31);
+    portAssignments.put("FR.Encoder", 1);
+
+    portAssignments.put("BL.SwerveMotor", 6);
+    portAssignments.put("BL.DriveMotor", 33);
+    portAssignments.put("BL.Encoder", 3);
+
+    portAssignments.put("BR.SwerveMotor", 3);
+    portAssignments.put("BR.DriveMotor", 30);
+    portAssignments.put("BR.Encoder", 2);
+
+    HashMap<String, Double> wheelOffsets = new HashMap<String, Double>();
+    wheelOffsets.put("FL", 55.28);
+    wheelOffsets.put("FR", 276.42);
+    wheelOffsets.put("BL", 82.63);
+    wheelOffsets.put("BR", 47.19);
+
+    
+    // Create and initialize all subsystems:
+    driveTrain = new SingleFalconDrivetrain();
+    driveTrain.init(portAssignments, wheelOffsets);
+    
+    io.bind(new ZeroGyro(telemetry.getGyro()), Button.kY, StickButton.RIGHT_2, ButtonActionType.WHEN_PRESSED);
   }
 
   /**
@@ -158,7 +196,7 @@ public class SubsystemFactory {
     driveTrain = new SingleFalconDrivetrain();
     driveTrain.init(portAssignments, wheelOffsets);
     
-    io.bind(new ZeroGyro(telemetry.getPigeon()), Button.kY, StickButton.RIGHT_2, ButtonActionType.WHEN_PRESSED);
+    io.bind(new ZeroGyro(telemetry.getGyro()), Button.kY, StickButton.RIGHT_2, ButtonActionType.WHEN_PRESSED);
   }
 
   /**
@@ -190,7 +228,7 @@ public class SubsystemFactory {
     return telemetry;
   }
 
-  public DrivetrainSubsystem getDrivetrain() {
+  public SwerveDrivetrain getDrivetrain() {
     return driveTrain;
   }
 
@@ -244,6 +282,7 @@ public class SubsystemFactory {
     COVID,
     CALIFORNIA,
     RIO99,
+    RIO1,
     UNRECOGNIZED
   }
 }
