@@ -112,6 +112,15 @@ public class CANSparkMaxModule extends SwerveModule {
         driveMotor.setVoltage(voltage);
     }
 
+    /**
+     * Completely stop both the drive motor and the angle motor.
+     */
+    @Override
+    public void stop() {
+        driveMotor.setVoltage(0);
+        angleMotor.set(0);
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj)

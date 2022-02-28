@@ -21,7 +21,6 @@ import edu.wpi.first.wpilibj.AnalogInput;
  * 
  */
 public class SingleFalconModule extends SwerveModule {
-    static int num;
 
     private WPI_TalonFX driveMotor;
     private CANSparkMax angleMotor;
@@ -32,6 +31,7 @@ public class SingleFalconModule extends SwerveModule {
         angleMotor = new CANSparkMax(angleMotorChannel, MotorType.kBrushless);
         driveMotor = new WPI_TalonFX(driveMotorChannel);
 
+        angleMotor.restoreFactoryDefaults();
         angleMotor.setInverted(true);
 
         driveMotor.configFactoryDefault();
@@ -88,12 +88,21 @@ public class SingleFalconModule extends SwerveModule {
      */
     @Override
     public double getVelocity() {
-        return driveMotor.getSelectedSensorVelocity(0) / 2048 * 2 * WHEEL_RADIUS * Math.PI;
+        return driveMotor.getSelectedSensorVelocity() / 2048 * 2 * WHEEL_RADIUS * Math.PI;
     }
 
     @Override
     public void setDriveVoltage(double voltage) {
         driveMotor.setVoltage(voltage);
+    }
+
+    /**
+     * Completely stop both the drive motor and the angle motor.
+     */
+    @Override
+    public void stop() {
+        driveMotor.setVoltage(0);
+        angleMotor.set(0);
     }
 
     @Override

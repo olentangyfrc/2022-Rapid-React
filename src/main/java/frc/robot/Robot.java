@@ -6,7 +6,6 @@ package frc.robot;
 
 
 import java.util.ArrayList;
-import java.util.List;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -54,7 +53,7 @@ public class Robot extends TimedRobot {
     Trajectory trajectory = TrajectoryGenerator.generateTrajectory(
       new Pose2d(),
       new ArrayList<Translation2d>(),
-      new Pose2d(3, 0, new Rotation2d()),
+      new Pose2d(1, 0, new Rotation2d()),
       new TrajectoryConfig(SwerveDrivetrain.MAX_LINEAR_SPEED, SwerveDrivetrain.MAX_LINEAR_ACCELERATION)
     );
     
@@ -81,10 +80,10 @@ public class Robot extends TimedRobot {
   public void disabledPeriodic() {}
 
   @Override
-  public void testInit() {
-  }
+  public void testInit() {}
 
   @Override
   public void testPeriodic() {
+    CommandScheduler.getInstance().run();
   }
 }

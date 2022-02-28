@@ -36,6 +36,7 @@ public class AutonTrajectoryFollower {
     public AutonTrajectoryFollower(PIDController xController, PIDController yController, ProfiledPIDController thetaController, Trajectory trajectory, Supplier<Pose2d> positionSupplier, Rotation2d targetAngle) {
         this.trajectory = trajectory;
         this.targetAngle = targetAngle;
+        this.positionSupplier = positionSupplier;
         driveController = new HolonomicDriveController(xController, yController, thetaController);
     }
 

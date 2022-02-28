@@ -43,7 +43,7 @@ public abstract class SwerveDrivetrain extends SubsystemBase {
     public static final double TRACK_WIDTH = 0.4445;
 
     public static final double MAX_LINEAR_SPEED = 6; // Meters per second
-    public static final double MAX_LINEAR_ACCELERATION = 2; // Meters per second squared
+    public static final double MAX_LINEAR_ACCELERATION = 0.4; // Meters per second squared
     public static final double MAX_ROTATION_SPEED = 15.1; // Radians per second
     public static final double MAX_ROTATION_ACCELERATION = Math.PI; // Radians per second squared
 
@@ -151,6 +151,17 @@ public abstract class SwerveDrivetrain extends SubsystemBase {
         frontRightModule.updateState(SwerveModuleState.optimize(states[1], frontRightModule.getAngle()));
         backLeftModule.updateState(SwerveModuleState.optimize(states[2], backLeftModule.getAngle()));
         backRightModule.updateState(SwerveModuleState.optimize(states[3], backRightModule.getAngle()));
+    }
+
+    /**
+     * Stop all of the drive and angle motors.
+     * 
+     */
+    public void stop() {
+        frontLeftModule.stop();
+        frontRightModule.stop();
+        backLeftModule.stop();
+        backRightModule.stop();
     }
 
     /**
