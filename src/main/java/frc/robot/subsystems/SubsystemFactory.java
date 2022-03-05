@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.XboxController.Button;
 // Project imports:
 import frc.robot.subsystems.drivetrain.DrivetrainSubsystem;
 import frc.robot.subsystems.drivetrain.commands.ZeroAngle;
+import frc.robot.subsystems.shooter.shooterSubsystem;
 import frc.robot.subsystems.telemetry.Telemetry;
 import frc.robot.subsystems.IO.ButtonActionType;
 import frc.robot.subsystems.IO.StickButton;
@@ -47,6 +48,7 @@ public class SubsystemFactory {
   private PortManager portManager;
   private IO io;
   private DrivetrainSubsystem driveTrain;
+  private shooterSubsystem shooter;
 
   // Should not be used outside of this class!
   private SubsystemFactory() {}

@@ -4,12 +4,18 @@
 
 package frc.robot;
 
+import java.util.Map;
 
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 
 import frc.robot.subsystems.SubsystemFactory;
+import frc.robot.subsystems.SubsystemFactory.BotType;
+import frc.robot.subsystems.shooter.shooterSubsystem;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -24,21 +30,28 @@ public class Robot extends TimedRobot {
    * initialization code.
    */
 
+  shooterSubsystem shooter;
+
   @Override
   public void robotInit() {
 
     
     try {
       SubsystemFactory.getInstance().init();
+      shooter = new shooterSubsystem();
+      shooter.init(BotType.COVID);
     } catch (Exception exception) {
       exception.printStackTrace();
     }
-
+    
 
   }
 
   @Override
-  public void robotPeriodic() {}
+  public void robotPeriodic() {
+    actualSpeedEntry.setNumber(shooter.getFlySpeed());
+    currentPosition.setNumber(shooter.getFlyPosition());
+  }
 
   @Override
   public void autonomousInit() {}
@@ -62,12 +75,19 @@ public class Robot extends TimedRobot {
   @Override
   public void disabledPeriodic() {}
 
+
+  private NetworkTableEntry targetSpeedEntry = Shuffleboard.getTab("Shooter").add("Target Speed", 0).withWidget(BuiltInWidgets.kTextView).withProperties(Map.of("min", -60, "max", 60)).getEntry();
+  private NetworkTableEntry actualSpeedEntry = Shuffleboard.getTab("Shooter").add("Actual Speed", 0).withWidget(BuiltInWidgets.kGraph).withProperties(Map.of("min", 0, "max", 0)).getEntry();
+  private NetworkTableEntry currentPosition = Shuffleboard.getTab("Shooter").add("Current Position", 0).withWidget(BuiltInWidgets.kTextView).withProperties(Map.of("min",0,"max",0)).getEntry();
+
   @Override
-  public void testInit() {
-  }
+  public void testInit() {}
 
   @Override
   public void testPeriodic() {
+
+    shooter.setSpeed(targetSpeedEntry.getDouble(0));
+
     CommandScheduler.getInstance().run();
   }
 }
