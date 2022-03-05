@@ -50,7 +50,7 @@ public abstract class SwerveDrivetrain extends SubsystemBase {
     private Logger logger = Logger.getLogger("DrivetrainSubsystem");
     
     // Odometry
-    private SwerveDrivePoseEstimator poseEstimator;
+    public SwerveDrivePoseEstimator poseEstimator;
     private Field2d field = new Field2d();
     
     private ShuffleboardTab tab = Shuffleboard.getTab("Drive");
@@ -160,4 +160,5 @@ public abstract class SwerveDrivetrain extends SubsystemBase {
     public boolean getFieldOriented() {
         return fieldOrientedToggle.getBoolean(true);
     }
+
 }
