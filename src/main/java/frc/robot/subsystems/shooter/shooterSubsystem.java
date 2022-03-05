@@ -1,16 +1,15 @@
 package frc.robot.subsystems.shooter;
 
-import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 // CTRE imports
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
-import java.util.Map;
 
 import java.util.logging.Logger;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.PortManager;
 import frc.robot.subsystems.SubsystemFactory;
 import frc.robot.subsystems.PortManager.PortType;
@@ -19,7 +18,7 @@ import frc.robot.subsystems.SubsystemFactory.BotType;
 /**
  * 
  */
-public class shooterSubsystem {
+public class shooterSubsystem extends SubsystemBase {
 
     private Logger logger = Logger.getLogger("Subsystem Factory");
     
@@ -51,6 +50,7 @@ public class shooterSubsystem {
                 flyWheel.configFactoryDefault();
                 triggerWheel = new WPI_TalonFX(portManager.aquirePort(PortType.CAN, 12, "shooterTriggerWheel"));
                 pid = new PIDController(8, 0, 0.2);
+                pid.setTolerance(2);
                 Shuffleboard.getTab("Shooter").add("Shooter PID", pid);
                 break;
             default:
@@ -62,11 +62,12 @@ public class shooterSubsystem {
     
     /**
      * Sets the speed of the fly wheel
+     * This should be called periodically even if the set speed has not changed
      * @param targetSpeed The target speed in rps
      */
     public void setSpeed(double targetSpeed) {
         pid.setSetpoint(targetSpeed);
-        double targetVolts = feedForward.calculate(targetSpeed, pid.calculate(getFlySpeed()));
+        double targetVolts = -feedForward.calculate(targetSpeed, pid.calculate(getFlySpeed()));
         //double targetVolts = pid.calculate(getFlySpeed(), targetSpeed);
         System.out.println(targetVolts);
         flyWheel.setVoltage(targetVolts);
@@ -76,14 +77,14 @@ public class shooterSubsystem {
      * @return The current speed of the fly wheel in rps
      */
     public double getFlySpeed() {
-        return flyWheel.getSelectedSensorVelocity()/sensorUnitsPerRotation*10;
+        return -flyWheel.getSelectedSensorVelocity()/sensorUnitsPerRotation*10;
     }
     
     /**
      * @return The active state of the fly wheel
      */
     public shooterState getState() {
-        if (pid.atSetpoint()) { return shooterState.ready; }
+        if (pid.atSetpoint() && pid.getSetpoint() != 0) { return shooterState.ready; }
         else { return shooterState.off; }
     }
 
