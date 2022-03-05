@@ -11,8 +11,6 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-
-
 import frc.robot.subsystems.SubsystemFactory;
 import frc.robot.subsystems.SubsystemFactory.BotType;
 import frc.robot.subsystems.shooter.shooterSubsystem;
@@ -24,7 +22,7 @@ import frc.robot.subsystems.shooter.shooterSubsystem;
  * project.
  */
 public class Robot extends TimedRobot {
-
+  
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.

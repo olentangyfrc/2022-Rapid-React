@@ -9,6 +9,7 @@ import frc.robot.subsystems.SubsystemFactory.BotType;
 // Java imports
 import java.util.logging.Logger;
 
+import edu.wpi.first.wpilibj.interfaces.Gyro;
 // WPILib imports
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -18,7 +19,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class Telemetry extends SubsystemBase {
     
     // Variables for all sensors
-    private Pigeon pigeon;
+    private Gyro gyro;
 
     private Logger logger = Logger.getLogger("Telemetry");
 
@@ -43,23 +44,37 @@ public class Telemetry extends SubsystemBase {
             case RIO99:
                 initRIO99();
                 break;
+            case RIO1:
+                initRIO1();
+                break;
             default:
                 logger.info("Unrecognized Bot");
         }
+    }
+
+    private void initRIO1() throws Exception {
+        PortManager pm = SubsystemFactory.getInstance().getPortManager();
+        Pigeon pigeon = new Pigeon(pm.aquirePort(PortType.CAN, 21, "Pigeon IMU"));
+        pigeon.init();
+
+        gyro = pigeon;
     }
 
     /**
      *  Initializes COVID Bot sensors
      */
     private void initCOVID() {}
+    
 
     /**
      *  Initializes California Bot sensors
      */
     private void initCALIFORNIA() throws Exception {
         PortManager pm = SubsystemFactory.getInstance().getPortManager();
-        pigeon = new Pigeon(pm.aquirePort(PortType.CAN, 21, "Pigeon IMU"));
+        Pigeon pigeon = new Pigeon(pm.aquirePort(PortType.CAN, 21, "Pigeon IMU"));
         pigeon.init();
+
+        gyro = pigeon;
     }
 
 
@@ -68,14 +83,12 @@ public class Telemetry extends SubsystemBase {
      */
     private void initRIO99() throws Exception {
         PortManager pm = SubsystemFactory.getInstance().getPortManager();
-        pigeon = new Pigeon(pm.aquirePort(PortType.CAN, 21, "Pigeon IMU"));
-        pigeon.init();
     }
 
     /**
      * @return The active pigeon sensor
      */
-    public Pigeon getPigeon() {
-        return pigeon;
+    public Gyro getGyro() {
+        return gyro;
     }
 }
