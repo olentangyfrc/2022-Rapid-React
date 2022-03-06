@@ -7,13 +7,16 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import frc.robot.subsystems.Climber.Climber;
 import frc.robot.subsystems.Climber.ClimberSBTab;
-import frc.robot.subsystems.Climber.commands.Climb;
+import frc.robot.subsystems.Climber.commands.ClimbToFirstBar;
+import frc.robot.subsystems.Climber.commands.ClimbToNextBar;
 import frc.robot.subsystems.Climber.commands.ExtendArms;
+import frc.robot.subsystems.Climber.commands.ExtendArmsToPosition;
 import frc.robot.subsystems.Climber.commands.LatchOntoBar;
 import frc.robot.subsystems.Climber.commands.LetGoOfBar;
 import frc.robot.subsystems.Climber.commands.PullArmsBack;
 import frc.robot.subsystems.Climber.commands.PushArmsForward;
 import frc.robot.subsystems.Climber.commands.RetractArms;
+import frc.robot.subsystems.Elevator.Elevator;
 
 import java.net.NetworkInterface;
 import java.util.Collections;
@@ -40,6 +43,7 @@ public class SubsystemFactory {
 
   private PowerDistribution pdp;
   private Climber climber;
+  private Elevator elevator;
   private Logger logger = Logger.getLogger("Subsystem Factory");
 
   /**
@@ -207,31 +211,28 @@ public class SubsystemFactory {
    */
   public void initRIO1() throws Exception{
     logger.info("Initializing Rio1");
-    logger.info("Initializing Rio1");
-    logger.info("Initializing Rio1");
-    logger.info("Initializing Rio1");
-    logger.info("Initializing Rio1");
-    logger.info("Initializing Rio1");
-    logger.info("Initializing Rio1");
-    logger.info("Initializing Rio1");
-    logger.info("Initializing Rio1");
-    logger.info("Initializing Rio1");
 
     climber = new Climber();
+    elevator = new Elevator();
     //driveTrain = new DrivetrainSubsystem();
 
     logger.info("Initializing Climber Subsystem");
     climber.init();
-    ClimberSBTab climberTab = new ClimberSBTab(climber);
+    elevator.init();
+    ClimberSBTab climberTab = new ClimberSBTab(climber, elevator);
     io.bind(new PushArmsForward(climber), Button.kLeftBumper, StickButton.LEFT_6, ButtonActionType.WHEN_HELD);
-    io.bind(new PullArmsBack(climber), Button.kLeftStick, StickButton.LEFT_7, ButtonActionType.WHEN_HELD);
+    //io.bind(new PullArmsBack(climber), Button.kLeftStick, StickButton.LEFT_7, ButtonActionType.WHEN_HELD);
     io.bind(new ExtendArms(climber), Button.kRightBumper, StickButton.LEFT_8, ButtonActionType.WHEN_HELD);
-    io.bind(new RetractArms(climber), Button.kRightStick, StickButton.LEFT_9, ButtonActionType.WHEN_HELD);
+    io.bind(new RetractArms(elevator), Button.kRightStick, StickButton.LEFT_9, ButtonActionType.WHEN_HELD);
     io.bind(new LatchOntoBar(climber), Button.kX, StickButton.LEFT_10, ButtonActionType.WHEN_PRESSED);
     io.bind(new LetGoOfBar(climber), Button.kB, StickButton.LEFT_11, ButtonActionType.WHEN_PRESSED);
 
-    //climb command group
-    //io.bind(new Climb(climber), Button.kX, StickButton.RIGHT_11, ButtonActionType.WHEN_PRESSED);
+    io.bind(new ClimbToFirstBar(climber), Button.kA, StickButton.RIGHT_10, ButtonActionType.WHEN_PRESSED);
+    io.bind(new ClimbToNextBar(climber), Button.kBack, StickButton.RIGHT_11, ButtonActionType.WHEN_PRESSED);
+
+    io.bind(new ExtendArmsToPosition(elevator, 2, true), Button.kY, StickButton.RIGHT_6, ButtonActionType.WHEN_PRESSED);
+    io.bind(new ExtendArmsToPosition(elevator, 8, false), Button.kStart, StickButton.RIGHT_7, ButtonActionType.WHEN_PRESSED);
+    io.bind(new ExtendArmsToPosition(elevator, 0, false), Button.kLeftStick, StickButton.RIGHT_8, ButtonActionType.WHEN_PRESSED);
   }
   
   // Getter methods for all of the subsystems:

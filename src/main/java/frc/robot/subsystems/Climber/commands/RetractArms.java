@@ -1,18 +1,18 @@
 package frc.robot.subsystems.Climber.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.Climber.Climber;
+import frc.robot.subsystems.Elevator.Elevator;
 
 import java.util.logging.Logger;
 
 public class RetractArms extends CommandBase{
-    private Climber climber;
+    private Elevator elevator;
 
     private static Logger logger = Logger.getLogger(RetractArms.class.getName());
 
-    public RetractArms(Climber cb) {
-        climber = cb;
-        addRequirements(cb);
+    public RetractArms(Elevator el) {
+        elevator = el;
+        addRequirements(el);
     }
 
     @Override
@@ -22,16 +22,16 @@ public class RetractArms extends CommandBase{
 
     @Override
     public void execute(){
-        climber.retractArms();
+        elevator.retractArms();
     }
 
     @Override
     public void end(boolean interrupted){
-        climber.stopWinch();
+        elevator.stopWinch();
     }
 
     @Override
     public boolean isFinished(){
-        return Math.abs(climber.getMinHeight() - climber.getWinchPosition()) <= 0.1;
+        return Math.abs(elevator.getMinHeight() - elevator.getWinchPosition()) <= 0.1;
     }
 }

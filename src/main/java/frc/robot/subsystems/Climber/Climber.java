@@ -8,6 +8,8 @@ import com.revrobotics.CANSparkMaxLowLevel;
 import com.revrobotics.SparkMaxAnalogSensor;
 import com.revrobotics.SparkMaxPIDController;
 
+import edu.wpi.first.math.controller.ElevatorFeedforward;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
@@ -33,6 +35,8 @@ public class Climber extends SubsystemBase{
     private final CANSparkMax.IdleMode MOTOR_MODE = CANSparkMax.IdleMode.kBrake;
     private final SparkMaxAnalogSensor.Mode POTENTIOMETER_MODE = SparkMaxAnalogSensor.Mode.kAbsolute;
 
+    private final TrapezoidProfile.Constraints SPEED_CONSTRAINTS = new TrapezoidProfile.Constraints(10, 7);
+
     private SparkMaxAnalogSensor rightPotentiometer, leftPotentiometer;
     private SparkMaxPIDController rightPidController, leftPidController;
     private double kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM, maxVel, minVel, maxAcc;
@@ -42,15 +46,6 @@ public class Climber extends SubsystemBase{
 
     private double maxLeftForwardPosition;
     private double minLeftBackPosition;
-
-    private WPI_TalonFX winchMotor;
-    private final int TALON_CAN = 28;
-    private double verticalPercentOutput;
-
-    private DutyCycleEncoder winchEncoder;
-    private double maxHeight;
-    private double minHeight;
-    private double targetHeight;
 
     private double actuatorLengthInPercent;
     private double rightActuatorLengthInPosition;
@@ -66,13 +61,7 @@ public class Climber extends SubsystemBase{
 
     public void init() throws Exception {
         logger.info("Setting Up Climber");
-        logger.info("Setting Up Climber");
-        logger.info("Setting Up Climber");
-        logger.info("Setting Up Climber");
-        logger.info("Setting Up Climber");
-        logger.info("Setting Up Climber");
-        logger.info("Setting Up Climber");
-        logger.info("Setting Up Climber");
+
         PortManager pm = SubsystemFactory.getInstance().getPortManager();
         rightLinearActuator = new CANSparkMax(pm.aquirePort(PortType.CAN, 20, "Right Linear Actuator"), MOTOR_TYPE);
         leftLinearActuator = new CANSparkMax(pm.aquirePort(PortType.CAN, 7, "Left Linear Actuator"), MOTOR_TYPE);
@@ -96,11 +85,11 @@ public class Climber extends SubsystemBase{
         kMaxOutput = 1;
         kMinOutput = -1;
 
-        maxRightForwardPosition = 0.9;
-        minRightBackPosition = 0.3;
+        maxRightForwardPosition = 1.12;
+        minRightBackPosition = 0.18;
 
-        maxLeftForwardPosition = 0.82;
-        minLeftBackPosition = 0.19;
+        maxLeftForwardPosition = 1.05;
+        minLeftBackPosition = 0.1;
 
         //maxVel = 0;
         //maxAcc = 0;
@@ -119,21 +108,6 @@ public class Climber extends SubsystemBase{
         leftPidController.setFF(kFF);
         leftPidController.setOutputRange(kMinOutput, kMaxOutput);
 
-        winchMotor = new WPI_TalonFX(pm.aquirePort(PortType.CAN, TALON_CAN, "Winch Motor"));
-        winchMotor.setNeutralMode(NeutralMode.Brake);
-
-        winchEncoder = new DutyCycleEncoder(pm.aquirePort(PortType.DIGITAL, 0, "Winch Encoder"));
-        winchEncoder.reset();
-        winchEncoder.setDistancePerRotation(1);
-        maxHeight = -10;
-        minHeight = 0;
-
-        verticalPercentOutput = 0.75;
-        
-        /*actuatorLengthInPercent = 0.5;
-        rightActuatorLengthInPosition = 2;
-        leftActuatorLengthInPosition = 2;
-        */
 
         pinsForward = 1;
         pinsReverse = 0;
@@ -143,15 +117,6 @@ public class Climber extends SubsystemBase{
         pins = new DoubleSolenoid(PCMCANID, PneumaticsModuleType.CTREPCM, pinsForward, pinsReverse);
         pins.set(Value.kOff);
     }
-
-    /*@Override
-    public void periodic(){
-        tab.addNumber("Right Potentiometer Position", () -> getRightPotentiometerPosition());
-        tab.addNumber("Left Potentiometer Position", () -> getLeftPotentiometerPosition());
-        tab.addNumber("Right Position Conversion Factor", () -> getRightPositionConversionFactor());
-        tab.addNumber("Left Position Conversion Fact", () -> getLeftPositionConversionFactor());
-    }
-    */
 
     public void pushArmsForward() {
         rightPidController.setReference(maxRightForwardPosition, CANSparkMax.ControlType.kPosition);
@@ -173,24 +138,12 @@ public class Climber extends SubsystemBase{
         leftLinearActuator.set(-0.4);
     }
 
-    public void extendArms() {
-        winchMotor.set(verticalPercentOutput);
-    }
-
-    public void retractArms() {
-        winchMotor.set(-verticalPercentOutput);
-    }
-
     public void latchOntoBar(){
         pins.set(Value.kForward);
     }
 
     public void letGoOfBar(){
         pins.set(Value.kReverse);
-    }
-
-    public void stopWinch(){
-        winchMotor.stopMotor();
     }
 
     public void stopRightLinearActuator(){
@@ -201,34 +154,12 @@ public class Climber extends SubsystemBase{
         leftLinearActuator.stopMotor();
     }
 
-    public void setVerticalPercentOutput(double output) {
-        if(output <= 1 && output >= -1) {
-            verticalPercentOutput = output;
-        }
-    }
-
-    public void getVerticalPercentOutput() {
-        winchMotor.get();
-    }
-
     public double getRightPotentiometerPosition() {
         return rightPotentiometer.getPosition();
     }
 
     public double getLeftPotentiometerPosition(){
         return leftPotentiometer.getPosition();
-    }
-
-    public double getWinchPosition() {
-        return winchEncoder.getDistance();
-    }
-
-    public double getMaxHeight() {
-        return maxHeight;
-    }
-
-    public double getMinHeight() {
-        return minHeight;
     }
 
     public double getRightMaxForwardPosition() {

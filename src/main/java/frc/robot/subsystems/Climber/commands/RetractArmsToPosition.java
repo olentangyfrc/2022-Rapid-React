@@ -5,23 +5,27 @@ import frc.robot.subsystems.Climber.Climber;
 
 import java.util.logging.Logger;
 
-public class ExtendArms extends CommandBase{
+public class RetractArmsToPosition extends CommandBase{
     private Climber climber;
-    private static Logger logger = Logger.getLogger(ExtendArms.class.getName());
 
-    public ExtendArms(Climber cb) {
+    private static Logger logger = Logger.getLogger(RetractArms.class.getName());
+
+    private double position;
+
+    public RetractArmsToPosition(Climber cb, double pos) {
         climber = cb;
         addRequirements(cb);
+        position = pos;
     }
 
     @Override
     public void initialize(){
-        logger.info("Extend Arms");
+        logger.info("Retracting Arms");
     }
 
     @Override
     public void execute(){
-        //climber.extendArms();
+        //climber.retractArms();
     }
 
     @Override
@@ -31,7 +35,7 @@ public class ExtendArms extends CommandBase{
 
     @Override
     public boolean isFinished(){
-        //return Math.abs(climber.getMaxHeight() - climber.getWinchPosition()) <= 0.1;
+        //return Math.abs(position - climber.getWinchPosition()) <= 0.2;
         return true;
     }
 }
