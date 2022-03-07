@@ -37,12 +37,12 @@ public class Elevator extends SubsystemBase{
     private double targetHeight;
 
     private final double kSOffBar = 0.50046;
-    private final double kGOffBar = 0.10773;
-    private final double kVOffBar = -0.024405;
+    private final double kVOffBar = 0.10773;
+    private final double kGOffBar = -0.024405;
 
     private final double kSOnBar = 0.53251;
-    private final double kGOnBar = 4.3071;
-    private final double kVOnBar = -0.29183;
+    private final double kVOnBar = 4.3071;
+    private final double kGOnBar = -0.29183;
 
 
     public void init() throws Exception {
@@ -69,7 +69,7 @@ public class Elevator extends SubsystemBase{
 
         winchVelocity = 0;
         elevatorFeedForwardOffBar = new ElevatorFeedforward(kSOffBar, kGOffBar, kVOffBar);
-        elevatorFeedForwardOnBar = new ElevatorFeedforward(kSOnBar, kGOnBar, kVOffBar);
+        elevatorFeedForwardOnBar = new ElevatorFeedforward(kSOnBar, kGOnBar, kVOnBar);
         //winchMotor.setSelectedSensorPosition(0);
     }
 
