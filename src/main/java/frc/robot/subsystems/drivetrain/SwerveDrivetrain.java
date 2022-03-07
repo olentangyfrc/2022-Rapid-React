@@ -6,6 +6,7 @@ import java.util.logging.Logger;
 // WPILib imports
 import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.Nat;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -56,6 +57,9 @@ public abstract class SwerveDrivetrain extends SubsystemBase {
     private ShuffleboardTab tab = Shuffleboard.getTab("Drive");
     private NetworkTableEntry fieldOrientedToggle = tab.add("Field Oriented", true).withWidget(BuiltInWidgets.kToggleButton).getEntry();
 
+    private PIDController anglePid = new PIDController(.01, 0, 0);
+    private double targetAngle = Double.NaN;
+
     /**
      * Initialize the drivetrain subsystem
      */
@@ -79,6 +83,9 @@ public abstract class SwerveDrivetrain extends SubsystemBase {
             new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0.1, 0.1, 0.01)
         );
 
+        anglePid.enableContinuousInput(0, 360);
+        anglePid.setTolerance(0.1);
+
         // Add the encoder readings to shuffleboard
         tab.addNumber("FL angle", () -> frontLeftModule.getAngle().getDegrees());
         tab.addNumber("FR angle", () -> frontRightModule.getAngle().getDegrees());
@@ -86,6 +93,9 @@ public abstract class SwerveDrivetrain extends SubsystemBase {
         tab.addNumber("BR angle", () -> backRightModule.getAngle().getDegrees());
         tab.add(field);
 
+    }
+    public SwerveDrivePoseEstimator getposeEstimator(){
+        return poseEstimator;
     }
 
     /**
@@ -97,7 +107,7 @@ public abstract class SwerveDrivetrain extends SubsystemBase {
      * @param wheelOffsets The offsets for the modules
      * @throws Exception If there is an issue acquiring a port.
      */
-    public abstract void initializeSwerveModules(Map<String, Integer> portAssignments, Map<String, Double> wheelOffsets) throws Exception;
+    protected abstract void initializeSwerveModules(Map<String, Integer> portAssignments, Map<String, Double> wheelOffsets) throws Exception;
 
     @Override
     public void periodic() {
@@ -126,6 +136,10 @@ public abstract class SwerveDrivetrain extends SubsystemBase {
             );
         }
 
+        if(targetAngle != Double.NaN) {
+            speeds.omegaRadiansPerSecond = anglePid.calculate(gyro.getAngle());
+        }
+
         SwerveModuleState[] states = kinematics.toSwerveModuleStates(speeds);
         SwerveDriveKinematics.desaturateWheelSpeeds(states, MAX_LINEAR_SPEED); // Normalize wheel speeds so we don't go faster than 100%
         
@@ -141,6 +155,22 @@ public abstract class SwerveDrivetrain extends SubsystemBase {
         frontRightModule.updateState(SwerveModuleState.optimize(states[1], frontRightModule.getAngle()));
         backLeftModule.updateState(SwerveModuleState.optimize(states[2], backLeftModule.getAngle()));
         backRightModule.updateState(SwerveModuleState.optimize(states[3], backRightModule.getAngle()));
+    }
+
+    /**
+     * Set the target angle for the bot to rotate to.
+     * 
+     * @param targetAngle The target angle in degrees.
+     */
+    public void setTargetAngle(Rotation2d targetAngle) {
+        this.targetAngle = targetAngle.getDegrees();
+    }
+
+    /**
+     * Remove the target angle so that the bot can freely rotate.
+     */
+    public void removeTargetAngle() {
+        targetAngle = Double.NaN;
     }
 
     /**

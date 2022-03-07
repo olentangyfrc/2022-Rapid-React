@@ -231,8 +231,18 @@ public class SubsystemFactory {
     return telemetry;
   }
 
+  /**
+   * @return The active drivetrain
+   */
   public SwerveDrivetrain getDrivetrain() {
     return driveTrain;
+  }
+
+  /**
+   * @return the active shooter
+   */
+  public shooterSubsystem getShooter() {
+    return shooter;
   }
 
   /**
