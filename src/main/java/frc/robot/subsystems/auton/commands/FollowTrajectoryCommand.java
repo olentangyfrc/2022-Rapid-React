@@ -54,7 +54,7 @@ public class FollowTrajectoryCommand extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    drivetrain.drive(follower.calculate(getCurrentTIme()));
+    drivetrain.drive(follower.calculate(getCurrentTIme()), false);
   }
 
   // Called once the command ends or is interrupted.

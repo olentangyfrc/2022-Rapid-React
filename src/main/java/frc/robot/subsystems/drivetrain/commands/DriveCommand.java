@@ -17,9 +17,9 @@ import frc.robot.subsystems.drivetrain.SwerveDrivetrain;
  */
 public class DriveCommand extends InstantCommand {
   private SwerveDrivetrain drivetrain;
-  private SlewRateLimiter xLimiter = new SlewRateLimiter(2.5);
-  private SlewRateLimiter yLimiter = new SlewRateLimiter(2.5);
-  private SlewRateLimiter thetaLimiter = new SlewRateLimiter(2.5);
+  private SlewRateLimiter xLimiter = new SlewRateLimiter(2);
+  private SlewRateLimiter yLimiter = new SlewRateLimiter(2);
+  private SlewRateLimiter thetaLimiter = new SlewRateLimiter(2);
 
   public DriveCommand(SwerveDrivetrain drivetrain) {
     this.drivetrain = drivetrain;
@@ -38,6 +38,6 @@ public class DriveCommand extends InstantCommand {
       thetaLimiter.calculate(io.getRotation()) * SwerveDrivetrain.MAX_ROTATION_SPEED
     );
 
-    drivetrain.drive(speeds);
+    drivetrain.drive(speeds, drivetrain.getFieldOriented());
   }
 }

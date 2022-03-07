@@ -20,8 +20,8 @@ public class SingleFalconDrivetrain extends SwerveDrivetrain {
     @Override
     public void initializeSwerveModules(Map<String, Integer> portAssignments, Map<String, Double> wheelOffsets) throws Exception {
 
-        xController = new PIDController(10, 0, 0);
-        yController = new PIDController(10, 0, 0);
+        xController = new PIDController(6, 0, 0);
+        yController = new PIDController(6, 0, 0);
         thetaController = new ProfiledPIDController(1, 0, 0, new Constraints(MAX_ROTATION_SPEED, MAX_ROTATION_ACCELERATION));
 
         PortManager portManager = SubsystemFactory.getInstance().getPortManager();

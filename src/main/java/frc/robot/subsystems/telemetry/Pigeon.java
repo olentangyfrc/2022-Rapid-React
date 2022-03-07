@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.interfaces.Gyro;
  */
 public class Pigeon implements Gyro {
     private WPI_PigeonIMU imu;
+    private boolean isInverted = false;
 
     public Pigeon(int deviceId) {
         this.imu = new WPI_PigeonIMU(deviceId);
@@ -36,8 +37,11 @@ public class Pigeon implements Gyro {
      */
     @Override
     public double getAngle() {
-        // Negate it to make it clockwise.
-        return (imu.getFusedHeading() % 360);
+        if(isInverted) {
+            return -(imu.getFusedHeading() % 360);
+        } else {
+            return (imu.getFusedHeading() % 360);
+        }
     }
 
     /**
@@ -77,6 +81,10 @@ public class Pigeon implements Gyro {
         imu.setFusedHeading(angle.getDegrees());
     }
 
+    public void setInverted(boolean inverted) {
+        isInverted = inverted;
+    }
+
     /**
      * Enter gyro calibration mode.
      * <p>
@@ -86,6 +94,12 @@ public class Pigeon implements Gyro {
     public void calibrate() {
         while (!imu.getState().equals(PigeonState.Ready));
         imu.enterCalibrationMode(CalibrationMode.BootTareGyroAccel);
+    }
+
+    public double getForwardsAcceleration() {
+        short[] xyz = new short[3];
+        imu.getBiasedAccelerometer(xyz);
+        return xyz[0] / 16384.0;
     }
 
     /**

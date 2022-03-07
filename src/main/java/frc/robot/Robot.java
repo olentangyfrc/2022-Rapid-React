@@ -6,6 +6,7 @@ package frc.robot;
 
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -50,14 +51,26 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
+    SubsystemFactory.getInstance().getDrivetrain().resetLocation(new Pose2d(0, 2, new Rotation2d()), new Rotation2d());
+
+    TrajectoryConfig config = new TrajectoryConfig(SwerveDrivetrain.MAX_LINEAR_SPEED, SwerveDrivetrain.MAX_LINEAR_ACCELERATION);
+
+
     Trajectory trajectory = TrajectoryGenerator.generateTrajectory(
-      new Pose2d(),
-      new ArrayList<Translation2d>(),
-      new Pose2d(1, 0, new Rotation2d()),
-      new TrajectoryConfig(SwerveDrivetrain.MAX_LINEAR_SPEED, SwerveDrivetrain.MAX_LINEAR_ACCELERATION)
+      new Pose2d(0, 2, new Rotation2d()),
+      new ArrayList<Translation2d>(Arrays.asList(
+        new Translation2d(2,2),
+        new Translation2d(2,3),
+        new Translation2d(4,3),
+        new Translation2d(4,1),
+        new Translation2d(6,1),
+        new Translation2d(6,2)
+      )),
+      new Pose2d(7, 2, new Rotation2d()),
+      config
     );
     
-    (new FollowTrajectoryCommand(SubsystemFactory.getInstance().getDrivetrain(), trajectory, new Rotation2d())).schedule();
+    (new FollowTrajectoryCommand(SubsystemFactory.getInstance().getDrivetrain(), trajectory, Rotation2d.fromDegrees(0))).schedule();
   }
 
   @Override

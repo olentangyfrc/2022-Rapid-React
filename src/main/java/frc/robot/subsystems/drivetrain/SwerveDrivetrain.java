@@ -1,5 +1,9 @@
 package frc.robot.subsystems.drivetrain;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -15,14 +19,16 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.trajectory.TrajectoryConfig;
+import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
-import edu.wpi.first.wpilibj2.command.ProfiledPIDCommand;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.SubsystemFactory;
 import frc.robot.subsystems.drivetrain.commands.DriveCommand;
@@ -42,8 +48,8 @@ public abstract class SwerveDrivetrain extends SubsystemBase {
     // Distance from center of wheel to center of wheel across the front of the bot in meters
     public static final double TRACK_WIDTH = 0.4445;
 
-    public static final double MAX_LINEAR_SPEED = 6; // Meters per second
-    public static final double MAX_LINEAR_ACCELERATION = 0.4; // Meters per second squared
+    public static final double MAX_LINEAR_SPEED = 2.74; // Meters per second
+    public static final double MAX_LINEAR_ACCELERATION = 1; // Meters per second squared
     public static final double MAX_ROTATION_SPEED = 15.1; // Radians per second
     public static final double MAX_ROTATION_ACCELERATION = Math.PI; // Radians per second squared
 
@@ -66,10 +72,13 @@ public abstract class SwerveDrivetrain extends SubsystemBase {
     private ShuffleboardTab tab = Shuffleboard.getTab("Drive");
     private NetworkTableEntry fieldOrientedToggle = tab.add("Field Oriented", true).withWidget(BuiltInWidgets.kToggleButton).getEntry();
 
+    private Instant startTime;
+
     /**
      * Initialize the drivetrain subsystem
      */
     public void init(Map<String, Integer> portAssignments, Map<String, Double> wheelOffsets) throws Exception {
+        startTime = Instant.now();
         initializeSwerveModules(portAssignments, wheelOffsets);
 
         // Create a new drive command to be reused later
@@ -94,8 +103,27 @@ public abstract class SwerveDrivetrain extends SubsystemBase {
         tab.addNumber("FR angle", () -> frontRightModule.getAngle().getDegrees());
         tab.addNumber("BL angle", () -> backLeftModule.getAngle().getDegrees());
         tab.addNumber("BR angle", () -> backRightModule.getAngle().getDegrees());
-        tab.add(field);
+        tab.addNumber("FL speed", frontLeftModule::getVelocity);
+        tab.addNumber("FR speed", frontRightModule::getVelocity);
+        tab.addNumber("BL speed", backLeftModule::getVelocity);
+        tab.addNumber("BR speed", backRightModule::getVelocity);
+        SmartDashboard.putData(field);
+        
+        Trajectory trajectory = TrajectoryGenerator.generateTrajectory(
+            new Pose2d(),
+            new ArrayList<Translation2d>(Arrays.asList(
+                new Translation2d(2,0),
+                new Translation2d(2,1),
+                new Translation2d(4,1),
+                new Translation2d(4,-1),
+                new Translation2d(6,-1),
+                new Translation2d(6,0)
+            )),
+            new Pose2d(7, 0, new Rotation2d()),
+            new TrajectoryConfig(SwerveDrivetrain.MAX_LINEAR_SPEED, SwerveDrivetrain.MAX_LINEAR_ACCELERATION)
+        );
 
+        field.getObject("traj").setTrajectory(trajectory);
     }
 
     /**
@@ -112,7 +140,7 @@ public abstract class SwerveDrivetrain extends SubsystemBase {
     @Override
     public void periodic() {
         // Run the drive command periodically
-        if(driveCommand != null && DriverStation.isTeleopEnabled()) {
+        if(driveCommand != null) {
             driveCommand.schedule();
         }
     }
@@ -124,10 +152,10 @@ public abstract class SwerveDrivetrain extends SubsystemBase {
      * 
      * @param speeds Chassis speeds with vx and vy <= max linear speed and omega < max rotation speed
     */
-    public void drive(ChassisSpeeds speeds) {
+    public void drive(ChassisSpeeds speeds, boolean fieldOriented) {
         
-        Gyro gyro = SubsystemFactory.getInstance().getTelemetry().getGyro();
-        if(getFieldOriented()) {
+        Pigeon gyro = (Pigeon) SubsystemFactory.getInstance().getTelemetry().getGyro();
+        if(fieldOriented) {
             speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
                 speeds.vxMetersPerSecond, 
                 speeds.vyMetersPerSecond,
@@ -138,19 +166,28 @@ public abstract class SwerveDrivetrain extends SubsystemBase {
 
         SwerveModuleState[] states = kinematics.toSwerveModuleStates(speeds);
         SwerveDriveKinematics.desaturateWheelSpeeds(states, MAX_LINEAR_SPEED); // Normalize wheel speeds so we don't go faster than 100%
-        
-        poseEstimator.update(gyro.getRotation2d(), states);
-        field.setRobotPose(
-            poseEstimator.getEstimatedPosition().getX(),
-            poseEstimator.getEstimatedPosition().getY(),
-            gyro.getRotation2d()
-        );
 
         // Update SwerveModule states
         frontLeftModule.updateState(SwerveModuleState.optimize(states[0], frontLeftModule.getAngle()));
         frontRightModule.updateState(SwerveModuleState.optimize(states[1], frontRightModule.getAngle()));
         backLeftModule.updateState(SwerveModuleState.optimize(states[2], backLeftModule.getAngle()));
         backRightModule.updateState(SwerveModuleState.optimize(states[3], backRightModule.getAngle()));
+        field.setRobotPose(-poseEstimator.getEstimatedPosition().getX(), poseEstimator.getEstimatedPosition().getY(), gyro.getRotation2d());
+        updateOdometry();
+    }
+    
+    public void updateOdometry() {
+        Gyro gyro = SubsystemFactory.getInstance().getTelemetry().getGyro();
+
+        SwerveModuleState[] states = {
+            new SwerveModuleState(frontLeftModule.getVelocity(), frontLeftModule.getAngle()),
+            new SwerveModuleState(frontRightModule.getVelocity(), frontRightModule.getAngle()),
+            new SwerveModuleState(backLeftModule.getVelocity(), backLeftModule.getAngle()),
+            new SwerveModuleState(backRightModule.getVelocity(), backRightModule.getAngle())
+        };
+
+        poseEstimator.updateWithTime(Duration.between(startTime, Instant.now()).toMillis() / 1000.0, gyro.getRotation2d(), states);
+        
     }
 
     /**
@@ -191,5 +228,9 @@ public abstract class SwerveDrivetrain extends SubsystemBase {
      */
     public Pose2d getLocation() {
         return poseEstimator.getEstimatedPosition();
+    }
+
+    public void resetLocation(Pose2d botLocation, Rotation2d botAngle) {
+        poseEstimator.resetPosition(botLocation, botAngle);
     }
 }
