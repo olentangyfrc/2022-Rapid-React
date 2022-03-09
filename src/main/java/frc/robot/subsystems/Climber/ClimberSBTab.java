@@ -32,8 +32,7 @@ public class ClimberSBTab {
         tab.addNumber("Max Left Potentiometer Position", climber::getLeftMaxForwardPosition);
         tab.addNumber("Min Right Potentiometer Position", climber::getRightMinBackPosition);
         tab.addNumber("Min Left Potentiometer Position", climber::getLeftMinBackPosition);
-        tab.addNumber("Winch Encoder Position in Rotations", elevator::getEncoderRotations);
-        tab.addNumber("Winch Encoder Position in Encoder Ticks", elevator::getEncoderPosition);
+        tab.addNumber("Winch Encoder Position in Rotations", elevator::getPosition);
         tab.addNumber("Current Velocity", elevator::getVelocity);
 
         //winchPercentOutput = tab.add("Set Winch Percent Output (-1 to 1)", 0.05).getEntry();
