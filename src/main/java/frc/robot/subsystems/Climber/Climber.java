@@ -92,10 +92,10 @@ public class Climber extends SubsystemBase{
         */
 
         maxRightForwardPosition = 1.12;
-        minRightBackPosition = 0.18;
+        minRightBackPosition = 0.171;
 
         maxLeftForwardPosition = 1.05;
-        minLeftBackPosition = 0.1;
+        minLeftBackPosition = 0.0939;
 
         /*rightPidController.setP(kP);
         rightPidController.setI(kI);

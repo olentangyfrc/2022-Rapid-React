@@ -21,6 +21,7 @@ import frc.robot.subsystems.Climber.Climber;
 import frc.robot.subsystems.Climber.ClimberSBTab;
 import frc.robot.subsystems.Climber.commands.LatchOntoBar;
 import frc.robot.subsystems.Climber.commands.LetGoOfBar;
+import frc.robot.subsystems.Climber.commands.PullArmsBack;
 import frc.robot.subsystems.Climber.commands.PushArmsForward;
 import frc.robot.subsystems.Elevator.Elevator;
 import frc.robot.subsystems.Elevator.commands.ExtendArmsToPosition;
@@ -216,13 +217,13 @@ public class SubsystemFactory {
     elevator.init();
     ClimberSBTab climberTab = new ClimberSBTab(climber, elevator);
     io.bind(new PushArmsForward(climber), Button.kLeftBumper, StickButton.LEFT_6, ButtonActionType.WHEN_HELD);
-    //io.bind(new PullArmsBack(climber), Button.kLeftStick, StickButton.LEFT_7, ButtonActionType.WHEN_HELD);
+    io.bind(new PullArmsBack(climber), Button.kLeftStick, StickButton.LEFT_7, ButtonActionType.WHEN_HELD);
     io.bind(new LatchOntoBar(climber), Button.kX, StickButton.LEFT_10, ButtonActionType.WHEN_PRESSED);
     io.bind(new LetGoOfBar(climber), Button.kB, StickButton.LEFT_11, ButtonActionType.WHEN_PRESSED);
 
-    io.bind(new ExtendArmsToPosition(elevator, 2), Button.kY, StickButton.RIGHT_6, ButtonActionType.WHEN_PRESSED);
-    io.bind(new ExtendArmsToPosition(elevator, 8), Button.kStart, StickButton.RIGHT_7, ButtonActionType.WHEN_PRESSED);
-    io.bind(new ExtendArmsToPosition(elevator, 0), Button.kLeftStick, StickButton.RIGHT_8, ButtonActionType.WHEN_PRESSED);
+    //io.bind(new ExtendArmsToPosition(elevator, 2), Button.kY, StickButton.RIGHT_6, ButtonActionType.WHEN_PRESSED);
+    //io.bind(new ExtendArmsToPosition(elevator, 8), Button.kStart, StickButton.RIGHT_7, ButtonActionType.WHEN_PRESSED);
+    //io.bind(new ExtendArmsToPosition(elevator, 0), Button.kLeftStick, StickButton.RIGHT_8, ButtonActionType.WHEN_PRESSED);
   }
   
   // Getter methods for all of the subsystems:

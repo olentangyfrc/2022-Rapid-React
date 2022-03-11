@@ -8,7 +8,10 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.PortManager;
 import frc.robot.subsystems.PortManager.PortType;
@@ -40,6 +43,7 @@ public class Elevator extends SubsystemBase{
     private final TrapezoidProfile.Constraints SPEED_CONSTRAINTS = new TrapezoidProfile.Constraints(10, 7);
     // Do not change these directly! Use SysID.
     private ProfiledPIDController elevatorController = new ProfiledPIDController(57.839, 0, 5.2621, SPEED_CONSTRAINTS);
+    //private ProfiledPIDController elevatorController = new ProfiledPIDController(10.038, 0, 4.1283, SPEED_CONSTRAINTS);
 
 
     public void init() throws Exception {
@@ -68,6 +72,8 @@ public class Elevator extends SubsystemBase{
         setTargetRotations(getPosition());
     }
 
+    NetworkTableEntry targetElevatorPosition = Shuffleboard.getTab("Climber").add("Target Position", 0).withWidget(BuiltInWidgets.kTextView).getEntry();
+
     @Override
     public void periodic() {
         // Constantly try to adhere to our target position.
@@ -77,6 +83,8 @@ public class Elevator extends SubsystemBase{
         double clampedError = MathUtil.clamp(getPosition(), targetPosition - MAX_ERROR, targetPosition + MAX_ERROR);
 
         winchMotor.setVoltage(elevatorController.calculate(clampedError));
+
+        setTargetRotations(targetElevatorPosition.getDouble(0));
     }
 
     //Moves the arms up using percent output.

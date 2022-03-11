@@ -33,6 +33,6 @@ public class PullArmsBack extends CommandBase{
 
     @Override
     public boolean isFinished(){
-        return (Math.abs(climber.getRightPotentiometerPosition() - climber.getRightMinBackPosition()) < 0.01 && Math.abs(climber.getLeftPotentiometerPosition() - climber.getLeftMinBackPosition()) < 0.01);
+        return (Math.abs(climber.getRightPotentiometerPosition() - climber.getRightMinBackPosition()) < 0.03 && Math.abs(climber.getLeftPotentiometerPosition() - climber.getLeftMinBackPosition()) < 0.03);
     }
 }
