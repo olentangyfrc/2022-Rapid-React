@@ -12,7 +12,7 @@ Things need to Updated:
 ***************************
 */
 
-package frc.robot.subsystems.drivetrain;
+package frc.robot.subsystems;
 
 import java.util.Map;
 
@@ -26,16 +26,20 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.networktables.EntryListenerFlags;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import frc.robot.subsystems.drivetrain.SwerveDrivetrain;
 
 
 
 
-public class networkTables extends SwerveDrivetrain {
+public class networkTables extends SubsystemBase {
   /** Listens for changes in the NetworkTables. */
+  private SwerveDrivetrain PoseEstimator;
   public networkTables() {}
   Gyro gyro = SubsystemFactory.getInstance().getTelemetry().getGyro();
 
@@ -152,7 +156,7 @@ public class networkTables extends SwerveDrivetrain {
        */
   public void addVision(double x, double y, double timestampSeconds){
 
-    poseEstimator.addVisionMeasurement(
+      PoseEstimator.getSwerveDrivePoseEstimator().addVisionMeasurement(
         new Pose2d(x,y, gyro.getRotation2d()), 
         timestampSeconds
     );
@@ -163,10 +167,5 @@ public class networkTables extends SwerveDrivetrain {
     periodic();
   }
 
-  @Override
-  public void initializeSwerveModules(Map<String, Integer> portAssignments, Map<String, Double> wheelOffsets)
-      throws Exception {
-    // TODO Auto-generated method stub
-    
-  }
+
 }
