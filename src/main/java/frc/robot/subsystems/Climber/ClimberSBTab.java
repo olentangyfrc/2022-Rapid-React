@@ -23,9 +23,6 @@ public class ClimberSBTab {
         elevator = el;
         tab = Shuffleboard.getTab("Climber");
 
-        //rightPotentiometerPosition = tab.add("Right Potentiometer Position", 0.0).getEntry();
-        //leftPotentiometerPosition = tab.add("Left Potentiometer Position", 0.0).getEntry();
-
         tab.addNumber("Right Potentiometer Position", climber::getRightPotentiometerPosition);
         tab.addNumber("Left Potentiometer Position", climber::getLeftPotentiometerPosition);
         tab.addNumber("Max Right Potentiometer Position", climber::getRightMaxForwardPosition);
@@ -34,16 +31,8 @@ public class ClimberSBTab {
         tab.addNumber("Min Left Potentiometer Position", climber::getLeftMinBackPosition);
         tab.addNumber("Winch Encoder Position in Rotations", elevator::getPosition);
         tab.addNumber("Current Velocity", elevator::getVelocity);
-
-        //winchPercentOutput = tab.add("Set Winch Percent Output (-1 to 1)", 0.05).getEntry();
-        //percentActuatorLength = tab.add("Set Actuator Length Target with Percentage", 0.0).getEntry();
-        //positionActuatorLength = tab.add("Actuator Length Target in Position", 0.0).getEntry();
     }
 
     public void update(){
-        //rightPotentiometerPosition.setDouble(climber.getRightPotentiometerPosition());
-        //leftPotentiometerPosition.setDouble(climber.getLeftPotentiometerPosition());
-        //climber.setVerticalPercentOutput(winchPercentOutput.getDouble(0.0));
-        //climber.setLinearActuatorLengthInPercent(percentActuatorLength.getDouble(0.0));
     }
 }

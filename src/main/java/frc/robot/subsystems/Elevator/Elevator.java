@@ -28,6 +28,7 @@ public class Elevator extends SubsystemBase{
     // The percent output to use for moving the arms forwards and backwards.
     private double verticalPercentOutput;
     
+    //TalonFX Motor and Encoder for vertical movement of the arms.
     private WPI_TalonFX winchMotor;
     private DutyCycleEncoder winchEncoder;
 
@@ -42,29 +43,29 @@ public class Elevator extends SubsystemBase{
 
 
     public void init() throws Exception {
+        //PortManager makes sure that a port is not used for two different objects.
         PortManager pm = SubsystemFactory.getInstance().getPortManager();
 
-        //maxVel = 0;
-        //maxAcc = 0;
-
+        //Assigning CAN ID to the Winch Motor.
         winchMotor = new WPI_TalonFX(pm.aquirePort(PortType.CAN, WINCH_MOTOR_CAN, "Winch Motor"));
+        //Setting Winch Motor into Brake Mode.
         winchMotor.setNeutralMode(NeutralMode.Brake);
 
+        //Assigning Digital Input Port to the encoder of the Winch Motor.
         winchEncoder = new DutyCycleEncoder(pm.aquirePort(PortType.DIGITAL, 0, "Winch Encoder"));
+        //Reseting the position to 0.
         winchEncoder.reset();
 
+        //Minimum height of the arms in rotations (all the way down).
         minHeight = 0;
+        //Maximum height of the arms in rotations (all the way up).
         maxHeight = 10;
 
-        verticalPercentOutput = 0.75;
+        //The percent output of the winch motor.
+        verticalPercentOutput = 0.75; 
         
         // Set the initial goal to the current position.
         setTargetRotations(getPosition());
-        
-        /*actuatorLengthInPercent = 0.5;
-        rightActuatorLengthInPosition = 2;
-        leftActuatorLengthInPosition = 2;
-        */
     }
 
     @Override
@@ -78,24 +79,37 @@ public class Elevator extends SubsystemBase{
         winchMotor.setVoltage(elevatorController.calculate(clampedError));
     }
 
+    //Moves the arms up using percent output.
     public void extendArms() {
         winchMotor.set(verticalPercentOutput);
     }
 
+    //Moves the arms down using percent output.
     public void retractArms() {
         winchMotor.set(-verticalPercentOutput);
     }
 
+    //Stops the winch motor.
     public void stopWinch(){
         winchMotor.stopMotor();
     }
 
+    /**
+     * Set the percent output of the winch motor.
+     * 
+     * @param verticalPercentOutput The percent output (-1 to 1)
+     */
     public void setVerticalPercentOutput(double output) {
         if(output <= 1 && output >= -1) {
             verticalPercentOutput = output;
         }
     }
 
+    /**
+     * Get the percent output of the winch motor.
+     * 
+     * @return the percent output
+     */
     public void getVerticalPercentOutput() {
         winchMotor.get();
     }
@@ -148,5 +162,3 @@ public class Elevator extends SubsystemBase{
         return winchMotor.getSelectedSensorVelocity() / MOTOR_ENCODER_TICKS / WINCH_GEAR_RATIO;
     }
 }
-
-
