@@ -3,8 +3,8 @@ package frc.robot.subsystems.Climber;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import frc.robot.subsystems.Climber.commands.ExtendArmsToPosition;
 import frc.robot.subsystems.Elevator.Elevator;
+import frc.robot.subsystems.Elevator.commands.ExtendArmsToPosition;
 
 public class ClimberSBTab {
     public Climber climber;
