@@ -14,88 +14,75 @@ Things need to Updated:
 
 package frc.robot.subsystems;
 
-import java.util.Map;
+import java.util.logging.Logger;
 
-import frc.robot.subsystems.SubsystemFactory;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.wpilibj.command.Subsystem;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.networktables.EntryListenerFlags;
+import edu.wpi.first.networktables.EntryNotification;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import frc.robot.subsystems.drivetrain.SwerveDrivetrain;
+import edu.wpi.first.util.WPIUtilJNI;
 
 
 
 
 public class networkTables extends SubsystemBase {
-  /** Listens for changes in the NetworkTables. */
-  private SwerveDrivetrain PoseEstimator;
-  public networkTables() {}
-  Gyro gyro = SubsystemFactory.getInstance().getTelemetry().getGyro();
 
-  @Override
-  public void periodic() {
-    NetworkTableInstance inst = NetworkTableInstance.getDefault();
-    listenTvecs(inst);
-   
-  }
-  /**
-   * 
-   * @param inst the default network table instance
-   */
-  public void listenTvecs(NetworkTableInstance inst){
+  private SwerveDrivePoseEstimator poseEstimator;
+  private Logger logger = Logger.getLogger("networkTables");
+
+  NetworkTableInstance inst;
+  Gyro gyro;
+  NetworkTableEntry Time, XEntry, YEntry, ZEntry;
+
+  
+  public networkTables() {
+    poseEstimator = SubsystemFactory.getInstance().getDrivetrain().getSwerveDrivePoseEstimator(); 
+    inst = NetworkTableInstance.getDefault();
+    gyro = SubsystemFactory.getInstance().getTelemetry().getGyro();
+    inst.startClientTeam(4611);
     NetworkTable Tvecs = inst.getTable("SmartDashboard"); //delcares the networktables to the already intizialized instance
 
-    inst.startClientTeam(190);
-    listener(Tvecs);    
+    Time = Tvecs.getEntry("Time");
+    XEntry = Tvecs.getEntry("X");
+    YEntry = Tvecs.getEntry("Y");
+    ZEntry = Tvecs.getEntry("Z");
+
+    Time.addListener(event -> {onVisionUpdate(event);}, EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
+   
+  }
+
+  public void onVisionUpdate(EntryNotification event ){
     
-    try {
-       Thread.sleep(10000);
-    } catch (InterruptedException ex) {
-       System.out.println("Interrupted");
-       Thread.currentThread().interrupt();
-       return;
-    }
+    //System.out.println("Time changed value: " + event.getEntry().getValue()); //If time is changed, then it records x,y,z
+    double time = event.getEntry().getDouble(0);
+    //System.out.println("X changed value: " + XEntry.getValue());
+    double x = XEntry.getDouble(0);
+    //System.out.println("Y changed value: " + YEntry.getValue());
+    double y = YEntry.getDouble(0);
+    //System.out.println("Z changed value: " + ZEntry.getValue());
+    double z = ZEntry.getDouble(0);
+
+    var position = convertTvec(x, y, z); //converts the x,y,z into final position vector
+    // Do work here like updates odometry...
+    addVision(position.get(0, 0), position.get(1, 0), time);
+    //System.out.print(position);
+
+
   }
 
-  /**
-   * listens for changes in the Tvecs
-   * @param Tvecs takes in Tvec from Network tables
-   */
-
-  public void listener(NetworkTable Tvecs){
-    NetworkTableEntry Time = Tvecs.getEntry("Time");
-    NetworkTableEntry XEntry = Tvecs.getEntry("X");
-    NetworkTableEntry YEntry = Tvecs.getEntry("Y");
-    NetworkTableEntry ZEntry = Tvecs.getEntry("Z");
-    //adds an entry listener for changed values of "Time", the lambda ("->" operator)
-    Time.addListener(event -> {
-      System.out.println("Time changed value: " + event.getEntry().getValue()); //If time is changed, then it records x,y,z
-      double time = event.getEntry().getDouble(0);
-      System.out.println("X changed value: " + XEntry.getValue());
-      double x = XEntry.getDouble(0);
-      System.out.println("Y changed value: " + YEntry.getValue());
-      double y = YEntry.getDouble(0);
-      System.out.println("Z changed value: " + ZEntry.getValue());
-      double z = ZEntry.getDouble(0);
-
-      var position = convertTvec(x, y, z); //converts the x,y,z into final position vector
-      // Do work here like updates odometry...
-      addVision(x, y, time);
-      System.out.print(position);
-
-    }, EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
-  }
  
   /**
    * 
@@ -103,7 +90,6 @@ public class networkTables extends SubsystemBase {
    * @return a vector that describes the robots position
    */
   public Matrix<N3, N1> convertTvec(double x, double y, double z) {
-
     // Build out input vector
     var in_vec = VecBuilder.fill(x, y, z);
 
@@ -113,9 +99,8 @@ public class networkTables extends SubsystemBase {
       0, -1, 0);
 
     var corrected_vec = cv2_correction_mat.times(in_vec);
-
     // Build our rotation matrix
-    var pitch = -10 * Math.PI / 180;
+    var pitch = -30 * Math.PI / 180;
     var c = Math.cos(pitch);
     var s = Math.sin(pitch);
     var camera_to_bot = Matrix.mat(Nat.N3(), Nat.N3()).fill(
@@ -127,22 +112,31 @@ public class networkTables extends SubsystemBase {
     var corrected_bot_oriented = camera_to_bot.times(corrected_vec);
 
 
-    var trans2_vec = VecBuilder.fill(0, 0, 1); //Change this where we know the displacement of the camera to the center of the robot
+    var trans2_vec = VecBuilder.fill(0.3048, 0.1524, 0.9906); //Change this where we know the displacement of the camera to the center of the robot
 
     var out_vec = trans2_vec.plus(corrected_bot_oriented);
-    double gyro_angle = gyro.getAngle(); //add the heading by multipling by gyro angle
-    var final_vec = out_vec.times(gyro_angle);
+    double gyro_angle = gyro.getAngle() * Math.PI / 180; //add the heading by multipling by gyro angle
     
-    var hub_coordinates = VecBuilder.fill(457, 134.5, 0);
+    
+
+    c = Math.cos(gyro_angle);
+    s = Math.sin(gyro_angle);
+    var bot_to_field = Matrix.mat(Nat.N3(), Nat.N3()).fill(
+       c, -s, 0,
+       s, c, 0,
+       0, 0, 1);
+    var final_vec = bot_to_field.times(out_vec);
+    
+    var hub_coordinates = VecBuilder.fill( (16.46)/2, (8.23/2), 2.64);
 
     var position_vec =  hub_coordinates.minus(final_vec);
 
     // Print output
 
 
-    SmartDashboard.putNumber("out_x", final_vec.get(0, 0));
-    SmartDashboard.putNumber("out_y", final_vec.get(1, 0));
-    SmartDashboard.putNumber("out_z", final_vec.get(2, 0)); 
+    SmartDashboard.putNumber("position_vecx", position_vec.get(0, 0));
+    SmartDashboard.putNumber("position_vecy", position_vec.get(1, 0));
+    SmartDashboard.putNumber("position_vecz", position_vec.get(2, 0)); 
 
     return position_vec; 
   }
@@ -154,12 +148,15 @@ public class networkTables extends SubsystemBase {
        * 
        * @param timeStampSeconds is when the vision measurement was made
        */
-  public void addVision(double x, double y, double timestampSeconds){
-
-      PoseEstimator.getSwerveDrivePoseEstimator().addVisionMeasurement(
-        new Pose2d(x,y, gyro.getRotation2d()), 
-        timestampSeconds
-    );
+  public void addVision(double x, double y, double elapsedtime){
+    poseEstimator.addVisionMeasurement(new Pose2d(x,y, gyro.getRotation2d()), Timer.getFPGATimestamp() - elapsedtime);
+    /*
+    try{
+      poseEstimator.addVisionMeasurement(new Pose2d(x,y, gyro.getRotation2d()), timestampSeconds);
+    }catch(Exception e){
+      
+    }
+    */
 
 }
   @Override

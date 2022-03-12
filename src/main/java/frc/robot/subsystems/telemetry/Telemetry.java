@@ -62,8 +62,15 @@ public class Telemetry extends SubsystemBase {
 
     /**
      *  Initializes COVID Bot sensors
+     * @throws Exception
      */
-    private void initCOVID() {}
+    private void initCOVID() throws Exception {
+        PortManager pm = SubsystemFactory.getInstance().getPortManager();
+        Pigeon pigeon = new Pigeon(pm.aquirePort(PortType.CAN, 21, "Pigeon IMU"));
+        pigeon.init();
+
+        gyro = pigeon;  
+    }
     
 
     /**

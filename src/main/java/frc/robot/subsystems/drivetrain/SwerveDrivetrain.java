@@ -13,6 +13,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
@@ -74,9 +75,9 @@ public abstract class SwerveDrivetrain extends SubsystemBase {
         );
 
         poseEstimator = new SwerveDrivePoseEstimator(new Rotation2d(), new Pose2d(), kinematics,
-            new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0.02, 0.02, 0.01), 
-            new MatBuilder<>(Nat.N1(), Nat.N1()).fill(0.02),
-            new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0.1, 0.1, 0.01)
+            new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0.05, 0.05, Units.degreesToRadians(5)), 
+            new MatBuilder<>(Nat.N1(), Nat.N1()).fill(Units.degreesToRadians(0.01)),
+            new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0.5, 0.5, Units.degreesToRadians(30))
         );
 
         // Add the encoder readings to shuffleboard
@@ -128,8 +129,12 @@ public abstract class SwerveDrivetrain extends SubsystemBase {
 
         SwerveModuleState[] states = kinematics.toSwerveModuleStates(speeds);
         SwerveDriveKinematics.desaturateWheelSpeeds(states, MAX_LINEAR_SPEED); // Normalize wheel speeds so we don't go faster than 100%
-        
-        poseEstimator.update(gyro.getRotation2d(), states);
+        try{
+            poseEstimator.update(gyro.getRotation2d(), states);
+        }catch(Exception e){
+
+        }
+
         field.setRobotPose(
             poseEstimator.getEstimatedPosition().getX(),
             poseEstimator.getEstimatedPosition().getY(),
