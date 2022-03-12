@@ -17,6 +17,7 @@ import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.subsystems.SubsystemFactory;
+import frc.robot.subsystems.auton.AutonChooser;
 import frc.robot.subsystems.auton.commands.FollowTrajectoryCommand;
 import frc.robot.subsystems.drivetrain.SwerveDrivetrain;
 
@@ -27,6 +28,7 @@ import frc.robot.subsystems.drivetrain.SwerveDrivetrain;
  * project.
  */
 public class Robot extends TimedRobot {
+  private AutonChooser chooser;
   
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -42,7 +44,7 @@ public class Robot extends TimedRobot {
       } catch (Exception exception) {
           exception.printStackTrace();
     }
-    
+    chooser = new AutonChooser();
 
   }
 
@@ -51,25 +53,25 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
-    SubsystemFactory.getInstance().getDrivetrain().resetLocation(new Pose2d(0, 2, new Rotation2d()), new Rotation2d());
+    SubsystemFactory.getInstance().getDrivetrain().resetLocation(new Pose2d(0, 5, new Rotation2d()), new Rotation2d());
 
-    TrajectoryConfig config = new TrajectoryConfig(SwerveDrivetrain.MAX_LINEAR_SPEED, SwerveDrivetrain.MAX_LINEAR_ACCELERATION);
+    // TrajectoryConfig config = new TrajectoryConfig(SwerveDrivetrain.MAX_LINEAR_SPEED, SwerveDrivetrain.MAX_LINEAR_ACCELERATION);
 
 
-    Trajectory trajectory = TrajectoryGenerator.generateTrajectory(
-      new Pose2d(0, 2, new Rotation2d()),
-      new ArrayList<Translation2d>(Arrays.asList(
-        new Translation2d(2,2),
-        new Translation2d(2,3),
-        new Translation2d(4,3),
-        new Translation2d(4,1),
-        new Translation2d(6,1),
-        new Translation2d(6,2)
-      )),
-      new Pose2d(7, 2, new Rotation2d()),
-      config
-    );
-    
+    // Trajectory trajectory = TrajectoryGenerator.generateTrajectory(
+    //   new Pose2d(0, 2, new Rotation2d()),
+    //   new ArrayList<Translation2d>(Arrays.asList(
+    //     new Translation2d(2,2),
+    //     new Translation2d(2,3),
+    //     new Translation2d(4,3),
+    //     new Translation2d(4,1),
+    //     new Translation2d(6,1),
+    //     new Translation2d(6,2)
+    //   )),
+    //   new Pose2d(7, 2, new Rotation2d()),
+    //   config
+    // );
+    Trajectory trajectory = chooser.getTrajectory();
     (new FollowTrajectoryCommand(SubsystemFactory.getInstance().getDrivetrain(), trajectory, Rotation2d.fromDegrees(0))).schedule();
   }
 
