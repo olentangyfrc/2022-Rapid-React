@@ -129,15 +129,15 @@ public class SubsystemFactory {
     portAssignments.put("BL.DriveMotor", 33);
     portAssignments.put("BL.Encoder", 3);
 
-    portAssignments.put("BR.SwerveMotor", 3);
+    portAssignments.put("BR.SwerveMotor", 14);
     portAssignments.put("BR.DriveMotor", 30);
     portAssignments.put("BR.Encoder", 2);
 
     HashMap<String, Double> wheelOffsets = new HashMap<String, Double>();
-    wheelOffsets.put("FL", 55.28);
-    wheelOffsets.put("FR", 276.42);
-    wheelOffsets.put("BL", 82.63);
-    wheelOffsets.put("BR", 47.19);
+    wheelOffsets.put("FL", 53.78);
+    wheelOffsets.put("FR", 277.91);
+    wheelOffsets.put("BL", 82.09);
+    wheelOffsets.put("BR", 159.96);
 
     
     // Create and initialize all subsystems:
