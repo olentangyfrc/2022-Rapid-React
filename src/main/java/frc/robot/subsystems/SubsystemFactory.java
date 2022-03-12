@@ -18,11 +18,14 @@ import frc.robot.subsystems.IO.ButtonActionType;
 import frc.robot.subsystems.IO.StickButton;
 import frc.robot.subsystems.Climber.Climber;
 import frc.robot.subsystems.Climber.ClimberSBTab;
-import frc.robot.subsystems.Climber.commands.ExtendArmsToPosition;
 import frc.robot.subsystems.Climber.commands.LatchOntoBar;
 import frc.robot.subsystems.Climber.commands.LetGoOfBar;
+import frc.robot.subsystems.Climber.commands.PullArmsBack;
 import frc.robot.subsystems.Climber.commands.PushArmsForward;
 import frc.robot.subsystems.Elevator.Elevator;
+import frc.robot.subsystems.Elevator.commands.ExtendArms;
+import frc.robot.subsystems.Elevator.commands.ExtendArmsToPosition;
+import frc.robot.subsystems.Elevator.commands.RetractArms;
 import frc.robot.subsystems.drivetrain.SingleFalconDrivetrain;
 import frc.robot.subsystems.drivetrain.SparkMaxDrivetrain;
 // Project imports:
@@ -145,19 +148,23 @@ public class SubsystemFactory {
 
     climber = new Climber();
     elevator = new Elevator();
-    //driveTrain = new DrivetrainSubsystem();
 
     logger.info("Initializing Climber Subsystem");
     climber.init();
     elevator.init();
     ClimberSBTab climberTab = new ClimberSBTab(climber, elevator);
     io.bind(new PushArmsForward(climber), Button.kLeftBumper, StickButton.LEFT_6, ButtonActionType.WHEN_HELD);
-    //io.bind(new PullArmsBack(climber), Button.kLeftStick, StickButton.LEFT_7, ButtonActionType.WHEN_HELD);
-    io.bind(new LatchOntoBar(climber), Button.kX, StickButton.LEFT_10, ButtonActionType.WHEN_PRESSED);
-    io.bind(new LetGoOfBar(climber), Button.kB, StickButton.LEFT_11, ButtonActionType.WHEN_PRESSED);
-    io.bind(new ExtendArmsToPosition(elevator, 2), Button.kA, StickButton.RIGHT_6, ButtonActionType.WHEN_PRESSED);
-    io.bind(new ExtendArmsToPosition(elevator, 8), Button.kStart, StickButton.RIGHT_7, ButtonActionType.WHEN_PRESSED);
-    io.bind(new ExtendArmsToPosition(elevator, 0), Button.kLeftStick, StickButton.RIGHT_8, ButtonActionType.WHEN_PRESSED);
+    io.bind(new PullArmsBack(climber), Button.kLeftStick, StickButton.LEFT_7, ButtonActionType.WHEN_HELD);
+    io.bind(new ExtendArms(elevator), Button.kRightBumper, StickButton.LEFT_8, ButtonActionType.WHEN_HELD);
+    io.bind(new RetractArms(elevator), Button.kRightStick, StickButton.LEFT_9, ButtonActionType.WHEN_HELD);
+    //io.bind(new LatchOntoBar(climber), Button.kX, StickButton.LEFT_10, ButtonActionType.WHEN_PRESSED);
+    //io.bind(new LetGoOfBar(climber), Button.kB, StickButton.LEFT_11, ButtonActionType.WHEN_PRESSED);
+
+    //io.bind(new ClimbToFirstBar(climber, elevator), Button.kY, StickButton.RIGHT_11, ButtonActionType.WHEN_HELD);
+
+    io.bind(new ExtendArmsToPosition(elevator, 10), Button.kA, StickButton.RIGHT_8, ButtonActionType.WHEN_HELD);
+    io.bind(new ExtendArmsToPosition(elevator, 0), Button.kStart, StickButton.RIGHT_9, ButtonActionType.WHEN_HELD);
+    io.bind(new ExtendArmsToPosition(elevator, 3), Button.kX, StickButton.RIGHT_10, ButtonActionType.WHEN_PRESSED);
   }
 
   /**
