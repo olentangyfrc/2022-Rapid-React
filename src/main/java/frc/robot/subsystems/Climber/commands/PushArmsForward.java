@@ -33,6 +33,6 @@ public class PushArmsForward extends CommandBase{
 
     @Override
     public boolean isFinished(){
-        return (Math.abs(climber.getRightPotentiometerPosition() - climber.getRightMaxForwardPosition()) < 0.1 && Math.abs(climber.getLeftPotentiometerPosition() - climber.getLeftMaxForwardPosition()) < 0.1);
+        return (Math.abs(climber.getRightPotentiometerPosition() - climber.getRightMaxForwardPosition()) < 0.03 && Math.abs(climber.getLeftPotentiometerPosition() - climber.getLeftMaxForwardPosition()) < 0.03);
     }
 }
