@@ -21,7 +21,7 @@ public class Elevator extends SubsystemBase{
     private static Logger logger = Logger.getLogger(Elevator.class.getName());
 
     // The maximum position error for the elevatorController in rotations.
-    public static final double MAX_ERROR = 0.1;
+    //public static final double MAX_ERROR = 0.1;
     // The ticks per revolution of the Falcon 500
     public static final double MOTOR_ENCODER_TICKS = 2048;
     // Gear ratio between the Falcon 500 motor and the output shaft for the elevator.
@@ -40,9 +40,9 @@ public class Elevator extends SubsystemBase{
     private double maxHeight;
     
     // Constraints for the movement of the elevator.
-    private final TrapezoidProfile.Constraints SPEED_CONSTRAINTS = new TrapezoidProfile.Constraints(10, 7);
+    private final TrapezoidProfile.Constraints SPEED_CONSTRAINTS = new TrapezoidProfile.Constraints(2, 4);
     // Do not change these directly! Use SysID.
-    private ProfiledPIDController elevatorController = new ProfiledPIDController(57.839, 0, 5.2621, SPEED_CONSTRAINTS);
+    private ProfiledPIDController elevatorController = new ProfiledPIDController(57.839, 0, 0, SPEED_CONSTRAINTS);
     //private ProfiledPIDController elevatorController = new ProfiledPIDController(10.038, 0, 4.1283, SPEED_CONSTRAINTS);
 
 
@@ -66,25 +66,25 @@ public class Elevator extends SubsystemBase{
         maxHeight = 10;
 
         //The percent output of the winch motor.
-        verticalPercentOutput = 0.75; 
+        verticalPercentOutput = 0.2; 
         
         // Set the initial goal to the current position.
         setTargetRotations(getPosition());
     }
 
-    NetworkTableEntry targetElevatorPosition = Shuffleboard.getTab("Climber").add("Target Position", 0).withWidget(BuiltInWidgets.kTextView).getEntry();
+    //NetworkTableEntry targetElevatorPosition = Shuffleboard.getTab("Climber").add("Target Position", 0).withWidget(BuiltInWidgets.kTextView).getEntry();
 
     @Override
     public void periodic() {
         // Constantly try to adhere to our target position.
 
-        double targetPosition = elevatorController.getSetpoint().position;
+        //double targetPosition = elevatorController.getSetpoint().position;
         // Make sure the error is not greater than MAX_ERROR
-        double clampedError = MathUtil.clamp(getPosition(), targetPosition - MAX_ERROR, targetPosition + MAX_ERROR);
+        //double clampedError = MathUtil.clamp(getPosition(), targetPosition - MAX_ERROR, targetPosition + MAX_ERROR);
 
-        winchMotor.setVoltage(elevatorController.calculate(clampedError));
+        //winchMotor.setVoltage(elevatorController.calculate(getPosition()));
 
-        setTargetRotations(targetElevatorPosition.getDouble(0));
+        //setTargetRotations(targetElevatorPosition.getDouble(0));
     }
 
     //Moves the arms up using percent output.
@@ -100,6 +100,10 @@ public class Elevator extends SubsystemBase{
     //Stops the winch motor.
     public void stopWinch(){
         winchMotor.stopMotor();
+    }
+
+    public void setVoltageToWinchMotor(){
+        winchMotor.setVoltage(elevatorController.calculate(getPosition()));
     }
 
     /**
@@ -146,7 +150,13 @@ public class Elevator extends SubsystemBase{
      * @param targetRotations The target position in rotations (up is positive)
      */
     public void setTargetRotations(double targetRotations) {
+        elevatorController.reset(getPosition());
         elevatorController.setGoal(targetRotations);
+    }
+
+    public boolean isWinchAtGoal()
+    {
+       return elevatorController.atGoal();
     }
 
     /**

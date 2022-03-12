@@ -19,12 +19,15 @@ import frc.robot.subsystems.IO.ButtonActionType;
 import frc.robot.subsystems.IO.StickButton;
 import frc.robot.subsystems.Climber.Climber;
 import frc.robot.subsystems.Climber.ClimberSBTab;
+import frc.robot.subsystems.Climber.commands.ClimbToFirstBar;
 import frc.robot.subsystems.Climber.commands.LatchOntoBar;
 import frc.robot.subsystems.Climber.commands.LetGoOfBar;
 import frc.robot.subsystems.Climber.commands.PullArmsBack;
 import frc.robot.subsystems.Climber.commands.PushArmsForward;
 import frc.robot.subsystems.Elevator.Elevator;
+import frc.robot.subsystems.Elevator.commands.ExtendArms;
 import frc.robot.subsystems.Elevator.commands.ExtendArmsToPosition;
+import frc.robot.subsystems.Elevator.commands.RetractArms;
 import frc.robot.subsystems.drivetrain.DrivetrainSubsystem;
 import frc.robot.subsystems.drivetrain.commands.ZeroAngle;
 import frc.robot.subsystems.telemetry.Telemetry;
@@ -210,7 +213,33 @@ public class SubsystemFactory {
 
     climber = new Climber();
     elevator = new Elevator();
-    //driveTrain = new DrivetrainSubsystem();
+
+    HashMap<String, Integer> portAssignments = new HashMap<String, Integer>();
+    portAssignments.put("FL.SwerveMotor", 9);
+    portAssignments.put("FL.DriveMotor", 32);
+    portAssignments.put("FL.Encoder", 0);
+    
+
+    portAssignments.put("FR.SwerveMotor", 11);
+    portAssignments.put("FR.DriveMotor", 31);
+    portAssignments.put("FR.Encoder", 1);
+
+    portAssignments.put("BL.SwerveMotor", 6);
+    portAssignments.put("BL.DriveMotor", 33);
+    portAssignments.put("BL.Encoder", 3);
+
+    portAssignments.put("BR.SwerveMotor", 3);
+    portAssignments.put("BR.DriveMotor", 30);
+    portAssignments.put("BR.Encoder", 2);
+
+    HashMap<String, Double> wheelOffsets = new HashMap<String, Double>();
+    wheelOffsets.put("FL", 55.28);
+    wheelOffsets.put("FR", 276.42);
+    wheelOffsets.put("BL", 82.63);
+    wheelOffsets.put("BR", 47.19);
+
+    driveTrain = new DrivetrainSubsystem();
+    driveTrain.init(portAssignments, wheelOffsets);
 
     logger.info("Initializing Climber Subsystem");
     climber.init();
@@ -218,12 +247,16 @@ public class SubsystemFactory {
     ClimberSBTab climberTab = new ClimberSBTab(climber, elevator);
     io.bind(new PushArmsForward(climber), Button.kLeftBumper, StickButton.LEFT_6, ButtonActionType.WHEN_HELD);
     io.bind(new PullArmsBack(climber), Button.kLeftStick, StickButton.LEFT_7, ButtonActionType.WHEN_HELD);
-    io.bind(new LatchOntoBar(climber), Button.kX, StickButton.LEFT_10, ButtonActionType.WHEN_PRESSED);
-    io.bind(new LetGoOfBar(climber), Button.kB, StickButton.LEFT_11, ButtonActionType.WHEN_PRESSED);
+    io.bind(new ExtendArms(elevator), Button.kRightBumper, StickButton.LEFT_8, ButtonActionType.WHEN_HELD);
+    io.bind(new RetractArms(elevator), Button.kRightStick, StickButton.LEFT_9, ButtonActionType.WHEN_HELD);
+    //io.bind(new LatchOntoBar(climber), Button.kX, StickButton.LEFT_10, ButtonActionType.WHEN_PRESSED);
+    //io.bind(new LetGoOfBar(climber), Button.kB, StickButton.LEFT_11, ButtonActionType.WHEN_PRESSED);
 
-    //io.bind(new ExtendArmsToPosition(elevator, 2), Button.kY, StickButton.RIGHT_6, ButtonActionType.WHEN_PRESSED);
-    //io.bind(new ExtendArmsToPosition(elevator, 8), Button.kStart, StickButton.RIGHT_7, ButtonActionType.WHEN_PRESSED);
-    //io.bind(new ExtendArmsToPosition(elevator, 0), Button.kLeftStick, StickButton.RIGHT_8, ButtonActionType.WHEN_PRESSED);
+    //io.bind(new ClimbToFirstBar(climber, elevator), Button.kY, StickButton.RIGHT_11, ButtonActionType.WHEN_HELD);
+
+    io.bind(new ExtendArmsToPosition(elevator, 10), Button.kA, StickButton.RIGHT_8, ButtonActionType.WHEN_HELD);
+    io.bind(new ExtendArmsToPosition(elevator, 0), Button.kStart, StickButton.RIGHT_9, ButtonActionType.WHEN_HELD);
+    io.bind(new ExtendArmsToPosition(elevator, 3), Button.kX, StickButton.RIGHT_10, ButtonActionType.WHEN_PRESSED);
   }
   
   // Getter methods for all of the subsystems:
