@@ -84,7 +84,7 @@ public abstract class SwerveDrivetrain extends SubsystemBase {
         );
 
         anglePid.enableContinuousInput(0, 360);
-        anglePid.setTolerance(0.1);
+        //anglePid.setTolerance(0.1);
 
         // Add the encoder readings to shuffleboard
         tab.addNumber("FL angle", () -> frontLeftModule.getAngle().getDegrees());
@@ -137,7 +137,7 @@ public abstract class SwerveDrivetrain extends SubsystemBase {
         }
 
         if(targetAngle != Double.NaN) {
-            speeds.omegaRadiansPerSecond = anglePid.calculate(gyro.getAngle());
+            speeds.omegaRadiansPerSecond = anglePid.calculate(gyro.getAngle(), targetAngle);
         }
 
         SwerveModuleState[] states = kinematics.toSwerveModuleStates(speeds);
@@ -160,7 +160,7 @@ public abstract class SwerveDrivetrain extends SubsystemBase {
     /**
      * Set the target angle for the bot to rotate to.
      * 
-     * @param targetAngle The target angle in degrees.
+     * @param targetAngle The target angle.
      */
     public void setTargetAngle(Rotation2d targetAngle) {
         this.targetAngle = targetAngle.getDegrees();

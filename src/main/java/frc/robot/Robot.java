@@ -7,6 +7,7 @@ package frc.robot;
 import java.util.Map;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
@@ -74,6 +75,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
+    drivetrain.setTargetAngle(Rotation2d.fromDegrees(targetAngle.getDouble(0)));
     CommandScheduler.getInstance().run();
   }
 
@@ -97,17 +99,18 @@ public class Robot extends TimedRobot {
   @Override
   public void testPeriodic() {
 
-    double flyWheelRPS = 30;
+    // double flyWheelRPS = 30;
 
-    try {
-      io.bind(new shootBall(drivetrain, shooter, flyWheelRPS), XboxController.Button.kX, IO.StickButton.LEFT_1, ButtonActionType.WHEN_PRESSED);
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
+    // try {
+    //   io.bind(new shootBall(drivetrain, shooter, flyWheelRPS), XboxController.Button.kX, IO.StickButton.LEFT_1, ButtonActionType.WHEN_PRESSED);
+    // } catch (Exception e) {
+    //   e.printStackTrace();
+    // }
     
-    shooter.setSpeed(targetSpeedEntry.getDouble(0));
+    // shooter.setSpeed(targetSpeedEntry.getDouble(0));
 
-    drivetrain.setTargetAngle(new Rotation2d(Math.toRadians(targetAngle.getDouble(0))));
+    drivetrain.setTargetAngle(Rotation2d.fromDegrees(targetAngle.getDouble(0)));
+    drivetrain.drive(new ChassisSpeeds());
 
     CommandScheduler.getInstance().run();
   }
