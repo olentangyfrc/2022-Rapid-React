@@ -1,10 +1,12 @@
 package frc.robot.subsystems.auton;
 
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryUtil;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -14,7 +16,7 @@ public class AutonChooser {
     private SendableChooser<AutonPath> pathChooser = new SendableChooser<AutonPath>();
 
     private static Map<AutonPath, String> trajectoryFilePaths = Map.of(
-        AutonPath.TEST_PATH, "\\paths\\output\\test_path.wpilib.json"
+        AutonPath.TEST_PATH, "paths/output/test-path.wpilib.json"
     );
 
 
@@ -22,6 +24,7 @@ public class AutonChooser {
         for(AutonPath path : AutonPath.values()) {
             pathChooser.addOption(path.toString(), path);
         }
+        tab.add(pathChooser);
     }
 
     /**
@@ -29,8 +32,9 @@ public class AutonChooser {
      * 
      * @return the selected trajectory
      */
-    public Trajectory getTrajectory() {
-        return TrajectoryUtil.deserializeTrajectory(trajectoryFilePaths.get(pathChooser.getSelected()));
+    public Trajectory getTrajectory() throws Exception {
+        Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(trajectoryFilePaths.get(pathChooser.getSelected()));
+        return TrajectoryUtil.fromPathweaverJson(trajectoryPath);
     }
 
     public enum AutonPath {

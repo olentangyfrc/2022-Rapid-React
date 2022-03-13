@@ -78,7 +78,8 @@ public class Pigeon implements Gyro {
      * @param angle the angle to reset to as a rotation2d
      */
     public void reset(Rotation2d angle) {
-        imu.setFusedHeading(angle.getDegrees());
+        System.out.println("ANGLE: " + angle.getDegrees());
+        imu.setFusedHeading(angle.getDegrees() * 64);
     }
 
     public void setInverted(boolean inverted) {
@@ -95,13 +96,7 @@ public class Pigeon implements Gyro {
         while (!imu.getState().equals(PigeonState.Ready));
         imu.enterCalibrationMode(CalibrationMode.BootTareGyroAccel);
     }
-
-    public double getForwardsAcceleration() {
-        short[] xyz = new short[3];
-        imu.getBiasedAccelerometer(xyz);
-        return xyz[0] / 16384.0;
-    }
-
+    
     /**
      * Enter accelerometer calibration mode.
      * <p>

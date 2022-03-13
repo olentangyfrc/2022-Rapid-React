@@ -37,7 +37,7 @@ public class SubsystemFactory {
   private Map<String, BotType> allMACs = Map.of(
     "00:80:2F:30:DB:F8", BotType.COVID,
     "00:80:2F:30:DB:F9", BotType.COVID,
-    "00:80:2F:25:B4:CA", BotType.CALIFORNIA,
+    "00:80:2F:25:B4:CA", BotType.RAPID_REACT,
     "00:80:2F:28:64:39", BotType.RIO99,
     "00:80:2F:28:64:38", BotType.RIO99,
     "00:80:2F:17:F8:3F", BotType.RIO1,
@@ -82,8 +82,8 @@ public class SubsystemFactory {
       case COVID:
         initCOVID();
         break;
-      case CALIFORNIA:
-        initCALIFORNIA();
+      case RAPID_REACT:
+        initRapidReact();
         break;
       case RIO99:
         initRIO99();
@@ -166,33 +166,33 @@ public class SubsystemFactory {
   }
 
   /**
-   * Initializes Califorinia Bot subsystems
+   * Initializes Rapid React Competition Bot subsystems
    * @throws Exception
    */
-  public void initCALIFORNIA() throws Exception{
+  public void initRapidReact() throws Exception{
     HashMap<String, Integer> portAssignments = new HashMap<String, Integer>();
-    portAssignments.put("FL.SwerveMotor", 17);
+    portAssignments.put("FL.SwerveMotor", 59);
     portAssignments.put("FL.DriveMotor", 41);
-    portAssignments.put("FL.Encoder", 0);
+    portAssignments.put("FL.Encoder", 1);
     
 
-    portAssignments.put("FR.SwerveMotor", 14);
+    portAssignments.put("FR.SwerveMotor", 8);
     portAssignments.put("FR.DriveMotor", 40);
-    portAssignments.put("FR.Encoder", 1);
+    portAssignments.put("FR.Encoder", 3);
 
-    portAssignments.put("BL.SwerveMotor", 15);
+    portAssignments.put("BL.SwerveMotor", 17);
     portAssignments.put("BL.DriveMotor", 42);
     portAssignments.put("BL.Encoder", 2);
 
-    portAssignments.put("BR.SwerveMotor", 59);
+    portAssignments.put("BR.SwerveMotor", 15);
     portAssignments.put("BR.DriveMotor", 43);
-    portAssignments.put("BR.Encoder", 3);
+    portAssignments.put("BR.Encoder", 0);
 
     HashMap<String, Double> wheelOffsets = new HashMap<String, Double>();
-    wheelOffsets.put("FL", 229.7);
-    wheelOffsets.put("FR", 142.77);
-    wheelOffsets.put("BL", 114.2);
-    wheelOffsets.put("BR", 70.84);
+    wheelOffsets.put("FL", 51.1);
+    wheelOffsets.put("FR", 322.77);
+    wheelOffsets.put("BL", 293.53);
+    wheelOffsets.put("BR", 249.6);
 
     
     // Create and initialize all subsystems:
@@ -283,7 +283,7 @@ public class SubsystemFactory {
    */
   public enum BotType {
     COVID,
-    CALIFORNIA,
+    RAPID_REACT,
     RIO99,
     RIO1,
     UNRECOGNIZED

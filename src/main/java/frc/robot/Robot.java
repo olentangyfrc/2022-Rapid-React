@@ -53,26 +53,17 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
-    SubsystemFactory.getInstance().getDrivetrain().resetLocation(new Pose2d(0, 5, new Rotation2d()), new Rotation2d());
+    SubsystemFactory.getInstance().getDrivetrain().resetLocation(new Pose2d(7.492, 1.779, Rotation2d.fromDegrees(100)));
 
-    // TrajectoryConfig config = new TrajectoryConfig(SwerveDrivetrain.MAX_LINEAR_SPEED, SwerveDrivetrain.MAX_LINEAR_ACCELERATION);
+    TrajectoryConfig config = new TrajectoryConfig(SwerveDrivetrain.MAX_LINEAR_SPEED, SwerveDrivetrain.MAX_LINEAR_ACCELERATION);
 
 
-    // Trajectory trajectory = TrajectoryGenerator.generateTrajectory(
-    //   new Pose2d(0, 2, new Rotation2d()),
-    //   new ArrayList<Translation2d>(Arrays.asList(
-    //     new Translation2d(2,2),
-    //     new Translation2d(2,3),
-    //     new Translation2d(4,3),
-    //     new Translation2d(4,1),
-    //     new Translation2d(6,1),
-    //     new Translation2d(6,2)
-    //   )),
-    //   new Pose2d(7, 2, new Rotation2d()),
-    //   config
-    // );
-    Trajectory trajectory = chooser.getTrajectory();
-    (new FollowTrajectoryCommand(SubsystemFactory.getInstance().getDrivetrain(), trajectory, Rotation2d.fromDegrees(0))).schedule();
+    try {
+      Trajectory trajectory = chooser.getTrajectory();
+      (new FollowTrajectoryCommand(SubsystemFactory.getInstance().getDrivetrain(), trajectory, Rotation2d.fromDegrees(0))).schedule();
+    } catch(Exception ex) {
+      ex.printStackTrace();
+    }
   }
 
   @Override

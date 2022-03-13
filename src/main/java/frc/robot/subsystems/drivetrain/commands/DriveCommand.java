@@ -6,6 +6,7 @@ package frc.robot.subsystems.drivetrain.commands;
 
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.IO;
 import frc.robot.subsystems.SubsystemFactory;
@@ -15,7 +16,7 @@ import frc.robot.subsystems.drivetrain.SwerveDrivetrain;
  * This command will grab user input from IO and call the drivetrain's drive method.
  * This should be called periodically by the drivetrain.
  */
-public class DriveCommand extends InstantCommand {
+public class DriveCommand extends CommandBase {
   private SwerveDrivetrain drivetrain;
   private SlewRateLimiter xLimiter = new SlewRateLimiter(2);
   private SlewRateLimiter yLimiter = new SlewRateLimiter(2);
@@ -27,10 +28,13 @@ public class DriveCommand extends InstantCommand {
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(drivetrain);
   }
-
+  
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {
+  public void initialize() {}
+
+  @Override
+  public void execute() {
     IO io = SubsystemFactory.getInstance().getIO();
     ChassisSpeeds speeds = new ChassisSpeeds(
       xLimiter.calculate(io.getForward()) * SwerveDrivetrain.MAX_LINEAR_SPEED,
@@ -40,4 +44,10 @@ public class DriveCommand extends InstantCommand {
 
     drivetrain.drive(speeds, drivetrain.getFieldOriented());
   }
+
+  @Override
+  public boolean isFinished() {
+    return false;
+  }
+
 }

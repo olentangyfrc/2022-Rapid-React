@@ -23,6 +23,7 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -122,6 +123,7 @@ public abstract class SwerveDrivetrain extends SubsystemBase {
             new Pose2d(7, 0, new Rotation2d()),
             new TrajectoryConfig(SwerveDrivetrain.MAX_LINEAR_SPEED, SwerveDrivetrain.MAX_LINEAR_ACCELERATION)
         );
+        setDefaultCommand(new DriveCommand(this));
 
         field.getObject("traj").setTrajectory(trajectory);
     }
@@ -136,14 +138,6 @@ public abstract class SwerveDrivetrain extends SubsystemBase {
      * @throws Exception If there is an issue acquiring a port.
      */
     public abstract void initializeSwerveModules(Map<String, Integer> portAssignments, Map<String, Double> wheelOffsets) throws Exception;
-
-    @Override
-    public void periodic() {
-        // Run the drive command periodically
-        if(driveCommand != null) {
-            driveCommand.schedule();
-        }
-    }
 
     /** 
      * Drive the robot with percent output given a ChassisSpeeds object
@@ -172,7 +166,8 @@ public abstract class SwerveDrivetrain extends SubsystemBase {
         frontRightModule.updateState(SwerveModuleState.optimize(states[1], frontRightModule.getAngle()));
         backLeftModule.updateState(SwerveModuleState.optimize(states[2], backLeftModule.getAngle()));
         backRightModule.updateState(SwerveModuleState.optimize(states[3], backRightModule.getAngle()));
-        field.setRobotPose(-poseEstimator.getEstimatedPosition().getX(), poseEstimator.getEstimatedPosition().getY(), gyro.getRotation2d());
+        
+        field.setRobotPose(poseEstimator.getEstimatedPosition().getX(), poseEstimator.getEstimatedPosition().getY(), gyro.getRotation2d());
         updateOdometry();
     }
     
@@ -230,7 +225,9 @@ public abstract class SwerveDrivetrain extends SubsystemBase {
         return poseEstimator.getEstimatedPosition();
     }
 
-    public void resetLocation(Pose2d botLocation, Rotation2d botAngle) {
-        poseEstimator.resetPosition(botLocation, botAngle);
+    public void resetLocation(Pose2d botLocation) {
+        poseEstimator.resetPosition(botLocation, botLocation.getRotation());
+        Pigeon pigeon = (Pigeon) SubsystemFactory.getInstance().getTelemetry().getGyro();
+        pigeon.reset(botLocation.getRotation());
     }
 }

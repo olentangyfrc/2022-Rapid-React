@@ -5,8 +5,10 @@
 package frc.robot.subsystems.auton.commands;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.subsystems.SubsystemFactory;
 import frc.robot.subsystems.auton.AutonTrajectoryFollower;
 import frc.robot.subsystems.drivetrain.SwerveDrivetrain;
 
@@ -28,7 +30,6 @@ public class FollowTrajectoryCommand extends CommandBase {
    * @param targetAngle the desired angle at the end of the trajectory
    */
   public FollowTrajectoryCommand(SwerveDrivetrain drivetrain, Trajectory trajectory, Rotation2d targetAngle) {
-
     this.drivetrain = drivetrain;
     this.trajectory = trajectory;
     this.targetAngle = targetAngle;
@@ -54,19 +55,21 @@ public class FollowTrajectoryCommand extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    drivetrain.drive(follower.calculate(getCurrentTIme()), false);
+    ChassisSpeeds speeds = follower.calculate(getCurrentTime());
+    drivetrain.drive(speeds, true);
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
+    System.out.println("INTERRUPTED: " +  interrupted);
     drivetrain.stop();
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return follower.hasFinished(getCurrentTIme());
+    return follower.hasFinished(getCurrentTime());
   }
 
   /**
@@ -74,7 +77,7 @@ public class FollowTrajectoryCommand extends CommandBase {
    * 
    * @return the time since the start in seconds.
    */
-  private double getCurrentTIme() {
+  private double getCurrentTime() {
     return ((double) System.currentTimeMillis() / 1000) - startTime;
   }
 }

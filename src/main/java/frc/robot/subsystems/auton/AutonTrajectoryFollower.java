@@ -13,13 +13,16 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.Trajectory.State;
+import edu.wpi.first.wpilibj.drive.Vector2d;
 
 /** Add your docs here. */
 public class AutonTrajectoryFollower {
     
     private Trajectory trajectory;
     private HolonomicDriveController driveController;
+    private ProfiledPIDController thetaController;
     private Supplier<Pose2d> positionSupplier;
     private Rotation2d targetAngle;
 
@@ -37,18 +40,42 @@ public class AutonTrajectoryFollower {
         this.trajectory = trajectory;
         this.targetAngle = targetAngle;
         this.positionSupplier = positionSupplier;
-        driveController = new HolonomicDriveController(xController, yController, thetaController);
+        this.thetaController = thetaController;
+
+        driveController = new HolonomicDriveController(
+            xController,
+            yController,
+            // This is just to satisfy requirements. We calculate angle on our own.
+            new ProfiledPIDController(0, 0, 0, new TrapezoidProfile.Constraints(0, 0))
+        );
     }
 
     /**
      * Calculate the chassis speeds required to follow the trajectory at a given time.
+     * <p>
+     * These chasses speeds are field oriented.
      * 
      * @param time Time since start in seconds
      * @return The speeds to apply to follow the trajectory
      */
     public ChassisSpeeds calculate(double time) {
         State goal = trajectory.sample(time);
-        return driveController.calculate(positionSupplier.get(), goal.poseMeters, goal.velocityMetersPerSecond, targetAngle);
+        Pose2d currentPosition = positionSupplier.get();
+
+        // Calculate bot-oriented speeds to follow trajectory
+        ChassisSpeeds speeds = driveController.calculate(positionSupplier.get(), goal.poseMeters, goal.velocityMetersPerSecond, targetAngle);
+
+        
+        // Rotate the vector so that it is field oriented and we don't have to worry about rotation.
+        Vector2d translation = new Vector2d(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond); // bot-oriented
+        translation.rotate(-currentPosition.getRotation().getDegrees()); // rotate to field-oriented
+        speeds.vxMetersPerSecond = translation.x;
+        speeds.vyMetersPerSecond = translation.y;
+        
+        // Independently calculate theta control
+        speeds.omegaRadiansPerSecond = thetaController.calculate(currentPosition.getRotation().getDegrees(), targetAngle.getDegrees());
+
+        return speeds;
     }
 
     /**
