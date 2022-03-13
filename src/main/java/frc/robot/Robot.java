@@ -8,6 +8,8 @@ package frc.robot;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -15,11 +17,20 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.subsystems.SubsystemFactory;
 import frc.robot.subsystems.auton.AutonChooser;
 import frc.robot.subsystems.auton.commands.FollowTrajectoryCommand;
 import frc.robot.subsystems.drivetrain.SwerveDrivetrain;
+import frc.robot.subsystems.intake.BallIntake;
+import frc.robot.subsystems.intake.commands.BringIntakeUp;
+import frc.robot.subsystems.intake.commands.PutIntakeDown;
+import frc.robot.subsystems.intake.commands.StartIntakeMotor;
+import frc.robot.subsystems.intake.commands.StartNoodleMotor;
+import frc.robot.subsystems.intake.commands.StopIntakeMotor;
+import frc.robot.subsystems.intake.commands.StopNoodleMotor;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -85,8 +96,24 @@ public class Robot extends TimedRobot {
   @Override
   public void disabledPeriodic() {}
 
+  BallIntake intake;
+  ShuffleboardTab tab = Shuffleboard.getTab("Intake");
+
   @Override
-  public void testInit() {}
+  public void testInit() {
+    try {
+      intake = new BallIntake();
+    } catch(Exception ex) {
+      ex.printStackTrace();
+    }
+
+    tab.add(new BringIntakeUp(intake));
+    tab.add(new PutIntakeDown(intake));
+    tab.add(new StartIntakeMotor(intake));
+    tab.add(new StartNoodleMotor(intake));
+    tab.add(new StopIntakeMotor(intake));
+    tab.add(new StopNoodleMotor(intake));
+  }
 
   @Override
   public void testPeriodic() {

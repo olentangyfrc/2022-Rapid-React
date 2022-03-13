@@ -6,6 +6,7 @@ package frc.robot.subsystems.intake;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
@@ -17,12 +18,15 @@ import frc.robot.subsystems.PortManager.PortType;
 
 public class BallIntake extends SubsystemBase {
   private static final int INTAKE_MOTOR_CAN = 30;
+  private static final int NOODLE_CAN = 11;
   private static final int UP_PCM = 3;
   private static final int DOWN_PCM = 4;
 
   private static final double INTAKE_PERCENT_OUTPUT = 0.5;
+  private static final double NOODLE_PERCENT_OUTPUT = 0.5;
 
-  private TalonSRX intakeMotor;
+  private WPI_TalonSRX intakeMotor;
+  private WPI_TalonSRX noodleMotor;
   private DoubleSolenoid intakeSolenoid;
 
 
@@ -31,9 +35,10 @@ public class BallIntake extends SubsystemBase {
    * 
    * @param intakeMotorChannel the CAN channel of the intake motor.
    */
-  public BallIntake(int intakeMotorChannel) throws Exception {
+  public BallIntake() throws Exception {
     PortManager pm = SubsystemFactory.getInstance().getPortManager();
-    intakeMotor = new TalonSRX(pm.aquirePort(PortType.CAN, INTAKE_MOTOR_CAN, "Intake motor"));
+    intakeMotor = new WPI_TalonSRX(pm.aquirePort(PortType.CAN, INTAKE_MOTOR_CAN, "Intake motor"));
+    noodleMotor = new WPI_TalonSRX(pm.aquirePort(PortType.CAN, NOODLE_CAN, "Noodle motor"));
 
     intakeSolenoid = new DoubleSolenoid(
       PneumaticsModuleType.CTREPCM,
@@ -68,5 +73,19 @@ public class BallIntake extends SubsystemBase {
    */
   public void stopIntakeMotor() {
     intakeMotor.set(ControlMode.PercentOutput, 0);
+  }
+
+  /**
+   * Start running the noodle motor at the percent output specified in INTAKE_PERCENT_OUTPUT
+   */
+  public void startNoodleMotor() {
+    noodleMotor.set(ControlMode.PercentOutput, INTAKE_PERCENT_OUTPUT);
+  }
+
+  /**
+   * Stop running the intake motor.
+   */
+  public void stopNoodleMotor() {
+    noodleMotor.set(ControlMode.PercentOutput, 0);
   }
 }
