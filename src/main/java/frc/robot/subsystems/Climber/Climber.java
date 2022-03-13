@@ -133,13 +133,13 @@ public class Climber extends SubsystemBase{
     */
 
     public void pushArmsForwardWithPercent(){
-        rightLinearActuator.set(0.4);
-        leftLinearActuator.set(0.4);
+        rightLinearActuator.set(0.2);
+        leftLinearActuator.set(0.2);
     }
 
     public void pullArmsBackWithPercent(){
-        rightLinearActuator.set(-0.4);
-        leftLinearActuator.set(-0.4);
+        rightLinearActuator.set(-0.2);
+        leftLinearActuator.set(-0.2);
     }
 
     public void latchOntoBar(){

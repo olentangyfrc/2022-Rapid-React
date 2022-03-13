@@ -47,6 +47,7 @@ public class Elevator extends SubsystemBase{
 
 
     public void init() throws Exception {
+        logger.info("Setting Up Elevator");
         //PortManager makes sure that a port is not used for two different objects.
         PortManager pm = SubsystemFactory.getInstance().getPortManager();
 
