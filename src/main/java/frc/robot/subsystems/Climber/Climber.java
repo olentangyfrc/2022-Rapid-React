@@ -91,11 +91,11 @@ public class Climber extends SubsystemBase{
         kMinOutput = -1;
         */
 
-        maxRightForwardPosition = 1.12;
-        minRightBackPosition = 0.171;
+        maxRightForwardPosition = 0.838; //proto: 1.12
+        minRightBackPosition = 0.111; //proto: 0.171
 
-        maxLeftForwardPosition = 1.05;
-        minLeftBackPosition = 0.0939;
+        maxLeftForwardPosition = 0.971; //proto: 1.05
+        minLeftBackPosition = 0.24; //proto: 0.0939
 
         /*rightPidController.setP(kP);
         rightPidController.setI(kI);

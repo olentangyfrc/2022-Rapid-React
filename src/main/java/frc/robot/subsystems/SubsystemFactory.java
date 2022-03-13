@@ -241,6 +241,8 @@ public class SubsystemFactory {
     io.bind(new ZeroGyro(telemetry.getGyro()), Button.kY, StickButton.RIGHT_2, ButtonActionType.WHEN_PRESSED);
 
     logger.info("Initializing Climber and Elevator Subsystem");
+    climber = new Climber();
+    elevator = new Elevator();
     climber.init();
     elevator.init();
     ClimberSBTab climberTab = new ClimberSBTab(climber, elevator);
