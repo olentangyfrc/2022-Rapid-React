@@ -27,7 +27,7 @@ public class ClimbToNextBar extends SequentialCommandGroup{
             new ExtendArmsToPosition(elevator, -6.79),
             new LetGoOfBar(climber),
             new ExtendArmsToPosition(elevator, -5.57),
-            new PushArmsForwardToPosition(climber, 0.19, 0.3),
+            new PullArmsBackToPosition(climber, 0.19, 0.3),
             new ExtendArmsToPosition(elevator, -0.69),
             new PushArmsForwardToPosition(climber, 0.37, 0.46),
             new LatchOntoBar(climber)

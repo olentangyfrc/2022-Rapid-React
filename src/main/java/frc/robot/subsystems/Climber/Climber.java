@@ -24,11 +24,11 @@ public class Climber extends SubsystemBase{
     //Declaration of right linear actuator.
     private CANSparkMax rightLinearActuator;
     //Right Linear Actuator CAN ID
-    private final int RIGHT_LIN_ACT_CAN = 20;
+    private final int RIGHT_LIN_ACT_CAN = 47; //proto: 20
     //Declaration of left linear actuator.
     private CANSparkMax leftLinearActuator;
     //Left Linear Actuator CAN ID
-    private final int LEFT_LIN_ACT_CAN = 7;
+    private final int LEFT_LIN_ACT_CAN = 44; //proto: 7
     //Sets Motor Type to Brushless according to Neo motors.
     private final CANSparkMaxLowLevel.MotorType MOTOR_TYPE = CANSparkMaxLowLevel.MotorType.kBrushless;
     //Sets right and left linear actuators into break mode.
