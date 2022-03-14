@@ -22,7 +22,7 @@ public class BallIntake extends SubsystemBase {
   private static final int UP_PCM = 3;
   private static final int DOWN_PCM = 4;
 
-  private static final double INTAKE_PERCENT_OUTPUT = 0.5;
+  private static final double INTAKE_PERCENT_OUTPUT = 1.0;
   private static final double NOODLE_PERCENT_OUTPUT = 0.5;
 
   private WPI_TalonSRX intakeMotor;
