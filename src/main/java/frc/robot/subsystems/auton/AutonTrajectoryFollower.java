@@ -62,8 +62,11 @@ public class AutonTrajectoryFollower {
         State goal = trajectory.sample(time);
         Pose2d currentPosition = positionSupplier.get();
 
+        // Current position, but with the angle as what the trajectory desires because we control angle separately.
+        Pose2d correctedAngle = new Pose2d(currentPosition.getTranslation(), goal.poseMeters.getRotation());
+
         // Calculate bot-oriented speeds to follow trajectory
-        ChassisSpeeds speeds = driveController.calculate(positionSupplier.get(), goal.poseMeters, goal.velocityMetersPerSecond, targetAngle);
+        ChassisSpeeds speeds = driveController.calculate(correctedAngle, goal.poseMeters, goal.velocityMetersPerSecond, targetAngle);
 
         
         // Rotate the vector so that it is field oriented and we don't have to worry about rotation.
