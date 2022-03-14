@@ -21,10 +21,12 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import frc.robot.subsystems.SubsystemFactory;
 import frc.robot.subsystems.drivetrain.commands.DriveCommand;
 import frc.robot.subsystems.drivetrain.modules.SwerveModule;
 import frc.robot.subsystems.telemetry.Pigeon;
+
 
 public abstract class SwerveDrivetrain extends SubsystemBase {
 
@@ -51,7 +53,7 @@ public abstract class SwerveDrivetrain extends SubsystemBase {
     private Logger logger = Logger.getLogger("DrivetrainSubsystem");
     
     // Odometry
-    private SwerveDrivePoseEstimator poseEstimator;
+    private SwerveDriveOdometry odometry;
     private Field2d field = new Field2d();
     
     private ShuffleboardTab tab = Shuffleboard.getTab("Drive");
@@ -74,11 +76,16 @@ public abstract class SwerveDrivetrain extends SubsystemBase {
             new Translation2d(-WHEEL_BASE / 2, TRACK_WIDTH / 2) // BR
         );
 
+        odometry = new SwerveDriveOdometry(kinematics, new Rotation2d());
+
+    /*
+
         poseEstimator = new SwerveDrivePoseEstimator(new Rotation2d(), new Pose2d(), kinematics,
             new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0.05, 0.05, Units.degreesToRadians(5)), 
             new MatBuilder<>(Nat.N1(), Nat.N1()).fill(Units.degreesToRadians(0.01)),
-            new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0.5, 0.5, Units.degreesToRadians(30))
+            new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0.01, 0.01, Units.degreesToRadians(30))
         );
+    */
 
         // Add the encoder readings to shuffleboard
         tab.addNumber("FL angle", () -> frontLeftModule.getAngle().getDegrees());
@@ -130,14 +137,14 @@ public abstract class SwerveDrivetrain extends SubsystemBase {
         SwerveModuleState[] states = kinematics.toSwerveModuleStates(speeds);
         SwerveDriveKinematics.desaturateWheelSpeeds(states, MAX_LINEAR_SPEED); // Normalize wheel speeds so we don't go faster than 100%
         try{
-            poseEstimator.update(gyro.getRotation2d(), states);
+            odometry.update(gyro.getRotation2d(), states);
         }catch(Exception e){
 
         }
 
         field.setRobotPose(
-            poseEstimator.getEstimatedPosition().getX(),
-            poseEstimator.getEstimatedPosition().getY(),
+            odometry.getPoseMeters().getX(),
+            odometry.getPoseMeters().getY(),
             gyro.getRotation2d()
         );
 
@@ -170,7 +177,7 @@ public abstract class SwerveDrivetrain extends SubsystemBase {
      * 
      * @return Returns PoseEstimator
      */
-    public SwerveDrivePoseEstimator getSwerveDrivePoseEstimator(){
-        return poseEstimator;
+    public SwerveDriveOdometry getSwerveDriveOdometry(){
+        return odometry;
     }
 }
