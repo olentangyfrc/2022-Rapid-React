@@ -14,6 +14,7 @@ import java.util.logging.Logger;
 import edu.wpi.first.wpilibj.XboxController.Button;
 // Project imports:
 import frc.robot.subsystems.drivetrain.SwerveDrivetrain;
+import frc.robot.subsystems.intake.BallIntake;
 import frc.robot.subsystems.drivetrain.SingleFalconDrivetrain;
 import frc.robot.subsystems.drivetrain.SparkMaxDrivetrain;
 import frc.robot.subsystems.telemetry.Telemetry;
@@ -51,6 +52,7 @@ public class SubsystemFactory {
   private PortManager portManager;
   private IO io;
   private SwerveDrivetrain driveTrain;
+  private BallIntake ballIntake;
 
   // Should not be used outside of this class!
   private SubsystemFactory() {}
@@ -198,6 +200,8 @@ public class SubsystemFactory {
     // Create and initialize all subsystems:
     driveTrain = new SingleFalconDrivetrain();
     driveTrain.init(portAssignments, wheelOffsets);
+
+    ballIntake = new BallIntake();
     
     io.bind(new ZeroGyro(telemetry.getGyro()), Button.kY, StickButton.RIGHT_2, ButtonActionType.WHEN_PRESSED);
   }
@@ -233,6 +237,10 @@ public class SubsystemFactory {
 
   public SwerveDrivetrain getDrivetrain() {
     return driveTrain;
+  }
+
+  public BallIntake getBallIntake() {
+    return ballIntake;
   }
 
   /**

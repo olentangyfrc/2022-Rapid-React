@@ -96,24 +96,8 @@ public class Robot extends TimedRobot {
   @Override
   public void disabledPeriodic() {}
 
-  BallIntake intake;
-  ShuffleboardTab tab = Shuffleboard.getTab("Intake");
-
   @Override
-  public void testInit() {
-    try {
-      intake = new BallIntake();
-    } catch(Exception ex) {
-      ex.printStackTrace();
-    }
-
-    tab.add(new BringIntakeUp(intake));
-    tab.add(new PutIntakeDown(intake));
-    tab.add(new StartIntakeMotor(intake));
-    tab.add(new StartNoodleMotor(intake));
-    tab.add(new StopIntakeMotor(intake));
-    tab.add(new StopNoodleMotor(intake));
-  }
+  public void testInit() {}
 
   @Override
   public void testPeriodic() {

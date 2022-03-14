@@ -40,11 +40,7 @@ public class BallIntake extends SubsystemBase {
     intakeMotor = new WPI_TalonSRX(pm.aquirePort(PortType.CAN, INTAKE_MOTOR_CAN, "Intake motor"));
     noodleMotor = new WPI_TalonSRX(pm.aquirePort(PortType.CAN, NOODLE_CAN, "Noodle motor"));
 
-    intakeSolenoid = new DoubleSolenoid(
-      PneumaticsModuleType.CTREPCM,
-      pm.aquirePort(PortType.PCM, DOWN_PCM, "Intake forward"),
-      pm.aquirePort(PortType.PCM, UP_PCM, "Intake back")
-    );
+    intakeSolenoid = new DoubleSolenoid(2, PneumaticsModuleType.CTREPCM, pm.aquirePort(PortType.PCM, DOWN_PCM, "Intake forward"), pm.aquirePort(PortType.PCM, UP_PCM, "Intake back"));
   }
 
   /**
