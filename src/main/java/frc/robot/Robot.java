@@ -17,7 +17,7 @@ import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.subsystems.SubsystemFactory;
-import frc.robot.subsystems.auton.AutonChooser;
+import frc.robot.subsystems.auton.AutonPaths;
 import frc.robot.subsystems.auton.commands.FollowTrajectoryCommand;
 import frc.robot.subsystems.drivetrain.SwerveDrivetrain;
 
@@ -28,7 +28,7 @@ import frc.robot.subsystems.drivetrain.SwerveDrivetrain;
  * project.
  */
 public class Robot extends TimedRobot {
-  private AutonChooser chooser;
+  private AutonPaths chooser;
   
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -44,7 +44,7 @@ public class Robot extends TimedRobot {
       } catch (Exception exception) {
           exception.printStackTrace();
     }
-    chooser = new AutonChooser();
+    chooser = new AutonPaths();
 
   }
 
@@ -56,14 +56,6 @@ public class Robot extends TimedRobot {
     SubsystemFactory.getInstance().getDrivetrain().resetLocation(new Pose2d(7.492, 1.779, Rotation2d.fromDegrees(100)));
 
     TrajectoryConfig config = new TrajectoryConfig(SwerveDrivetrain.MAX_LINEAR_SPEED, SwerveDrivetrain.MAX_LINEAR_ACCELERATION);
-
-
-    try {
-      Trajectory trajectory = chooser.getTrajectory();
-      (new FollowTrajectoryCommand(SubsystemFactory.getInstance().getDrivetrain(), trajectory, Rotation2d.fromDegrees(0))).schedule();
-    } catch(Exception ex) {
-      ex.printStackTrace();
-    }
   }
 
   @Override
