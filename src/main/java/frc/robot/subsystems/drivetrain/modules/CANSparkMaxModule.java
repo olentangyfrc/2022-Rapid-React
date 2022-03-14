@@ -49,7 +49,7 @@ public class CANSparkMaxModule extends SwerveModule {
         driveEncoder.setPositionConversionFactor(2 * Math.PI * WHEEL_RADIUS);
 
         // Set the velocity conversion factor to the circumference of the wheel
-        driveEncoder.setVelocityConversionFactor(1.0 / 60.0 * 2 * Math.PI * WHEEL_RADIUS);
+        driveEncoder.setVelocityConversionFactor(2 * Math.PI * WHEEL_RADIUS);
 
         velocityFactorPID = new PIDController(0.01, 0, 0);
         velocityFactorPID.setSetpoint(0); // We want the error to be 0
@@ -110,15 +110,6 @@ public class CANSparkMaxModule extends SwerveModule {
     public void setDriveVoltage(double voltage) {
         // TODO Auto-generated method stub
         driveMotor.setVoltage(voltage);
-    }
-
-    /**
-     * Completely stop both the drive motor and the angle motor.
-     */
-    @Override
-    public void stop() {
-        driveMotor.setVoltage(0);
-        angleMotor.set(0);
     }
 
     @Override

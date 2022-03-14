@@ -111,9 +111,4 @@ public abstract class SwerveModule {
      * @return the speed of the drive motor in meters per second
      */
     public abstract double getVelocity();
-
-    /**
-     * Completely stop both the drive motor and the angle motor.
-     */
-    public abstract void stop();
 }
