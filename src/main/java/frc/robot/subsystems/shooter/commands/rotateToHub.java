@@ -22,4 +22,9 @@ public class rotateToHub extends CommandBase {
     public void initialize() {
         driveTrain.setTargetAngle(new Rotation2d(Math.toRadians(angle)));
     }
+
+    @Override
+    public boolean isFinished() {
+        return driveTrain.atTargetAngle();
+    }
 }

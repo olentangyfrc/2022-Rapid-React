@@ -8,7 +8,6 @@ import java.util.logging.Logger;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.PortManager;
 import frc.robot.subsystems.SubsystemFactory;
@@ -18,12 +17,15 @@ import frc.robot.subsystems.SubsystemFactory.BotType;
 /**
  * 
  */
-public class shooterSubsystem extends SubsystemBase {
+public class ShooterSubsystem extends SubsystemBase {
 
     private Logger logger = Logger.getLogger("Subsystem Factory");
     
     private WPI_TalonFX flyWheel;
     private WPI_TalonFX triggerWheel;
+
+    private double targetSpeed = 0;
+    private double previousTriggerSpeed = 0;
 
     private final int sensorUnitsPerRotation = 2048;
 
@@ -37,40 +39,65 @@ public class shooterSubsystem extends SubsystemBase {
      * @param botType The current bot type of the bot that the shooter subsytem is being initialized on
      * @throws Exception Throws an exception if the fly wheel and trigger wheel ports are already taken or do not exist
      */
+
     public void init(BotType botType) throws Exception {
+        final double Ks;
+        final double Kv;
+        final double Ka;
         switch (botType) {
             case COVID:            
-                final double Ks = 0.7329;
-                final double Kv = 0.11151;
-                // orignal double Kv = 0.11397;
-                // second modififed final double Kv = 1.1397;
-                final double Ka = 0.060377;
+                Ks = 0.7329;
+                Kv = 0.11151;
+                Ka = 0.060377;
                 feedForward = new SimpleMotorFeedforward(Ks, Kv, Ka);
                 flyWheel = new WPI_TalonFX(portManager.aquirePort(PortType.CAN, 43, "shooterFlyWheel"));
                 flyWheel.configFactoryDefault();
                 triggerWheel = new WPI_TalonFX(portManager.aquirePort(PortType.CAN, 12, "shooterTriggerWheel"));
-                pid = new PIDController(8, 0, 0.2);
-                pid.setTolerance(2);
-                Shuffleboard.getTab("Shooter").add("Shooter PID", pid);
+                break;
+            case RAPID_REACT:
+                Ks = 0.51003;
+                Kv = 0.10813;
+                Ka = 0.028561;
+                feedForward = new SimpleMotorFeedforward(Ks, Kv, Ka);
+                flyWheel = new WPI_TalonFX(portManager.aquirePort(PortType.CAN, 50, "Fly Wheel"));
+                flyWheel.configFactoryDefault();
+                triggerWheel = new WPI_TalonFX(portManager.aquirePort(PortType.CAN, 16, "Trigger Wheel"));
+                triggerWheel.configFactoryDefault();
+                triggerWheel.setInverted(true);
                 break;
             default:
                 logger.severe("Unknown bot");
                 break;
         }
+        pid = new PIDController(8, 0, 0.2);
+        pid.setTolerance(1);
         flyWheel.setSelectedSensorPosition(0);
+    }
+
+    /**
+     * This function must be called periodically in order for the shooter to run properly
+     * This function sets the voltage of both motors constantly
+     */
+    public void periodic() {
+        double targetVolts = -feedForward.calculate(targetSpeed, pid.calculate(getFlySpeed()));
+        flyWheel.setVoltage(targetVolts);
+    }
+
+    public void takeInBall() {
+        triggerWheel.setVoltage(.75);
+    }
+
+    public boolean hasBall() {
+        return getTriggerWheelState().equals(triggerWheelState.loaded);        
     }
     
     /**
      * Sets the speed of the fly wheel
-     * This should be called periodically even if the set speed has not changed
      * @param targetSpeed The target speed in rps
      */
     public void setSpeed(double targetSpeed) {
         pid.setSetpoint(targetSpeed);
-        double targetVolts = -feedForward.calculate(targetSpeed, pid.calculate(getFlySpeed()));
-        //double targetVolts = pid.calculate(getFlySpeed(), targetSpeed);
-        System.out.println(targetVolts);
-        flyWheel.setVoltage(targetVolts);
+        this.targetSpeed = targetSpeed;
     }
 
     /**
@@ -79,13 +106,26 @@ public class shooterSubsystem extends SubsystemBase {
     public double getFlySpeed() {
         return -flyWheel.getSelectedSensorVelocity()/sensorUnitsPerRotation*10;
     }
+
+    public boolean isReady() {
+        return getFlyWheelState().equals(flyWheelState.ready);
+    }
     
     /**
      * @return The active state of the fly wheel
      */
-    public shooterState getState() {
-        if (pid.atSetpoint() && pid.getSetpoint() != 0) { return shooterState.ready; }
-        else { return shooterState.off; }
+    public flyWheelState getFlyWheelState() {
+        if (pid.atSetpoint() && pid.getSetpoint() != 0) { return flyWheelState.ready; }
+        else if (!pid.atSetpoint()) { return flyWheelState.intermediate; }
+        else { return flyWheelState.off; }
+    }
+
+    /**
+     * @return The active state of the trigger wheel
+     */
+    public triggerWheelState getTriggerWheelState() {
+        if (triggerWheel.getSelectedSensorVelocity() == 0 && previousTriggerSpeed != 0) return triggerWheelState.loaded;
+        else return triggerWheelState.waiting;
     }
 
     /**
@@ -99,12 +139,30 @@ public class shooterSubsystem extends SubsystemBase {
      * Rotates the trigger wheel to move the ball into the fly wheel
      */
     public void shoot() {
-        while (!getState().equals(shooterState.ready)) {}
-        triggerWheel.setVoltage(2);
+        if (getFlyWheelState().equals(flyWheelState.off)) { 
+            System.out.println("Returning");
+            return; }
+        while (getFlyWheelState().equals(flyWheelState.intermediate)) { System.out.println("Waiting"); }
+        triggerWheel.setVoltage(5);
+        previousTriggerSpeed = 5;
+    }
+
+    /**
+     * Sets the trigger wheel's speed to 0
+     */
+    public void stopTrigger() {
+        triggerWheel.setVoltage(0);
+        previousTriggerSpeed = 0;
+    }
+
+    private enum triggerWheelState {
+        loaded,
+        waiting
     }
     
-    public enum shooterState {
+    private enum flyWheelState {
         ready,
+        intermediate,
         off
     }
 

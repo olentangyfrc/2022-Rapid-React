@@ -16,9 +16,9 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.subsystems.IO;
 import frc.robot.subsystems.SubsystemFactory;
 import frc.robot.subsystems.IO.ButtonActionType;
-import frc.robot.subsystems.SubsystemFactory.BotType;
+import frc.robot.subsystems.IO.StickButton;
 import frc.robot.subsystems.drivetrain.SwerveDrivetrain;
-import frc.robot.subsystems.shooter.shooterSubsystem;
+import frc.robot.subsystems.shooter.ShooterSubsystem;
 import frc.robot.subsystems.shooter.commands.shootBall;
 
 /**
@@ -34,7 +34,7 @@ public class Robot extends TimedRobot {
    * initialization code.
    */
 
-  shooterSubsystem shooter;
+  ShooterSubsystem shooter;
   SwerveDrivetrain drivetrain;
   IO io;
 
@@ -47,6 +47,7 @@ public class Robot extends TimedRobot {
       shooter = SubsystemFactory.getInstance().getShooter();
       drivetrain = SubsystemFactory.getInstance().getDrivetrain();
       io = SubsystemFactory.getInstance().getIO();
+      io.bind(new shootBall(drivetrain, shooter, 20), XboxController.Button.kX, StickButton.LEFT_1, ButtonActionType.WHILE_HELD);
     } catch (Exception exception) {
       exception.printStackTrace();
     }
@@ -58,7 +59,6 @@ public class Robot extends TimedRobot {
   public void robotPeriodic() {
     actualSpeedEntry.setNumber(shooter.getFlySpeed());
     currentPosition.setNumber(shooter.getFlyPosition());
-    actualAngle.setNumber(SubsystemFactory.getInstance().getTelemetry().getGyro().getAngle());
   }
 
   @Override
@@ -88,8 +88,8 @@ public class Robot extends TimedRobot {
   private NetworkTableEntry actualSpeedEntry = Shuffleboard.getTab("Shooter").add("Actual Speed", 0).withWidget(BuiltInWidgets.kGraph).withProperties(Map.of("min", 0, "max", 0)).getEntry();
   private NetworkTableEntry currentPosition = Shuffleboard.getTab("Shooter").add("Current Position", 0).withWidget(BuiltInWidgets.kTextView).withProperties(Map.of("min",0,"max",0)).getEntry();
 
-  private NetworkTableEntry targetAngle = Shuffleboard.getTab("Drivetrain Test").add("Target Angle", 0).withWidget(BuiltInWidgets.kTextView).withProperties(Map.of("min", 0, "max", 360)).getEntry();
-  private NetworkTableEntry actualAngle = Shuffleboard.getTab("Drivetrain Test").add("Actual Angle", 0).withWidget(BuiltInWidgets.kTextView).withProperties(Map.of("min", 0, "max", 360)).getEntry();
+  private NetworkTableEntry shootBall = Shuffleboard.getTab("Shooter").add("Shoot Ball", false).withWidget(BuiltInWidgets.kToggleButton).getEntry();
+  private NetworkTableEntry triggerOff = Shuffleboard.getTab("Shooter").add("Stop Trigger", false).withWidget(BuiltInWidgets.kToggleButton).getEntry();
 
   @Override
   public void testInit() {}
@@ -97,17 +97,19 @@ public class Robot extends TimedRobot {
   @Override
   public void testPeriodic() {
 
-    double flyWheelRPS = 30;
-
-    try {
-      io.bind(new shootBall(drivetrain, shooter, flyWheelRPS), XboxController.Button.kX, IO.StickButton.LEFT_1, ButtonActionType.WHEN_PRESSED);
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
+    shooter.periodic();
     
-    shooter.setSpeed(targetSpeedEntry.getDouble(0));
+    if (shootBall.getBoolean(false)) {
+      shooter.shoot();
+      shootBall.setBoolean(false);
+    }
 
-    drivetrain.setTargetAngle(new Rotation2d(Math.toRadians(targetAngle.getDouble(0))));
+    if (triggerOff.getBoolean(false)) {
+      shooter.stopTrigger();
+      triggerOff.setBoolean(false);
+    }
+
+    shooter.setSpeed(targetSpeedEntry.getDouble(0));
 
     CommandScheduler.getInstance().run();
   }

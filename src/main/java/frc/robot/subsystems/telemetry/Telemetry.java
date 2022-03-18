@@ -38,8 +38,8 @@ public class Telemetry extends SubsystemBase {
             case COVID:
                 initCOVID();
                 break;
-            case CALIFORNIA:
-                initCALIFORNIA();
+            case RAPID_REACT:
+                initRAPID_REACT();
                 break;
             case RIO99:
                 initRIO99();
@@ -67,9 +67,9 @@ public class Telemetry extends SubsystemBase {
     
 
     /**
-     *  Initializes California Bot sensors
+     *  Initializes Rapid React Bot sensors
      */
-    private void initCALIFORNIA() throws Exception {
+    private void initRAPID_REACT() throws Exception {
         PortManager pm = SubsystemFactory.getInstance().getPortManager();
         Pigeon pigeon = new Pigeon(pm.aquirePort(PortType.CAN, 21, "Pigeon IMU"));
         pigeon.init();

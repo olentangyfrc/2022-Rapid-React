@@ -3,25 +3,23 @@ package frc.robot.subsystems.shooter.commands;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
 
-public class speedUpShooter extends CommandBase {
+public class takeInBall extends CommandBase {
 
     ShooterSubsystem shooterSubsystem;
-    double flyWheelRPS;
 
-    public speedUpShooter(ShooterSubsystem shooterSubsystem, double flyWheelRPS) {
+    public takeInBall(ShooterSubsystem shooterSubsystem) {
         this.shooterSubsystem = shooterSubsystem;
-        this.flyWheelRPS = flyWheelRPS;
     
         addRequirements(shooterSubsystem);
     }
 
     @Override
     public void initialize() {
-        shooterSubsystem.setSpeed(flyWheelRPS);
+        shooterSubsystem.takeInBall();
     }
 
     @Override
     public boolean isFinished() {
-        return shooterSubsystem.isReady();
+        return shooterSubsystem.hasBall();
     }
 }

@@ -173,6 +173,11 @@ public abstract class SwerveDrivetrain extends SubsystemBase {
         targetAngle = Double.NaN;
     }
 
+    public boolean atTargetAngle() {
+        Gyro gyro = SubsystemFactory.getInstance().getTelemetry().getGyro();
+        return gyro.getAngle() == targetAngle;
+    }
+
     /**
      * Turn field oriented on or off
      * 
