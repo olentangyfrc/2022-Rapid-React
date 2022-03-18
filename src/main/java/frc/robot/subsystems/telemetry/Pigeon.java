@@ -37,7 +37,7 @@ public class Pigeon implements Gyro {
     @Override
     public double getAngle() {
         // Negate it to make it clockwise.
-        return (imu.getFusedHeading() % 360);
+        return (-imu.getFusedHeading() % 360);
     }
 
     /**

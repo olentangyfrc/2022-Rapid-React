@@ -154,14 +154,16 @@ public class SubsystemFactory {
     portAssignments.put("BR.Encoder", 3);
 
     HashMap<String, Double> wheelOffsets = new HashMap<String, Double>();
-    wheelOffsets.put("FL", 121.46);
-    wheelOffsets.put("FR", 36.38);
-    wheelOffsets.put("BL", 218.4);
-    wheelOffsets.put("BR", 105.08);
+    wheelOffsets.put("FL", 337.08);
+    wheelOffsets.put("FR", 214.18);
+    wheelOffsets.put("BL", 40.45);
+    wheelOffsets.put("BR", 282.21
+    );
 
     // Create and initialize all subsystems:
     driveTrain = new SparkMaxDrivetrain();
     driveTrain.init(portAssignments, wheelOffsets);
+    shooter = new ShooterSubsystem();
     shooter.init(botType);
   }
 
