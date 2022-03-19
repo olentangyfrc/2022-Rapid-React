@@ -41,6 +41,8 @@ public class ShooterSubsystem extends SubsystemBase {
 
     private ShuffleboardTab tab = Shuffleboard.getTab("Shooter");
 
+    private boolean isBallLoaded = false;
+
     // For tuning purposes only
     // Target speed in rps
     private NetworkTableEntry targetShooterSpeed = tab.add("Target Shooter Speed", 0.0).withWidget(BuiltInWidgets.kTextView).getEntry();
@@ -109,10 +111,6 @@ public class ShooterSubsystem extends SubsystemBase {
     public void takeInBall() {
         triggerWheel.setVoltage(.75);
     }
-
-    public boolean hasBall() {
-        return getTriggerWheelState().equals(triggerWheelState.loaded);        
-    }
     
     /**
      * Sets the speed of the fly wheel
@@ -128,6 +126,14 @@ public class ShooterSubsystem extends SubsystemBase {
      */
     public double getFlySpeed() {
         return -flyWheel.getSelectedSensorVelocity()/sensorUnitsPerRotation*10;
+    }
+
+    public double getTriggerSpeed() {
+        return triggerWheel.getSelectedSensorVelocity();
+    }
+
+    public double getPreviousTriggerSpeed() {
+        return previousTriggerSpeed;
     }
 
     public boolean isReady() {
@@ -147,8 +153,15 @@ public class ShooterSubsystem extends SubsystemBase {
      * @return The active state of the trigger wheel
      */
     public triggerWheelState getTriggerWheelState() {
-        if (triggerWheel.getSelectedSensorVelocity() == 0 && previousTriggerSpeed != 0) return triggerWheelState.loaded;
-        else return triggerWheelState.waiting;
+        return getBallLoaded()? triggerWheelState.loaded : triggerWheelState.waiting;
+    }
+
+    public boolean getBallLoaded() {
+        return isBallLoaded;
+    }
+
+    public void setBallLoaded(Boolean isLoaded)  {
+        isBallLoaded = isLoaded;
     }
 
     /**

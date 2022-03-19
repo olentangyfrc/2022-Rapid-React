@@ -34,6 +34,6 @@ public class WaitToShoot extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return drivetrain.atTargetAngle() && shooter.isReady() && shooter.hasBall();
+    return drivetrain.atTargetAngle() && shooter.isReady() && shooter.getBallLoaded();
   }
 }

@@ -14,6 +14,7 @@ public class feedBall extends CommandBase {
     @Override
     public void initialize() {
         shooterSubsystem.shoot();
+        shooterSubsystem.setBallLoaded(false);
     }
 
     @Override

@@ -24,11 +24,12 @@ public class takeInBall extends CommandBase {
     @Override
     public void end(boolean interupted) {
         shooterSubsystem.stopTrigger();
+        shooterSubsystem.setBallLoaded(true);
         intake.stopNoodleMotor();
     }
 
     @Override
     public boolean isFinished() {
-        return shooterSubsystem.hasBall();
+        return shooterSubsystem.getTriggerSpeed() == 0 && shooterSubsystem.getPreviousTriggerSpeed() != 0;
     }
 }
