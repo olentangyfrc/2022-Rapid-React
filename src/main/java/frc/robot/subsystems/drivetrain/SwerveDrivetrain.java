@@ -180,6 +180,8 @@ public abstract class SwerveDrivetrain extends SubsystemBase {
      */
     public void setTargetAngle(Rotation2d targetAngle) {
         this.targetAngle = targetAngle.getDegrees();
+        anglePid.setSetpoint(this.targetAngle);
+
     }
 
     /**
