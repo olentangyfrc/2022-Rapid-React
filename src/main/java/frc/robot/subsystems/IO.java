@@ -197,7 +197,7 @@ public class IO extends SubsystemBase {
                 button = stickButton.ordinal() + 1;
             } else {
                 joystick = rightStick;
-                button = stickButton.ordinal() - 10 + 1;
+                button = stickButton.ordinal() - 10;
             }
         }
 

@@ -12,8 +12,17 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import edu.wpi.first.wpilibj.XboxController.Button;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 // Project imports:
 import frc.robot.subsystems.drivetrain.SwerveDrivetrain;
+import frc.robot.subsystems.intake.BallIntake;
+import frc.robot.subsystems.intake.commands.BringIntakeUp;
+import frc.robot.subsystems.intake.commands.PutIntakeDown;
+import frc.robot.subsystems.intake.commands.StartIntakeMotor;
+import frc.robot.subsystems.intake.commands.StartNoodleMotor;
+import frc.robot.subsystems.intake.commands.StopIntakeMotor;
+import frc.robot.subsystems.intake.commands.StopNoodleMotor;
+import frc.robot.subsystems.intake.commands.ToggleIntakeMotor;
 import frc.robot.subsystems.drivetrain.SingleFalconDrivetrain;
 import frc.robot.subsystems.drivetrain.SparkMaxDrivetrain;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
@@ -57,6 +66,7 @@ public class SubsystemFactory {
   private SwerveDrivetrain driveTrain;
   private ShooterSubsystem shooter;
   private networkTables vision;
+  private BallIntake ballIntake;
 
   // Should not be used outside of this class!
   private SubsystemFactory() {}
@@ -215,11 +225,13 @@ public class SubsystemFactory {
     shooter.init(botType);
     vision = new networkTables();
 
+    ballIntake = new BallIntake();
     
     io.bind(new ZeroGyro(telemetry.getGyro()), Button.kY, StickButton.RIGHT_2, ButtonActionType.WHEN_PRESSED);
     io.bind(new takeInBall(shooter), Button.kA, StickButton.LEFT_1, ButtonActionType.WHEN_HELD);
     io.bind(new feedBall(shooter), Button.kB, StickButton.LEFT_2, ButtonActionType.WHEN_HELD);
     io.bind(new rotateToHub(driveTrain), Button.kX, StickButton.LEFT_3, ButtonActionType.WHEN_HELD);
+    io.bind(new ToggleIntakeMotor(ballIntake), Button.kRightStick, StickButton.LEFT_4, ButtonActionType.WHEN_PRESSED);
   }
 
   /**
@@ -256,6 +268,10 @@ public class SubsystemFactory {
    */
   public SwerveDrivetrain getDrivetrain() {
     return driveTrain;
+  }
+
+  public BallIntake getBallIntake() {
+    return ballIntake;
   }
 
   /**
