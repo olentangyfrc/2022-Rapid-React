@@ -104,7 +104,7 @@ public abstract class SwerveModule {
      * @return the current state of the module
      */
     public SwerveModuleState getState() {
-        return new SwerveModuleState(getVelocity(), getAngle());
+        return new SwerveModuleState(getVelocity(), Rotation2d.fromDegrees(-getAngle().getDegrees()));
     }
 
     /**
