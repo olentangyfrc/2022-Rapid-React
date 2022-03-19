@@ -62,6 +62,7 @@ public class Telemetry extends SubsystemBase {
 
     /**
      *  Initializes COVID Bot sensors
+     * @throws Exception
      */
     private void initCOVID() throws Exception{
         PortManager pm = SubsystemFactory.getInstance().getPortManager();

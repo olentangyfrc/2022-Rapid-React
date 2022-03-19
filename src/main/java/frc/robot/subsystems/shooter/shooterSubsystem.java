@@ -8,6 +8,11 @@ import java.util.logging.Logger;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.PortManager;
 import frc.robot.subsystems.SubsystemFactory;
@@ -33,6 +38,12 @@ public class ShooterSubsystem extends SubsystemBase {
     private PIDController pid;
     
     private PortManager portManager = SubsystemFactory.getInstance().getPortManager();
+
+    private ShuffleboardTab tab = Shuffleboard.getTab("Shooter");
+
+    // For tuning purposes only
+    // Target speed in rps
+    private NetworkTableEntry targetShooterSpeed = tab.add("Target Shooter Speed", 0.0).withWidget(BuiltInWidgets.kTextView).getEntry();
 
     /**
      *  Initalizes the shooter subsystem. THIS FUNCTION MUST BE CALLED BEFORE THE SUBSYSTEM WILL WORK!
@@ -72,6 +83,16 @@ public class ShooterSubsystem extends SubsystemBase {
         pid = new PIDController(8, 0, 0.2);
         pid.setTolerance(1);
         flyWheel.setSelectedSensorPosition(0);
+
+        tab.addNumber("Distance from hub: ", () -> {
+            // Bot position: 
+            Translation2d botPosition = SubsystemFactory.getInstance().getDrivetrain().getSwerveDriveOdometry().getPoseMeters().getTranslation();
+            Translation2d hubPosition = new Translation2d(8.23, 4.115);
+
+            return botPosition.getDistance(hubPosition);
+        });
+
+        tab.addNumber("Current Shooter Speed", this::getFlySpeed);
     }
 
     /**
@@ -79,6 +100,8 @@ public class ShooterSubsystem extends SubsystemBase {
      * This function sets the voltage of both motors constantly
      */
     public void periodic() {
+        setSpeed(targetShooterSpeed.getDouble(0.0));
+
         double targetVolts = -feedForward.calculate(targetSpeed, pid.calculate(getFlySpeed()));
         flyWheel.setVoltage(targetVolts);
     }

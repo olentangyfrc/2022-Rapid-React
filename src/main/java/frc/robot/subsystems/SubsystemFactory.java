@@ -53,6 +53,7 @@ public class SubsystemFactory {
   private IO io;
   private SwerveDrivetrain driveTrain;
   private ShooterSubsystem shooter;
+  private networkTables vision;
 
   // Should not be used outside of this class!
   private SubsystemFactory() {}
@@ -127,6 +128,8 @@ public class SubsystemFactory {
     // Create and initialize all subsystems:
     driveTrain = new SingleFalconDrivetrain();
     driveTrain.init(portAssignments, wheelOffsets);
+
+    vision = new networkTables();
     
     io.bind(new ZeroGyro(telemetry.getGyro()), Button.kY, StickButton.RIGHT_2, ButtonActionType.WHEN_PRESSED);
   }
@@ -154,17 +157,20 @@ public class SubsystemFactory {
     portAssignments.put("BR.Encoder", 3);
 
     HashMap<String, Double> wheelOffsets = new HashMap<String, Double>();
-    wheelOffsets.put("FL", 337.08);
-    wheelOffsets.put("FR", 214.18);
-    wheelOffsets.put("BL", 40.45);
-    wheelOffsets.put("BR", 282.21
-    );
+    wheelOffsets.put("FL", 337.5);
+    wheelOffsets.put("FR", 214.54);
+    wheelOffsets.put("BL", 40.16);
+    wheelOffsets.put("BR", 283.18);
 
     // Create and initialize all subsystems:
     driveTrain = new SparkMaxDrivetrain();
     driveTrain.init(portAssignments, wheelOffsets);
     shooter = new ShooterSubsystem();
     shooter.init(botType);
+    vision = new networkTables();
+
+    io.bind(new ZeroGyro(telemetry.getGyro()), Button.kY, StickButton.RIGHT_2, ButtonActionType.WHEN_PRESSED);
+
   }
 
   /**
@@ -204,6 +210,8 @@ public class SubsystemFactory {
 
     shooter = new ShooterSubsystem();
     shooter.init(botType);
+    vision = new networkTables();
+
     
     io.bind(new ZeroGyro(telemetry.getGyro()), Button.kY, StickButton.RIGHT_2, ButtonActionType.WHEN_PRESSED);
   }
