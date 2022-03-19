@@ -33,6 +33,11 @@ public class rotateToHub extends CommandBase {
     }
 
     @Override
+    public void end(boolean interrupted) {
+        driveTrain.removeTargetAngle();
+    }
+
+    @Override
     public boolean isFinished() {
         return driveTrain.atTargetAngle();
     }

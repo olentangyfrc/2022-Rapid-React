@@ -68,7 +68,6 @@ public abstract class SwerveDrivetrain extends SubsystemBase {
      */
     public void init(Map<String, Integer> portAssignments, Map<String, Double> wheelOffsets) throws Exception {
         initializeSwerveModules(portAssignments, wheelOffsets);
-
         // Create a new drive command to be reused later
         driveCommand = new DriveCommand(this);
 
@@ -92,7 +91,7 @@ public abstract class SwerveDrivetrain extends SubsystemBase {
     */
 
         anglePid.enableContinuousInput(0, 360);
-        //anglePid.setTolerance(0.1);
+        anglePid.setTolerance(1);
 
         // Add the encoder readings to shuffleboard
         tab.addNumber("FL angle", () -> frontLeftModule.getAngle().getDegrees());
@@ -130,23 +129,22 @@ public abstract class SwerveDrivetrain extends SubsystemBase {
      * @param speeds Chassis speeds with vx and vy <= max linear speed and omega < max rotation speed
     */
     public void drive(ChassisSpeeds speeds) {
-        
         Gyro gyro = SubsystemFactory.getInstance().getTelemetry().getGyro();
         if(getFieldOriented()) {
             speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
                 speeds.vxMetersPerSecond, 
                 speeds.vyMetersPerSecond,
                 speeds.omegaRadiansPerSecond, 
-                gyro.getRotation2d()
-            );
-        }
-
-        if(targetAngle != Double.NaN) {
-            speeds.omegaRadiansPerSecond = anglePid.calculate(gyro.getAngle(), targetAngle);
-        }
-
-        SwerveModuleState[] states = kinematics.toSwerveModuleStates(speeds);
-        SwerveDriveKinematics.desaturateWheelSpeeds(states, MAX_LINEAR_SPEED); // Normalize wheel speeds so we don't go faster than 100%
+                Rotation2d.fromDegrees(-gyro.getAngle())
+                );
+            }
+            
+            if(!Double.isNaN(targetAngle)) {
+                speeds.omegaRadiansPerSecond = -anglePid.calculate(gyro.getAngle(), targetAngle);
+            }
+            
+            SwerveModuleState[] states = kinematics.toSwerveModuleStates(speeds);
+            SwerveDriveKinematics.desaturateWheelSpeeds(states, MAX_LINEAR_SPEED); // Normalize wheel speeds so we don't go faster than 100%
         try{
             odometry.update(gyro.getRotation2d(), states);
         }catch(Exception e){
@@ -183,8 +181,7 @@ public abstract class SwerveDrivetrain extends SubsystemBase {
     }
 
     public boolean atTargetAngle() {
-        Gyro gyro = SubsystemFactory.getInstance().getTelemetry().getGyro();
-        return gyro.getAngle() == targetAngle;
+        return anglePid.atSetpoint();
     }
 
     /**
