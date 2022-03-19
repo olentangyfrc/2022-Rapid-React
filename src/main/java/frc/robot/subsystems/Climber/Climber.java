@@ -26,11 +26,11 @@ public class Climber extends SubsystemBase{
     //Declaration of right linear actuator.
     private CANSparkMax rightLinearActuator;
     //Right Linear Actuator CAN ID
-    private final int RIGHT_LIN_ACT_CAN = 20; //proto: 20 comp: 47
+    private final int RIGHT_LIN_ACT_CAN = 7; //proto: 20 comp: 47
     //Declaration of left linear actuator.
     private CANSparkMax leftLinearActuator;
     //Left Linear Actuator CAN ID
-    private final int LEFT_LIN_ACT_CAN = 7; //proto: 7 comp: 44
+    private final int LEFT_LIN_ACT_CAN = 20; //proto: 7 comp: 44
     //Sets Motor Type to Brushless according to Neo motors.
     private final CANSparkMaxLowLevel.MotorType MOTOR_TYPE = CANSparkMaxLowLevel.MotorType.kBrushless;
     //Sets right and left linear actuators into break mode.
@@ -69,14 +69,14 @@ public class Climber extends SubsystemBase{
     public static final double MAX_ARM_ERROR = 0.05;
     private static final double ARMS_TOLERANCE = 0.01;
 
-    private static final double LEFT_ARM_OFFSET = 0.0763;
-    private static final double RIGHT_ARM_OFFSET = 0.1837;
+    private static final double LEFT_ARM_OFFSET = 0.19; //proto: 0.0763 comp: 
+    private static final double RIGHT_ARM_OFFSET = 0.08; //proto: 0.1837 comp:
 
-    public static final double MAX_ARM_POSITION = 0.95;
+    public static final double MAX_ARM_POSITION = 0.7; //proto: 0.95 comp: 
 
     private double targetArmPosition;
 
-    //Initialization of the Climber Subsystem
+    //Initialization of the Climber Subsystems
     public void init() throws Exception {
         logger.info("Setting Up Climber");
 
@@ -106,11 +106,11 @@ public class Climber extends SubsystemBase{
         kMinOutput = -1;
         */
 
-        maxRightForwardPosition = 1.12; //proto: 1.12 comp: 0.838
-        minRightBackPosition = 0.171; //proto: 0.171 comp: 0.111
+        maxRightForwardPosition = 1.05; //proto: 1.12 comp: 0.838
+        minRightBackPosition = 0.0939; //proto: 0.171 comp: 0.111
 
-        maxLeftForwardPosition = 1.05; //proto: 1.05 comp: 0.971
-        minLeftBackPosition = 0.0939; //proto: 0.0939 comp: 0.24
+        maxLeftForwardPosition = 1.12; //proto: 1.05 comp: 0.971
+        minLeftBackPosition = 0.171; //proto: 0.0939 comp: 0.24
 
         /*rightPidController.setP(kP);
         rightPidController.setI(kI);

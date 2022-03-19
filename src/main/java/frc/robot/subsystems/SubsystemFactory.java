@@ -265,26 +265,41 @@ public class SubsystemFactory {
     
     io.bind(new ZeroGyro(telemetry.getGyro()), Button.kY, StickButton.RIGHT_2, ButtonActionType.WHEN_PRESSED);
 
-    logger.info("Initializing Climber and Elevator Subsystem");
     climber = new Climber();
     elevator = new Elevator();
+
+    logger.info("Initializing Climber Subsystem");
     climber.init();
     elevator.init();
     ClimberSBTab climberTab = new ClimberSBTab(climber, elevator);
     io.bind(new PushArmsForward(climber), Button.kLeftBumper, StickButton.LEFT_6, ButtonActionType.WHEN_HELD);
     io.bind(new PullArmsBack(climber), Button.kRightBumper, StickButton.LEFT_7, ButtonActionType.WHEN_HELD);
-
     io.bind(new ExtendArms(elevator), Button.kB, StickButton.LEFT_8, ButtonActionType.WHEN_HELD);
     io.bind(new RetractArms(elevator), Button.kRightStick, StickButton.LEFT_9, ButtonActionType.WHEN_HELD);
-
     io.bind(new LatchOntoBar(climber), Button.kX, StickButton.LEFT_10, ButtonActionType.WHEN_PRESSED);
     io.bind(new LetGoOfBar(climber), Button.kA, StickButton.LEFT_11, ButtonActionType.WHEN_PRESSED);
 
-    io.bind(new ExtendArmsToPosition(elevator, 10.4), Button.kBack, StickButton.RIGHT_8, ButtonActionType.WHEN_HELD);
+    Shuffleboard.getTab("Climber").add("Climb to first bar", new ClimbToFirstBar(climber, elevator));
+    Shuffleboard.getTab("Climber").add("Climb to next bar", new ClimbToNextBar(climber, elevator));
+    // io.bind(new ClimbToFirstBar(climber, elevator), Button.k, StickButton.RIGHT_11, ButtonActionType.WHEN_PRESSED);
+    
+    io.bind(new ExtendArmsToPosition(elevator, 10.3), Button.kBack, StickButton.RIGHT_8, ButtonActionType.WHEN_PRESSED);
     io.bind(new ExtendArmsToPosition(elevator, 0), Button.kStart, StickButton.RIGHT_9, ButtonActionType.WHEN_HELD);
+    Shuffleboard.getTab("Climber").add("Move Arms", new InstantCommand() {
+      @Override
+      public void initialize() {
+        (new PushArmsForwardToPosition(climber, targetArmPosition.getDouble(0.5))).schedule();
+      }
+    });
 
-    //io.bind(new ClimbToFirstBar(climber, elevator), Button.kY, StickButton.RIGHT_10, ButtonActionType.WHEN_PRESSED);
-    //io.bind(new ClimbToNextBar(climber, elevator), Button.kX, StickButton.RIGHT_11, ButtonActionType.WHEN_PRESSED);
+    Shuffleboard.getTab("Climber").add("Move Elevator", new InstantCommand() {
+      @Override
+      public void initialize() {
+        (new ExtendArmsToPosition(elevator, targetElevatorPosition.getDouble(0.0))).schedule();
+      }
+    });
+
+    //io.bind(new ExtendArmsToPosition(elevator, 3), Button.kX, StickButton.RIGHT_10, ButtonActionType.WHEN_PRESSED);
   }
 
   /**

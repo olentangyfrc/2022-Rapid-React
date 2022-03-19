@@ -25,8 +25,8 @@ public class Elevator extends SubsystemBase{
     // The ticks per revolution of the Falcon 500
     public static final double MOTOR_ENCODER_TICKS = 2048;
     // Gear ratio between the Falcon 500 motor and the output shaft for the elevator.
-    public static final double WINCH_GEAR_RATIO = 80;
-    private static final int WINCH_MOTOR_CAN = 28; //proto: 28 comp: 10
+    public static final double WINCH_GEAR_RATIO = 20;
+    private static final int WINCH_MOTOR_CAN = 10; //proto: 28 comp: 10
 
     // The percent output to use for moving the arms forwards and backwards.
     private double verticalPercentOutput;
@@ -40,7 +40,7 @@ public class Elevator extends SubsystemBase{
     private double maxHeight;
     
     // Constraints for the movement of the elevator.
-    private final TrapezoidProfile.Constraints SPEED_CONSTRAINTS = new TrapezoidProfile.Constraints(2, 4);
+    private final TrapezoidProfile.Constraints SPEED_CONSTRAINTS = new TrapezoidProfile.Constraints(4, 4);
     // Do not change these directly! Use SysID.
     private ProfiledPIDController elevatorController = new ProfiledPIDController(57.839, 0, 0, SPEED_CONSTRAINTS);
     //private ProfiledPIDController elevatorController = new ProfiledPIDController(10.038, 0, 4.1283, SPEED_CONSTRAINTS);
