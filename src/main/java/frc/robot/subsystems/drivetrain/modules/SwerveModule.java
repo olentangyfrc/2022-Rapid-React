@@ -99,6 +99,15 @@ public abstract class SwerveModule {
     }
 
     /**
+     * Get the current state of the module
+     * 
+     * @return the current state of the module
+     */
+    public SwerveModuleState getState() {
+        return new SwerveModuleState(getVelocity(), getAngle());
+    }
+
+    /**
      * Get the angle of the swerve module
      * 
      * @return the angle as a rotation2D
