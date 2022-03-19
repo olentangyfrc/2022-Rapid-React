@@ -228,7 +228,7 @@ public class SubsystemFactory {
     ballIntake = new BallIntake();
     
     io.bind(new ZeroGyro(telemetry.getGyro()), Button.kY, StickButton.RIGHT_2, ButtonActionType.WHEN_PRESSED);
-    io.bind(new takeInBall(shooter), Button.kA, StickButton.LEFT_1, ButtonActionType.WHEN_HELD);
+    io.bind(new takeInBall(shooter, ballIntake), Button.kA, StickButton.LEFT_1, ButtonActionType.WHEN_HELD);
     io.bind(new feedBall(shooter), Button.kB, StickButton.LEFT_2, ButtonActionType.WHEN_HELD);
     io.bind(new rotateToHub(driveTrain), Button.kX, StickButton.LEFT_3, ButtonActionType.WHEN_HELD);
     io.bind(new ToggleIntakeMotor(ballIntake), Button.kRightStick, StickButton.LEFT_4, ButtonActionType.WHEN_PRESSED);

@@ -60,7 +60,7 @@ public abstract class SwerveDrivetrain extends SubsystemBase {
     private ShuffleboardTab tab = Shuffleboard.getTab("Drive");
     private NetworkTableEntry fieldOrientedToggle = tab.add("Field Oriented", true).withWidget(BuiltInWidgets.kToggleButton).getEntry();
 
-    private PIDController anglePid = new PIDController(.01, 0, 0);
+    private PIDController anglePid = new PIDController(.08, 0, 0);
     private double targetAngle = Double.NaN;
 
     /**

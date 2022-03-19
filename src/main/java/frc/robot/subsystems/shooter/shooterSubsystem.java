@@ -168,8 +168,8 @@ public class ShooterSubsystem extends SubsystemBase {
         //This will cause problems. You cannot pause the flow of code. Code is impatient. 
         // TODO: Fix this.
         //while (getFlyWheelState().equals(flyWheelState.intermediate)) { System.out.println("Waiting"); }
-        triggerWheel.setVoltage(5);
-        previousTriggerSpeed = 5;
+        triggerWheel.setVoltage(10);
+        previousTriggerSpeed = 10;
     }
 
     /**

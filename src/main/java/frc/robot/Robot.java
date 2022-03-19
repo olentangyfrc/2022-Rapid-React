@@ -6,6 +6,7 @@ package frc.robot;
 
 import java.util.Map;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
@@ -46,7 +47,7 @@ public class Robot extends TimedRobot {
       shooter = SubsystemFactory.getInstance().getShooter();
       drivetrain = SubsystemFactory.getInstance().getDrivetrain();
       io = SubsystemFactory.getInstance().getIO();
-      io.bind(new shootBall(drivetrain, shooter, 20), XboxController.Button.kX, StickButton.LEFT_1, ButtonActionType.WHILE_HELD);
+      io.bind(new shootBall(drivetrain, shooter, SubsystemFactory.getInstance().getBallIntake(), 20), XboxController.Button.kX, StickButton.LEFT_1, ButtonActionType.WHILE_HELD);
     } catch (Exception exception) {
       exception.printStackTrace();
     }
@@ -69,7 +70,8 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void teleopInit() {}
+  public void teleopInit() {
+  }
 
   @Override
   public void teleopPeriodic() {
@@ -91,24 +93,25 @@ public class Robot extends TimedRobot {
   private NetworkTableEntry triggerOff = Shuffleboard.getTab("Shooter").add("Stop Trigger", false).withWidget(BuiltInWidgets.kToggleButton).getEntry();
 
   @Override
-  public void testInit() {}
+  public void testInit() {
+  }
 
   @Override
   public void testPeriodic() {
 
-    shooter.periodic();
+    // shooter.periodic();
     
-    if (shootBall.getBoolean(false)) {
-      shooter.shoot();
-      shootBall.setBoolean(false);
-    }
+    // if (shootBall.getBoolean(false)) {
+    //   shooter.shoot();
+    //   shootBall.setBoolean(false);
+    // }
 
-    if (triggerOff.getBoolean(false)) {
-      shooter.stopTrigger();
-      triggerOff.setBoolean(false);
-    }
+    // if (triggerOff.getBoolean(false)) {
+    //   shooter.stopTrigger();
+    //   triggerOff.setBoolean(false);
+    // }
 
-    shooter.setSpeed(targetSpeedEntry.getDouble(0));
+    // shooter.setSpeed(targetSpeedEntry.getDouble(0));
 
     CommandScheduler.getInstance().run();
   }
