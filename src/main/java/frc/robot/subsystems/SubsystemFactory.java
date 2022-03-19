@@ -12,17 +12,23 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.XboxController.Button;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.IO.ButtonActionType;
 import frc.robot.subsystems.IO.StickButton;
 import frc.robot.subsystems.Climber.Climber;
 import frc.robot.subsystems.Climber.ClimberSBTab;
+import frc.robot.subsystems.Climber.commands.ClimbToFirstBar;
 import frc.robot.subsystems.Climber.commands.ClimbToNextBar;
 import frc.robot.subsystems.Climber.commands.LatchOntoBar;
 import frc.robot.subsystems.Climber.commands.LetGoOfBar;
 import frc.robot.subsystems.Climber.commands.PullArmsBack;
 import frc.robot.subsystems.Climber.commands.PushArmsForward;
+import frc.robot.subsystems.Climber.commands.PushArmsForwardToPosition;
 import frc.robot.subsystems.Elevator.Elevator;
 import frc.robot.subsystems.Elevator.commands.ExtendArms;
 import frc.robot.subsystems.Elevator.commands.ExtendArmsToPosition;
@@ -115,6 +121,9 @@ public class SubsystemFactory {
     }
   }
 
+  private NetworkTableEntry targetArmPosition = Shuffleboard.getTab("Climber").add("Target Arm position", 0.5).withWidget(BuiltInWidgets.kTextView).getEntry();
+  private NetworkTableEntry targetElevatorPosition = Shuffleboard.getTab("Climber").add("Target Elevator position", 0.5).withWidget(BuiltInWidgets.kTextView).getEntry();
+
   private void initRIO1() throws Exception {
     HashMap<String, Integer> portAssignments = new HashMap<String, Integer>();
     portAssignments.put("FL.SwerveMotor", 9);
@@ -161,10 +170,26 @@ public class SubsystemFactory {
     io.bind(new LatchOntoBar(climber), Button.kX, StickButton.LEFT_10, ButtonActionType.WHEN_PRESSED);
     io.bind(new LetGoOfBar(climber), Button.kA, StickButton.LEFT_11, ButtonActionType.WHEN_PRESSED);
 
-    //io.bind(new ClimbToFirstBar(climber, elevator), Button.kY, StickButton.RIGHT_11, ButtonActionType.WHEN_HELD);
-
-    io.bind(new ExtendArmsToPosition(elevator, 10.4), Button.kBack, StickButton.RIGHT_8, ButtonActionType.WHEN_HELD);
+    Shuffleboard.getTab("Climber").add("Climb to first bar", new ClimbToFirstBar(climber, elevator));
+    Shuffleboard.getTab("Climber").add("Climb to next bar", new ClimbToNextBar(climber, elevator));
+    // io.bind(new ClimbToFirstBar(climber, elevator), Button.k, StickButton.RIGHT_11, ButtonActionType.WHEN_PRESSED);
+    
+    io.bind(new ExtendArmsToPosition(elevator, 10.3), Button.kBack, StickButton.RIGHT_8, ButtonActionType.WHEN_PRESSED);
     io.bind(new ExtendArmsToPosition(elevator, 0), Button.kStart, StickButton.RIGHT_9, ButtonActionType.WHEN_HELD);
+    Shuffleboard.getTab("Climber").add("Move Arms", new InstantCommand() {
+      @Override
+      public void initialize() {
+        (new PushArmsForwardToPosition(climber, targetArmPosition.getDouble(0.5))).schedule();
+      }
+    });
+
+    Shuffleboard.getTab("Climber").add("Move Elevator", new InstantCommand() {
+      @Override
+      public void initialize() {
+        (new ExtendArmsToPosition(elevator, targetElevatorPosition.getDouble(0.0))).schedule();
+      }
+    });
+
     //io.bind(new ExtendArmsToPosition(elevator, 3), Button.kX, StickButton.RIGHT_10, ButtonActionType.WHEN_PRESSED);
   }
 

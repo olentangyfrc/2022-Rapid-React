@@ -1,5 +1,6 @@
 package frc.robot.subsystems.Climber.commands;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Climber.Climber;
 
@@ -10,24 +11,23 @@ public class PushArmsForwardToPosition extends CommandBase{
 
     private static Logger logger = Logger.getLogger(PushArmsForward.class.getName());
 
-    private double leftPosition;
-    private double rightPosition;
+    private double position;
 
-    public PushArmsForwardToPosition(Climber cb, double leftPos, double rightPos) {
+    public PushArmsForwardToPosition(Climber cb, double pos) {
         climber = cb;
         addRequirements(cb);
-        leftPosition = leftPos;
-        rightPosition = rightPos;
+        position = MathUtil.clamp(pos, 0, climber.MAX_ARM_POSITION);
     }
 
     @Override
     public void initialize(){
         logger.info("Pushing Arms Forward");
+        climber.setTargetArmPosition(position);
     }
 
     @Override
     public void execute(){
-        climber.pushArmsForwardWithPercent();
+        climber.setArmVoltage();
     }
 
     @Override
@@ -38,6 +38,6 @@ public class PushArmsForwardToPosition extends CommandBase{
 
     @Override
     public boolean isFinished(){
-        return ((Math.abs(climber.getRightPotentiometerPosition() - climber.getRightMaxForwardPosition()) < 0.1 && Math.abs(climber.getLeftPotentiometerPosition() - climber.getLeftMaxForwardPosition()) < 0.1) || (Math.abs(rightPosition - climber.getRightPotentiometerPosition()) < 0.1 && Math.abs(leftPosition - climber.getLeftPotentiometerPosition()) < 0.1));
+        return climber.armsAtPosition();
     }
 }

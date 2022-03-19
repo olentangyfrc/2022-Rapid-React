@@ -4,6 +4,8 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel;
 import com.revrobotics.SparkMaxAnalogSensor;
 
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
@@ -24,11 +26,11 @@ public class Climber extends SubsystemBase{
     //Declaration of right linear actuator.
     private CANSparkMax rightLinearActuator;
     //Right Linear Actuator CAN ID
-    private final int RIGHT_LIN_ACT_CAN = 47; //proto: 20
+    private final int RIGHT_LIN_ACT_CAN = 20; //proto: 20 comp: 47
     //Declaration of left linear actuator.
     private CANSparkMax leftLinearActuator;
     //Left Linear Actuator CAN ID
-    private final int LEFT_LIN_ACT_CAN = 44; //proto: 7
+    private final int LEFT_LIN_ACT_CAN = 7; //proto: 7 comp: 44
     //Sets Motor Type to Brushless according to Neo motors.
     private final CANSparkMaxLowLevel.MotorType MOTOR_TYPE = CANSparkMaxLowLevel.MotorType.kBrushless;
     //Sets right and left linear actuators into break mode.
@@ -63,6 +65,17 @@ public class Climber extends SubsystemBase{
     //Creating a new Shuffleboard Tab
     private ShuffleboardTab tab = Shuffleboard.getTab("Climber");
 
+    private PIDController armsController = new PIDController(180, 0, 0);
+    public static final double MAX_ARM_ERROR = 0.05;
+    private static final double ARMS_TOLERANCE = 0.01;
+
+    private static final double LEFT_ARM_OFFSET = 0.0763;
+    private static final double RIGHT_ARM_OFFSET = 0.1837;
+
+    public static final double MAX_ARM_POSITION = 0.95;
+
+    private double targetArmPosition;
+
     //Initialization of the Climber Subsystem
     public void init() throws Exception {
         logger.info("Setting Up Climber");
@@ -78,6 +91,8 @@ public class Climber extends SubsystemBase{
         leftLinearActuator.restoreFactoryDefaults();
         rightPotentiometer.setPositionConversionFactor(1);
         leftPotentiometer.setPositionConversionFactor(1);
+
+        armsController.setTolerance(ARMS_TOLERANCE);
         /*rightPidController = rightLinearActuator.getPIDController();
         leftPidController = leftLinearActuator.getPIDController();
 
@@ -91,11 +106,11 @@ public class Climber extends SubsystemBase{
         kMinOutput = -1;
         */
 
-        maxRightForwardPosition = 0.838; //proto: 1.12
-        minRightBackPosition = 0.111; //proto: 0.171
+        maxRightForwardPosition = 1.12; //proto: 1.12 comp: 0.838
+        minRightBackPosition = 0.171; //proto: 0.171 comp: 0.111
 
-        maxLeftForwardPosition = 0.971; //proto: 1.05
-        minLeftBackPosition = 0.24; //proto: 0.0939
+        maxLeftForwardPosition = 1.05; //proto: 1.05 comp: 0.971
+        minLeftBackPosition = 0.0939; //proto: 0.0939 comp: 0.24
 
         /*rightPidController.setP(kP);
         rightPidController.setI(kI);
@@ -119,6 +134,8 @@ public class Climber extends SubsystemBase{
         compressor.enableDigital();
         pins = new DoubleSolenoid(PCMCANID, PneumaticsModuleType.CTREPCM, pinsForward, pinsReverse);
         pins.set(Value.kOff);
+
+        targetArmPosition = 0;
     }
 
     /*public void pushArmsForward() {
@@ -135,6 +152,22 @@ public class Climber extends SubsystemBase{
     public void pushArmsForwardWithPercent(){
         rightLinearActuator.set(0.2);
         leftLinearActuator.set(0.2);
+    }
+
+    public boolean armsAtPosition(){
+        return armsController.atSetpoint();
+    }
+
+    public void setTargetArmPosition(double pos){
+        targetArmPosition = pos;
+    }
+
+    public void setArmVoltage(){
+        double averagePosition = (getLeftPotentiometerPosition() + getRightPotentiometerPosition()) / 2.0;
+        double clampedPosition = MathUtil.clamp(averagePosition, targetArmPosition - MAX_ARM_ERROR, targetArmPosition + MAX_ARM_ERROR);
+        double volts = armsController.calculate(clampedPosition, targetArmPosition);
+        leftLinearActuator.setVoltage(volts);
+        rightLinearActuator.setVoltage(volts);
     }
 
     public void pullArmsBackWithPercent(){
@@ -159,11 +192,11 @@ public class Climber extends SubsystemBase{
     }
 
     public double getRightPotentiometerPosition() {
-        return rightPotentiometer.getPosition();
+        return rightPotentiometer.getPosition() - RIGHT_ARM_OFFSET;
     }
 
     public double getLeftPotentiometerPosition(){
-        return leftPotentiometer.getPosition();
+        return leftPotentiometer.getPosition() - LEFT_ARM_OFFSET;
     }
 
     public double getRightMaxForwardPosition() {
