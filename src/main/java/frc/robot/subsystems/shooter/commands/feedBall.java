@@ -15,5 +15,10 @@ public class feedBall extends CommandBase {
     public void initialize() {
         shooterSubsystem.shoot();
     }
+
+    @Override
+    public boolean isFinished() {
+        return true;
+    }
     
 }

@@ -19,6 +19,11 @@ public class takeInBall extends CommandBase {
     }
 
     @Override
+    public void end(boolean interupted) {
+        shooterSubsystem.stopTrigger();
+    }
+
+    @Override
     public boolean isFinished() {
         return shooterSubsystem.hasBall();
     }

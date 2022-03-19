@@ -17,6 +17,9 @@ import frc.robot.subsystems.drivetrain.SwerveDrivetrain;
 import frc.robot.subsystems.drivetrain.SingleFalconDrivetrain;
 import frc.robot.subsystems.drivetrain.SparkMaxDrivetrain;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
+import frc.robot.subsystems.shooter.commands.feedBall;
+import frc.robot.subsystems.shooter.commands.rotateToHub;
+import frc.robot.subsystems.shooter.commands.takeInBall;
 import frc.robot.subsystems.telemetry.Telemetry;
 import frc.robot.subsystems.telemetry.commands.ZeroGyro;
 import frc.robot.subsystems.IO.ButtonActionType;
@@ -214,6 +217,9 @@ public class SubsystemFactory {
 
     
     io.bind(new ZeroGyro(telemetry.getGyro()), Button.kY, StickButton.RIGHT_2, ButtonActionType.WHEN_PRESSED);
+    io.bind(new takeInBall(shooter), Button.kA, StickButton.LEFT_1, ButtonActionType.WHEN_HELD);
+    io.bind(new feedBall(shooter), Button.kB, StickButton.LEFT_2, ButtonActionType.WHEN_HELD);
+    io.bind(new rotateToHub(driveTrain), Button.kX, StickButton.LEFT_3, ButtonActionType.WHEN_HELD);
   }
 
   /**
