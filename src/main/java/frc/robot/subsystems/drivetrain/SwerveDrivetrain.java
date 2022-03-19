@@ -148,7 +148,7 @@ public abstract class SwerveDrivetrain extends SubsystemBase {
         SwerveModuleState[] states = kinematics.toSwerveModuleStates(speeds);
         SwerveDriveKinematics.desaturateWheelSpeeds(states, MAX_LINEAR_SPEED); // Normalize wheel speeds so we don't go faster than 100%
         try{
-            odometry.update(gyro.getRotation2d(), states);
+            odometry.update(gyro.getRotation2d(), getModuleStates());
         }catch(Exception e){
 
         }
@@ -164,6 +164,15 @@ public abstract class SwerveDrivetrain extends SubsystemBase {
         frontRightModule.updateState(SwerveModuleState.optimize(states[1], frontRightModule.getAngle()));
         backLeftModule.updateState(SwerveModuleState.optimize(states[2], backLeftModule.getAngle()));
         backRightModule.updateState(SwerveModuleState.optimize(states[3], backRightModule.getAngle()));
+    }
+
+    public SwerveModuleState[] getModuleStates() {
+        return new SwerveModuleState[]{
+            frontLeftModule.getState(),
+            frontRightModule.getState(),
+            backLeftModule.getState(),
+            backRightModule.getState()
+        };
     }
 
     /**
