@@ -15,29 +15,22 @@ Things need to Updated:
 package frc.robot.subsystems;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Logger;
 
-
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
+import edu.wpi.first.networktables.EntryListenerFlags;
+import edu.wpi.first.networktables.EntryNotification;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.networktables.EntryListenerFlags;
-import edu.wpi.first.networktables.EntryNotification;
-import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 
 
 
@@ -128,7 +121,7 @@ public class networkTables extends SubsystemBase {
 
     var corrected_vec = cv2_correction_mat.times(in_vec);
     // Build our rotation matrix
-    var pitch = -30 * Math.PI / 180;
+    var pitch = -28 * Math.PI / 180;
     var c = Math.cos(pitch);
     var s = Math.sin(pitch);
     var camera_to_bot = Matrix.mat(Nat.N3(), Nat.N3()).fill(
@@ -140,7 +133,7 @@ public class networkTables extends SubsystemBase {
     var corrected_bot_oriented = camera_to_bot.times(corrected_vec);
 
 
-    var trans2_vec = VecBuilder.fill(0.3048, 0.1524, 0.9906); //Change this where we know the displacement of the camera to the center of the robot
+    var trans2_vec = VecBuilder.fill(0.0, -0.215, 0.813); //Change this where we know the displacement of the camera to the center of the robot
 
     var out_vec = trans2_vec.plus(corrected_bot_oriented);
     double gyro_angle = 0; //add the heading by multipling by gyro angle

@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import frc.robot.subsystems.drivetrain.SwerveDrivetrain;
 import frc.robot.subsystems.intake.BallIntake;
+import frc.robot.subsystems.intake.commands.StartNoodleMotor;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
 
 public class prepareToShoot extends ParallelDeadlineGroup {
@@ -12,11 +13,8 @@ public class prepareToShoot extends ParallelDeadlineGroup {
         super(
             new WaitToShoot(driveTrain, shooterSubsystem), // deadline command
             new rotateToHub(driveTrain),
-            new speedUpShooter(shooterSubsystem, flyWheelRPS),
-            new takeInBall(shooterSubsystem, intake)
+            new speedUpShooter(shooterSubsystem, flyWheelRPS)
         );
-        
-
     }
 
 }

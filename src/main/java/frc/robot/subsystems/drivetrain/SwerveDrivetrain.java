@@ -60,7 +60,7 @@ public abstract class SwerveDrivetrain extends SubsystemBase {
     private ShuffleboardTab tab = Shuffleboard.getTab("Drive");
     private NetworkTableEntry fieldOrientedToggle = tab.add("Field Oriented", true).withWidget(BuiltInWidgets.kToggleButton).getEntry();
 
-    private PIDController anglePid = new PIDController(.08, 0, 0);
+    private PIDController anglePid = new PIDController(.12, 0, 0);
     private double targetAngle = Double.NaN;
 
     /**
@@ -91,7 +91,7 @@ public abstract class SwerveDrivetrain extends SubsystemBase {
     */
 
         anglePid.enableContinuousInput(0, 360);
-        anglePid.setTolerance(1);
+        anglePid.setTolerance(3);
 
         // Add the encoder readings to shuffleboard
         tab.addNumber("FL angle", () -> frontLeftModule.getAngle().getDegrees());
@@ -140,7 +140,7 @@ public abstract class SwerveDrivetrain extends SubsystemBase {
             }
             
             if(!Double.isNaN(targetAngle)) {
-                speeds.omegaRadiansPerSecond = -anglePid.calculate(gyro.getAngle(), targetAngle);
+                speeds.omegaRadiansPerSecond = -anglePid.calculate(gyro.getAngle());
             }
             
             SwerveModuleState[] states = kinematics.toSwerveModuleStates(speeds);

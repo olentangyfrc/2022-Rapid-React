@@ -4,6 +4,10 @@
 
 package frc.robot.subsystems.shooter.commands;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.drivetrain.SwerveDrivetrain;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
@@ -11,6 +15,8 @@ import frc.robot.subsystems.shooter.ShooterSubsystem;
 public class WaitToShoot extends CommandBase {
   private SwerveDrivetrain drivetrain;
   private ShooterSubsystem shooter;
+
+  private Instant startTime;
 
   /** Creates a new WaitToShoot. */
   public WaitToShoot(SwerveDrivetrain drivetrain, ShooterSubsystem shooter) {
@@ -21,7 +27,9 @@ public class WaitToShoot extends CommandBase {
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+    startTime = Instant.now();
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
@@ -34,6 +42,8 @@ public class WaitToShoot extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return drivetrain.atTargetAngle() && shooter.isReady() && shooter.getBallLoaded();
+    SmartDashboard.putBoolean("At target angle", drivetrain.atTargetAngle());
+    SmartDashboard.putBoolean("Shooter at speed", shooter.isReady());
+    return drivetrain.atTargetAngle() && shooter.isReady();
   }
 }

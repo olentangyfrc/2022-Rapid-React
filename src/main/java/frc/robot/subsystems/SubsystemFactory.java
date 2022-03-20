@@ -11,28 +11,28 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.XboxController.Button;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import frc.robot.subsystems.IO.ButtonActionType;
+import frc.robot.subsystems.IO.StickButton;
+import frc.robot.subsystems.drivetrain.SingleFalconDrivetrain;
+import frc.robot.subsystems.drivetrain.SparkMaxDrivetrain;
 // Project imports:
 import frc.robot.subsystems.drivetrain.SwerveDrivetrain;
 import frc.robot.subsystems.intake.BallIntake;
-import frc.robot.subsystems.intake.commands.BringIntakeUp;
 import frc.robot.subsystems.intake.commands.PutIntakeDown;
-import frc.robot.subsystems.intake.commands.StartIntakeMotor;
-import frc.robot.subsystems.intake.commands.StartNoodleMotor;
-import frc.robot.subsystems.intake.commands.StopIntakeMotor;
-import frc.robot.subsystems.intake.commands.StopNoodleMotor;
-import frc.robot.subsystems.intake.commands.ToggleIntakeMotor;
-import frc.robot.subsystems.drivetrain.SingleFalconDrivetrain;
-import frc.robot.subsystems.drivetrain.SparkMaxDrivetrain;
+import frc.robot.subsystems.intake.commands.StartIntake;
+import frc.robot.subsystems.intake.commands.StopIntake;
+import frc.robot.subsystems.intake.commands.ToggleIntake;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
 import frc.robot.subsystems.shooter.commands.feedBall;
-import frc.robot.subsystems.shooter.commands.rotateToHub;
+import frc.robot.subsystems.shooter.commands.shootBall;
 import frc.robot.subsystems.shooter.commands.takeInBall;
 import frc.robot.subsystems.telemetry.Telemetry;
 import frc.robot.subsystems.telemetry.commands.ZeroGyro;
-import frc.robot.subsystems.IO.ButtonActionType;
-import frc.robot.subsystems.IO.StickButton;
 
 /**
  * This class instantiates and initializes all of the subsystems and stores references to them.
@@ -59,6 +59,7 @@ public class SubsystemFactory {
 
   private BotType botType;
   private Telemetry telemetry;
+  private PowerDistribution pdp;
 
   // Variables for all subsystems:
   private PortManager portManager;
@@ -88,6 +89,7 @@ public class SubsystemFactory {
    * Create and initialize all of the subsystems.
    */
   public void init() throws Exception {
+    pdp = new PowerDistribution(1, ModuleType.kRev);
     botType = getBotType();
     portManager = new PortManager();
     telemetry = new Telemetry(botType);
@@ -228,10 +230,11 @@ public class SubsystemFactory {
     ballIntake = new BallIntake();
     
     io.bind(new ZeroGyro(telemetry.getGyro()), Button.kY, StickButton.RIGHT_2, ButtonActionType.WHEN_PRESSED);
-    io.bind(new takeInBall(shooter, ballIntake), Button.kA, StickButton.LEFT_1, ButtonActionType.WHEN_HELD);
-    io.bind(new feedBall(shooter), Button.kB, StickButton.LEFT_2, ButtonActionType.WHEN_HELD);
-    io.bind(new rotateToHub(driveTrain), Button.kX, StickButton.LEFT_3, ButtonActionType.WHEN_HELD);
-    io.bind(new ToggleIntakeMotor(ballIntake), Button.kRightStick, StickButton.LEFT_4, ButtonActionType.WHEN_PRESSED);
+    io.bind(new shootBall(driveTrain, shooter, SubsystemFactory.getInstance().getBallIntake(), 20), XboxController.Button.kX, StickButton.LEFT_1, ButtonActionType.WHEN_HELD);
+    io.bind(new PutIntakeDown(ballIntake), Button.kStart, StickButton.LEFT_5, ButtonActionType.WHEN_PRESSED);
+    io.bind(new StartIntake(ballIntake), Button.kRightBumper, StickButton.RIGHT_6, ButtonActionType.WHEN_PRESSED);
+    io.bind(new StopIntake(ballIntake), Button.kRightBumper, StickButton.RIGHT_7, ButtonActionType.WHEN_RELEASED);
+
   }
 
   /**
@@ -247,6 +250,10 @@ public class SubsystemFactory {
    */
   public PortManager getPortManager() {
     return portManager;
+  }
+
+  public PowerDistribution getPdp() {
+    return pdp;
   }
 
   /**

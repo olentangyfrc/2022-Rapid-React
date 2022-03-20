@@ -16,19 +16,19 @@ public class rotateToHub extends CommandBase {
     public rotateToHub(SwerveDrivetrain driveTrain) {
         this.driveTrain = driveTrain;
         // Hub position in meters
-        Translation2d hubLocation = new Translation2d(8.23, 4.115);
-
-        // Bot position in meters
-        Translation2d botLocation = driveTrain.getSwerveDriveOdometry().getPoseMeters().getTranslation();
-
-        // Relative hub position
-        Translation2d relativeHubLocation = hubLocation.minus(botLocation);
-
-        angle = new Rotation2d(Math.atan2(relativeHubLocation.getY(), relativeHubLocation.getX()));
     }
-
+    
     @Override
     public void initialize() {
+        Translation2d hubLocation = new Translation2d(8.23, 4.115);
+    
+        // Bot position in meters
+        Translation2d botLocation = driveTrain.getSwerveDriveOdometry().getPoseMeters().getTranslation();
+    
+        // Relative hub position
+        Translation2d relativeHubLocation = hubLocation.minus(botLocation);
+    
+        angle = new Rotation2d(Math.atan2(relativeHubLocation.getY(), relativeHubLocation.getX()));
         driveTrain.setTargetAngle(angle);
     }
 
@@ -39,6 +39,6 @@ public class rotateToHub extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        return driveTrain.atTargetAngle();
+        return false;
     }
 }

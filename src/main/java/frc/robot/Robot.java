@@ -20,6 +20,7 @@ import frc.robot.subsystems.SubsystemFactory;
 import frc.robot.subsystems.drivetrain.SwerveDrivetrain;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
 import frc.robot.subsystems.shooter.commands.shootBall;
+import frc.robot.subsystems.shooter.commands.takeInBall;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -33,7 +34,6 @@ public class Robot extends TimedRobot {
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
    */
-
   ShooterSubsystem shooter;
   SwerveDrivetrain drivetrain;
   IO io;
@@ -47,7 +47,7 @@ public class Robot extends TimedRobot {
       shooter = SubsystemFactory.getInstance().getShooter();
       drivetrain = SubsystemFactory.getInstance().getDrivetrain();
       io = SubsystemFactory.getInstance().getIO();
-      io.bind(new shootBall(drivetrain, shooter, SubsystemFactory.getInstance().getBallIntake(), 20), XboxController.Button.kX, StickButton.LEFT_1, ButtonActionType.WHILE_HELD);
+      
     } catch (Exception exception) {
       exception.printStackTrace();
     }
@@ -71,6 +71,8 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
+    SubsystemFactory.getInstance().getBallIntake().putIntakeDown();
+    (new takeInBall(SubsystemFactory.getInstance().getShooter())).schedule();
   }
 
   @Override
@@ -85,7 +87,6 @@ public class Robot extends TimedRobot {
   public void disabledPeriodic() {}
 
 
-  private NetworkTableEntry targetSpeedEntry = Shuffleboard.getTab("Shooter").add("Target Speed", 0).withWidget(BuiltInWidgets.kTextView).withProperties(Map.of("min", -60, "max", 60)).getEntry();
   private NetworkTableEntry actualSpeedEntry = Shuffleboard.getTab("Shooter").add("Actual Speed", 0).withWidget(BuiltInWidgets.kGraph).withProperties(Map.of("min", 0, "max", 0)).getEntry();
   private NetworkTableEntry currentPosition = Shuffleboard.getTab("Shooter").add("Current Position", 0).withWidget(BuiltInWidgets.kTextView).withProperties(Map.of("min",0,"max",0)).getEntry();
 
@@ -95,9 +96,10 @@ public class Robot extends TimedRobot {
   @Override
   public void testInit() {
   }
-
+  
   @Override
   public void testPeriodic() {
+    SubsystemFactory.getInstance().getBallIntake().bringIntakeUp();
 
     // shooter.periodic();
     

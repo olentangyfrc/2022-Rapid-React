@@ -1,22 +1,20 @@
 package frc.robot.subsystems.shooter;
 
+import java.util.logging.Logger;
+
 // CTRE imports
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
-
-
-import java.util.logging.Logger;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.PortManager;
-import frc.robot.subsystems.SubsystemFactory;
 import frc.robot.subsystems.PortManager.PortType;
+import frc.robot.subsystems.SubsystemFactory;
 import frc.robot.subsystems.SubsystemFactory.BotType;
 
 /**
@@ -41,11 +39,11 @@ public class ShooterSubsystem extends SubsystemBase {
 
     private ShuffleboardTab tab = Shuffleboard.getTab("Shooter");
 
-    private boolean isBallLoaded = false;
+    private boolean isStopped = true;
+    private TriggerWheelState triggerState = TriggerWheelState.EMPTY;
 
     // For tuning purposes only
     // Target speed in rps
-    private NetworkTableEntry targetShooterSpeed = tab.add("Target Shooter Speed", 0.0).withWidget(BuiltInWidgets.kTextView).getEntry();
 
     /**
      *  Initalizes the shooter subsystem. THIS FUNCTION MUST BE CALLED BEFORE THE SUBSYSTEM WILL WORK!
@@ -82,8 +80,8 @@ public class ShooterSubsystem extends SubsystemBase {
                 logger.severe("Unknown bot");
                 break;
         }
-        pid = new PIDController(8, 0, 0.2);
-        pid.setTolerance(1);
+        pid = new PIDController(9, 0, 0.2);
+        pid.setTolerance(0.3);
         flyWheel.setSelectedSensorPosition(0);
 
         tab.addNumber("Distance from hub: ", () -> {
@@ -102,10 +100,20 @@ public class ShooterSubsystem extends SubsystemBase {
      * This function sets the voltage of both motors constantly
      */
     public void periodic() {
-        setSpeed(targetShooterSpeed.getDouble(0.0));
+        if(isStopped) {
+            flyWheel.setVoltage(0.0);
+        } else {
+            double targetVolts = -feedForward.calculate(targetSpeed, pid.calculate(getFlySpeed()));
+            flyWheel.setVoltage(targetVolts);
+        }
+    }
 
-        double targetVolts = -feedForward.calculate(targetSpeed, pid.calculate(getFlySpeed()));
-        flyWheel.setVoltage(targetVolts);
+    public void stop() {
+        isStopped = true;
+    }
+
+    public double getTriggerCurrent() {
+        return SubsystemFactory.getInstance().getPdp().getCurrent(8);
     }
 
     public void takeInBall() {
@@ -117,6 +125,7 @@ public class ShooterSubsystem extends SubsystemBase {
      * @param targetSpeed The target speed in rps
      */
     public void setSpeed(double targetSpeed) {
+        isStopped = false;
         pid.setSetpoint(targetSpeed);
         this.targetSpeed = targetSpeed;
     }
@@ -150,21 +159,6 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     /**
-     * @return The active state of the trigger wheel
-     */
-    public triggerWheelState getTriggerWheelState() {
-        return getBallLoaded()? triggerWheelState.loaded : triggerWheelState.waiting;
-    }
-
-    public boolean getBallLoaded() {
-        return isBallLoaded;
-    }
-
-    public void setBallLoaded(Boolean isLoaded)  {
-        isBallLoaded = isLoaded;
-    }
-
-    /**
      * @return The current position of teh fly wheel in it's rotation
      */
     public double getFlyPosition() {
@@ -175,14 +169,24 @@ public class ShooterSubsystem extends SubsystemBase {
      * Rotates the trigger wheel to move the ball into the fly wheel
      */
     public void shoot() {
-        if (getFlyWheelState().equals(flyWheelState.off)) { 
-            System.out.println("Returning");
-            return; }
         //This will cause problems. You cannot pause the flow of code. Code is impatient. 
         // TODO: Fix this.
         //while (getFlyWheelState().equals(flyWheelState.intermediate)) { System.out.println("Waiting"); }
         triggerWheel.setVoltage(10);
         previousTriggerSpeed = 10;
+    }
+
+    public void setTriggerState(TriggerWheelState state) {
+        triggerState = state;
+    }
+
+    public void setTriggerVoltage(double voltage) {
+        triggerWheel.setVoltage(voltage);
+    }
+
+    public boolean isTriggerMoving() {
+        SmartDashboard.putNumber("Trigger moving", Math.abs(triggerWheel.getSelectedSensorVelocity()));
+        return (int) Math.abs(triggerWheel.getSelectedSensorVelocity()) > 0;
     }
 
     /**
@@ -193,9 +197,15 @@ public class ShooterSubsystem extends SubsystemBase {
         previousTriggerSpeed = 0;
     }
 
-    private enum triggerWheelState {
-        loaded,
-        waiting
+    public void stopFlywheel() {
+        setSpeed(0);
+    }
+
+    public enum TriggerWheelState {
+        LOADING,
+        HAS_BALL,
+        EMPTY,
+        SHOOTING
     }
     
     private enum flyWheelState {
