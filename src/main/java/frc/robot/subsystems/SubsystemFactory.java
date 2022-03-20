@@ -274,8 +274,8 @@ public class SubsystemFactory {
     ClimberSBTab climberTab = new ClimberSBTab(climber, elevator);
     io.bind(new PushArmsForward(climber), Button.kLeftBumper, StickButton.LEFT_6, ButtonActionType.WHEN_HELD);
     io.bind(new PullArmsBack(climber), Button.kRightBumper, StickButton.LEFT_7, ButtonActionType.WHEN_HELD);
-    io.bind(new ExtendArms(elevator), Button.kB, StickButton.LEFT_8, ButtonActionType.WHEN_HELD);
-    io.bind(new RetractArms(elevator), Button.kRightStick, StickButton.LEFT_9, ButtonActionType.WHEN_HELD);
+    io.bind(new ExtendArms(elevator), Button.kB, StickButton.LEFT_8, ButtonActionType.WHEN_PRESSED);
+    io.bind(new RetractArms(elevator), Button.kRightStick, StickButton.LEFT_9, ButtonActionType.WHEN_PRESSED);
     io.bind(new LatchOntoBar(climber), Button.kX, StickButton.LEFT_10, ButtonActionType.WHEN_PRESSED);
     io.bind(new LetGoOfBar(climber), Button.kA, StickButton.LEFT_11, ButtonActionType.WHEN_PRESSED);
 

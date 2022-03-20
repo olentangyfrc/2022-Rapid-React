@@ -79,11 +79,7 @@ public class Elevator extends SubsystemBase{
     public void periodic() {
         // Constantly try to adhere to our target position.
 
-        //double targetPosition = elevatorController.getSetpoint().position;
-        // Make sure the error is not greater than MAX_ERROR
-        //double clampedError = MathUtil.clamp(getPosition(), targetPosition - MAX_ERROR, targetPosition + MAX_ERROR);
-
-        //winchMotor.setVoltage(elevatorController.calculate(getPosition()));
+        setVoltageToWinchMotor();
 
         //setTargetRotations(targetElevatorPosition.getDouble(0));
     }
@@ -105,6 +101,10 @@ public class Elevator extends SubsystemBase{
 
     public void setVoltageToWinchMotor(){
         winchMotor.setVoltage(elevatorController.calculate(getPosition()));
+    }
+
+    public double getTargetRotations() {
+        return elevatorController.getGoal().position;
     }
 
     /**

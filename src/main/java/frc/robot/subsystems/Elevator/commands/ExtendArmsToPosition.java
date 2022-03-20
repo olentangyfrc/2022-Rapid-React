@@ -27,13 +27,10 @@ public class ExtendArmsToPosition extends CommandBase {
 
     @Override
     public void execute(){
-        logger.info("Moving Arms");
-        elevator.setVoltageToWinchMotor();
     }
 
     @Override
     public void end(boolean interrupted){
-        elevator.stopWinch();
         logger.info("Finished Extending Arms");
     }
 
