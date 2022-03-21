@@ -42,6 +42,9 @@ public class networkTables extends SubsystemBase {
   private SwerveDriveOdometry odometry;
   private ArrayList<past_object> past_positions = new ArrayList<past_object>(100);
 
+  private int fieldlength = 16;
+  private int fieldwidth = 8;
+
   NetworkTableInstance inst;
   Gyro gyro;
   NetworkTableEntry Time, XEntry, YEntry, ZEntry;
@@ -92,12 +95,8 @@ public class networkTables extends SubsystemBase {
     //System.out.println("Z changed value: " + ZEntry.getValue());
     double z = ZEntry.getDouble(0);
    
-    Pose2d position = updatePositionwithVision(x, y, z, elapsedtime); //converts the x,y,z into final position vector
-    SmartDashboard.putNumber("x", position.getX());
-    SmartDashboard.putNumber("y", position.getY());
-    if (position.getY() == 0){
-     odometry.resetPosition(position, gyro.getRotation2d());
-    } 
+    updatePositionwithVision(x, y, z, elapsedtime); //converts the x,y,z into final position vector
+
     // Do work here like updates odometry...
     //System.out.print(position);
 
@@ -112,7 +111,7 @@ public class networkTables extends SubsystemBase {
        * 
        * @param timeStampSeconds is when the vision measurement was made
        */
-  public Pose2d updatePositionwithVision(double x, double y, double z, double elapsedtime){
+  public void updatePositionwithVision(double x, double y, double z, double elapsedtime){
     // Build out input vector
     var in_vec = VecBuilder.fill(x, y, z);
 
@@ -161,7 +160,7 @@ public class networkTables extends SubsystemBase {
     SmartDashboard.putNumber("position_vecy", position.get(1, 0));
     SmartDashboard.putNumber("position_vecz", position.get(2, 0)); 
 
-    if((position.get(1,0) > 0) && (position.get(2,0) > - 0.9) && (position.get(2,0) <  0.9)){
+    if( (position.get(0,0) > 0 ) && (position.get(0,0) < fieldlength ) && (position.get(1,0) > 0) && (position.get(1,0) < fieldwidth) && (position.get(2,0) > - 0.9) && (position.get(2,0) <  0.9)){
 
       Transform2d visiontoodermetry = new Transform2d();       
       visiontoodermetry = (new Pose2d(position.get(0, 0),position.get(1, 0), gyro.getRotation2d()).minus(past_positions.get(getPastPose(elapsedtime)).getEstimatedPosition()));
@@ -172,9 +171,16 @@ public class networkTables extends SubsystemBase {
         past_object.estimate = past_object.estimate.plus(visiontoodermetry.times(0.6));
       }
 
-      return odometry.getPoseMeters().plus(visiontoodermetry.times(0.6));
+      Pose2d final_position = odometry.getPoseMeters().plus(visiontoodermetry.times(0.6));
+
+
+      SmartDashboard.putNumber("x", final_position.getX());
+      SmartDashboard.putNumber("y", final_position.getY());
+      if (final_position.getY() == 0){
+       odometry.resetPosition(final_position, gyro.getRotation2d());
+      }  
     }
-    return new Pose2d(0,0,gyro.getRotation2d());  
+    
 
   }
 
