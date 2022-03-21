@@ -95,8 +95,9 @@ public class networkTables extends SubsystemBase {
     Pose2d position = updatePositionwithVision(x, y, z, elapsedtime); //converts the x,y,z into final position vector
     SmartDashboard.putNumber("x", position.getX());
     SmartDashboard.putNumber("y", position.getY());
-    odometry.resetPosition(position, gyro.getRotation2d());
-
+    if (position.getY() == 0){
+     odometry.resetPosition(position, gyro.getRotation2d());
+    } 
     // Do work here like updates odometry...
     //System.out.print(position);
 
@@ -160,30 +161,20 @@ public class networkTables extends SubsystemBase {
     SmartDashboard.putNumber("position_vecy", position.get(1, 0));
     SmartDashboard.putNumber("position_vecz", position.get(2, 0)); 
 
-    Transform2d visiontoodermetry = new Transform2d();
+    if((position.get(1,0) > 0) && (position.get(2,0) > - 0.9) && (position.get(2,0) <  0.9)){
 
+      Transform2d visiontoodermetry = new Transform2d();       
+      visiontoodermetry = (new Pose2d(position.get(0, 0),position.get(1, 0), gyro.getRotation2d()).minus(past_positions.get(getPastPose(elapsedtime)).getEstimatedPosition()));
 
-       
-       
-    visiontoodermetry = (new Pose2d(position.get(0, 0),position.get(1, 0), gyro.getRotation2d()).minus(past_positions.get(getPastPose(elapsedtime)).getEstimatedPosition()));
+      SmartDashboard.putNumber("offset", visiontoodermetry.getX()); 
 
-    SmartDashboard.putNumber("offset", visiontoodermetry.getX()); 
+      for (past_object past_object : past_positions) {
+        past_object.estimate = past_object.estimate.plus(visiontoodermetry.times(0.6));
+      }
 
-    for (past_object past_object : past_positions) {
-      past_object.estimate = past_object.estimate.plus(visiontoodermetry.times(0.6));
+      return odometry.getPoseMeters().plus(visiontoodermetry.times(0.6));
     }
-
-    return odometry.getPoseMeters().plus(visiontoodermetry.times(0.6));
-
-  
-    //poseEstimator.addVisionMeasurement(new Pose2d(x,y, gyro.getRotation2d()), Timer.getFPGATimestamp() - elapsedtime);
-    /*
-    try{
-      poseEstimator.addVisionMeasurement(new Pose2d(x,y, gyro.getRotation2d()), timestampSeconds);
-    }catch(Exception e){
-      
-    }
-    */
+    return new Pose2d(0,0,gyro.getRotation2d());  
 
   }
 
