@@ -150,7 +150,7 @@ public class networkTables extends SubsystemBase {
         0, 0, 1);
     var final_vec = bot_to_field.times(out_vec);
     
-    var hub_coordinates = VecBuilder.fill( (16.46)/2, (8.23/2), 2.64);
+    var hub_coordinates = VecBuilder.fill( 8.255, 4.103, 2.64);
 
     var position =  hub_coordinates.minus(final_vec);
 

@@ -77,6 +77,10 @@ public abstract class SwerveModule {
         setDriveVoltage(voltage);
     }
 
+    public void stop() {
+        updateState(new SwerveModuleState(0.0, getAngle()));
+    }
+
     /**
      * Set the voltage of the drive motor
      * <p>

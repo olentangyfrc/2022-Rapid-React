@@ -34,6 +34,6 @@ public class DriveCommand extends InstantCommand {
       io.getRotation() * SwerveDrivetrain.MAX_ROTATION_SPEED
     );
 
-    drivetrain.drive(speeds);
+    drivetrain.drive(speeds, drivetrain.getFieldOriented());
   }
 }

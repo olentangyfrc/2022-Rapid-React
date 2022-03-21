@@ -23,7 +23,7 @@ public class rotateToHub extends CommandBase {
     }
     
     public void execute() {
-        Translation2d hubLocation = new Translation2d(8.23, 4.115);
+        Translation2d hubLocation = new Translation2d(8.255, 4.103);
     
         // Bot position in meters
         Translation2d botLocation = driveTrain.getSwerveDriveOdometry().getPoseMeters().getTranslation();

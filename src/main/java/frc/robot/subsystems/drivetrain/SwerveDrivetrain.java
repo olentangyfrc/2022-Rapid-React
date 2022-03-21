@@ -3,18 +3,14 @@ package frc.robot.subsystems.drivetrain;
 import java.util.Map;
 import java.util.logging.Logger;
 
-// WPILib imports
-import edu.wpi.first.math.MatBuilder;
-import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
@@ -22,7 +18,6 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import frc.robot.subsystems.SubsystemFactory;
 import frc.robot.subsystems.drivetrain.commands.DriveCommand;
 import frc.robot.subsystems.drivetrain.modules.SwerveModule;
@@ -129,9 +124,9 @@ public abstract class SwerveDrivetrain extends SubsystemBase {
      * 
      * @param speeds Chassis speeds with vx and vy <= max linear speed and omega < max rotation speed
     */
-    public void drive(ChassisSpeeds speeds) {
+    public void drive(ChassisSpeeds speeds, boolean fieldOriented) {
         Gyro gyro = SubsystemFactory.getInstance().getTelemetry().getGyro();
-        if(getFieldOriented()) {
+        if(fieldOriented) {
             speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
                 speeds.vxMetersPerSecond, 
                 speeds.vyMetersPerSecond,
@@ -174,6 +169,13 @@ public abstract class SwerveDrivetrain extends SubsystemBase {
         };
     }
 
+    public void stop() {
+        frontLeftModule.stop();
+        frontRightModule.stop();
+        backLeftModule.stop();
+        backRightModule.stop();
+    }
+
     /**
      * Set the target angle for the bot to rotate to.
      * 
@@ -212,6 +214,24 @@ public abstract class SwerveDrivetrain extends SubsystemBase {
      */
     public boolean getFieldOriented() {
         return fieldOrientedToggle.getBoolean(true);
+    }
+
+    /**
+     * Get the current estimated position of the robot in meters.
+     * <p>
+     * x+ is forwards, y+ is right.
+     * 
+     * @return The estimated position of the bot.
+     */
+    public Pose2d getLocation() {
+        Pigeon pigeon = (Pigeon) SubsystemFactory.getInstance().getTelemetry().getGyro();
+        return new Pose2d(odometry.getPoseMeters().getTranslation(), pigeon.getRotation2d());
+    }
+
+    public void resetLocation(Pose2d botLocation) {
+        Pigeon pigeon = (Pigeon) SubsystemFactory.getInstance().getTelemetry().getGyro();
+        odometry.resetPosition(botLocation, botLocation.getRotation());
+        pigeon.reset(botLocation.getRotation());
     }
 
     /**
