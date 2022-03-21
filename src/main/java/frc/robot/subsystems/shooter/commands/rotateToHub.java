@@ -20,6 +20,9 @@ public class rotateToHub extends CommandBase {
     
     @Override
     public void initialize() {
+    }
+    
+    public void execute() {
         Translation2d hubLocation = new Translation2d(8.23, 4.115);
     
         // Bot position in meters
@@ -30,6 +33,7 @@ public class rotateToHub extends CommandBase {
     
         angle = new Rotation2d(Math.atan2(relativeHubLocation.getY(), relativeHubLocation.getX()));
         driveTrain.setTargetAngle(angle);
+
     }
 
     @Override

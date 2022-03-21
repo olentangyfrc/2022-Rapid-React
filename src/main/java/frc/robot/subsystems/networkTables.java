@@ -21,6 +21,7 @@ import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.networktables.EntryListenerFlags;
 import edu.wpi.first.networktables.EntryNotification;
@@ -168,8 +169,11 @@ public class networkTables extends SubsystemBase {
 
     SmartDashboard.putNumber("offset", visiontoodermetry.getX()); 
 
+    for (past_object past_object : past_positions) {
+      past_object.estimate = past_object.estimate.plus(visiontoodermetry.times(0.6));
+    }
 
-    return odometry.getPoseMeters().plus(visiontoodermetry.times(0.25));
+    return odometry.getPoseMeters().plus(visiontoodermetry.times(0.6));
 
   
     //poseEstimator.addVisionMeasurement(new Pose2d(x,y, gyro.getRotation2d()), Timer.getFPGATimestamp() - elapsedtime);
@@ -190,6 +194,13 @@ public class networkTables extends SubsystemBase {
       }
     } 
     return 0;
+  }
+
+  public double getDistanceFromHub() {
+    Translation2d botPosition = SubsystemFactory.getInstance().getDrivetrain().getSwerveDriveOdometry().getPoseMeters().getTranslation();
+    Translation2d hubPosition = new Translation2d(8.23, 4.115);
+
+    return botPosition.getDistance(hubPosition);
   }
   
   @Override

@@ -86,10 +86,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
         tab.addNumber("Distance from hub: ", () -> {
             // Bot position: 
-            Translation2d botPosition = SubsystemFactory.getInstance().getDrivetrain().getSwerveDriveOdometry().getPoseMeters().getTranslation();
-            Translation2d hubPosition = new Translation2d(8.23, 4.115);
-
-            return botPosition.getDistance(hubPosition);
+            return SubsystemFactory.getInstance().getVision().getDistanceFromHub();
         });
 
         tab.addNumber("Current Shooter Speed", this::getFlySpeed);

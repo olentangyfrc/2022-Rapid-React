@@ -134,10 +134,10 @@ public class SubsystemFactory {
     portAssignments.put("BR.Encoder", 2);
 
     HashMap<String, Double> wheelOffsets = new HashMap<String, Double>();
-    wheelOffsets.put("FL", 55.28);
-    wheelOffsets.put("FR", 276.42);
-    wheelOffsets.put("BL", 82.63);
-    wheelOffsets.put("BR", 47.19);
+    wheelOffsets.put("FL", 54.58);
+    wheelOffsets.put("FR", 277.12);
+    wheelOffsets.put("BL", 6.06);
+    wheelOffsets.put("BR", 160.48);
 
     
     // Create and initialize all subsystems:
@@ -275,6 +275,10 @@ public class SubsystemFactory {
    */
   public SwerveDrivetrain getDrivetrain() {
     return driveTrain;
+  }
+
+  public networkTables getVision() {
+    return vision;
   }
 
   public BallIntake getBallIntake() {

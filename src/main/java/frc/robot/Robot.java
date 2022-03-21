@@ -4,22 +4,9 @@
 
 package frc.robot;
 
-import java.util.Map;
-
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.subsystems.IO;
-import frc.robot.subsystems.IO.ButtonActionType;
-import frc.robot.subsystems.IO.StickButton;
 import frc.robot.subsystems.SubsystemFactory;
-import frc.robot.subsystems.drivetrain.SwerveDrivetrain;
-import frc.robot.subsystems.shooter.ShooterSubsystem;
-import frc.robot.subsystems.shooter.commands.shootBall;
 import frc.robot.subsystems.shooter.commands.takeInBall;
 
 /**
@@ -34,9 +21,6 @@ public class Robot extends TimedRobot {
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
    */
-  ShooterSubsystem shooter;
-  SwerveDrivetrain drivetrain;
-  IO io;
 
   @Override
   public void robotInit() {
@@ -44,9 +28,6 @@ public class Robot extends TimedRobot {
     
     try {
       SubsystemFactory.getInstance().init();
-      shooter = SubsystemFactory.getInstance().getShooter();
-      drivetrain = SubsystemFactory.getInstance().getDrivetrain();
-      io = SubsystemFactory.getInstance().getIO();
       
     } catch (Exception exception) {
       exception.printStackTrace();
@@ -57,12 +38,13 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotPeriodic() {
-    actualSpeedEntry.setNumber(shooter.getFlySpeed());
-    currentPosition.setNumber(shooter.getFlyPosition());
   }
 
   @Override
-  public void autonomousInit() {}
+  public void autonomousInit() {
+    SubsystemFactory.getInstance().getBallIntake().putIntakeDown();
+    (new takeInBall(SubsystemFactory.getInstance().getShooter())).schedule();
+  }
 
   @Override
   public void autonomousPeriodic() {
@@ -71,8 +53,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
-    SubsystemFactory.getInstance().getBallIntake().putIntakeDown();
-    (new takeInBall(SubsystemFactory.getInstance().getShooter())).schedule();
+    (new takeInBall(SubsystemFactory.getInstance().getShooter())).schedule(); // COMP!!!
   }
 
   @Override
@@ -87,11 +68,6 @@ public class Robot extends TimedRobot {
   public void disabledPeriodic() {}
 
 
-  private NetworkTableEntry actualSpeedEntry = Shuffleboard.getTab("Shooter").add("Actual Speed", 0).withWidget(BuiltInWidgets.kGraph).withProperties(Map.of("min", 0, "max", 0)).getEntry();
-  private NetworkTableEntry currentPosition = Shuffleboard.getTab("Shooter").add("Current Position", 0).withWidget(BuiltInWidgets.kTextView).withProperties(Map.of("min",0,"max",0)).getEntry();
-
-  private NetworkTableEntry shootBall = Shuffleboard.getTab("Shooter").add("Shoot Ball", false).withWidget(BuiltInWidgets.kToggleButton).getEntry();
-  private NetworkTableEntry triggerOff = Shuffleboard.getTab("Shooter").add("Stop Trigger", false).withWidget(BuiltInWidgets.kToggleButton).getEntry();
 
   @Override
   public void testInit() {
@@ -100,21 +76,6 @@ public class Robot extends TimedRobot {
   @Override
   public void testPeriodic() {
     SubsystemFactory.getInstance().getBallIntake().bringIntakeUp();
-
-    // shooter.periodic();
-    
-    // if (shootBall.getBoolean(false)) {
-    //   shooter.shoot();
-    //   shootBall.setBoolean(false);
-    // }
-
-    // if (triggerOff.getBoolean(false)) {
-    //   shooter.stopTrigger();
-    //   triggerOff.setBoolean(false);
-    // }
-
-    // shooter.setSpeed(targetSpeedEntry.getDouble(0));
-
     CommandScheduler.getInstance().run();
   }
 }

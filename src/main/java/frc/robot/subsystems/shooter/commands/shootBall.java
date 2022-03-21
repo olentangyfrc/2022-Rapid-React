@@ -3,6 +3,7 @@ package frc.robot.subsystems.shooter.commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
+import frc.robot.subsystems.SubsystemFactory;
 import frc.robot.subsystems.drivetrain.SwerveDrivetrain;
 import frc.robot.subsystems.intake.BallIntake;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
@@ -30,6 +31,7 @@ public class shootBall extends SequentialCommandGroup {
         shooter.stop();
         shooter.stopTrigger();
         intake.stopNoodleMotor();
+
         (new takeInBall(shooter)).schedule();
     }
 
