@@ -6,15 +6,21 @@ package frc.robot.subsystems.drivetrain;
 
 import java.util.Map;
 
+import edu.wpi.first.math.controller.PIDController;
 import frc.robot.subsystems.PortManager;
-import frc.robot.subsystems.SubsystemFactory;
 import frc.robot.subsystems.PortManager.PortType;
+import frc.robot.subsystems.SubsystemFactory;
 import frc.robot.subsystems.drivetrain.modules.CANSparkMaxModule;
 
 public class SparkMaxDrivetrain extends SwerveDrivetrain {
 
     @Override
     public void initializeSwerveModules(Map<String, Integer> portAssignments, Map<String, Double> wheelOffsets) throws Exception {
+
+        xController = new PIDController(1, 0, 0);
+        yController = new PIDController(1, 0, 0);
+        thetaController = new PIDController(1, 0, 0);
+
         PortManager portManager = SubsystemFactory.getInstance().getPortManager();
         // Initialize swerve modules
         frontLeftModule = new CANSparkMaxModule(

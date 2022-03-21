@@ -12,10 +12,9 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import edu.wpi.first.wpilibj.PowerDistribution;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.XboxController.Button;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import frc.robot.subsystems.IO.ButtonActionType;
 import frc.robot.subsystems.IO.StickButton;
 import frc.robot.subsystems.drivetrain.SingleFalconDrivetrain;
@@ -26,11 +25,8 @@ import frc.robot.subsystems.intake.BallIntake;
 import frc.robot.subsystems.intake.commands.PutIntakeDown;
 import frc.robot.subsystems.intake.commands.StartIntake;
 import frc.robot.subsystems.intake.commands.StopIntake;
-import frc.robot.subsystems.intake.commands.ToggleIntake;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
-import frc.robot.subsystems.shooter.commands.feedBall;
 import frc.robot.subsystems.shooter.commands.shootBall;
-import frc.robot.subsystems.shooter.commands.takeInBall;
 import frc.robot.subsystems.telemetry.Telemetry;
 import frc.robot.subsystems.telemetry.commands.ZeroGyro;
 

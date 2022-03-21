@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.interfaces.Gyro;
  */
 public class Pigeon implements Gyro {
     private WPI_PigeonIMU imu;
+    private boolean isInverted = true;
 
     public Pigeon(int deviceId) {
         this.imu = new WPI_PigeonIMU(deviceId);
@@ -74,7 +75,11 @@ public class Pigeon implements Gyro {
      * @param angle the angle to reset to as a rotation2d
      */
     public void reset(Rotation2d angle) {
-        imu.setFusedHeading(angle.getDegrees());
+        imu.setFusedHeading(angle.getDegrees() * 64);
+    }
+
+    public void setInverted(boolean inverted) {
+        isInverted = inverted;
     }
 
     /**

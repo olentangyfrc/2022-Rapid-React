@@ -42,11 +42,15 @@ public abstract class SwerveDrivetrain extends SubsystemBase {
     // Distance from center of wheel to center of wheel across the front of the bot in meters
     public static final double TRACK_WIDTH = 0.4445;
 
-    public static final double MAX_LINEAR_SPEED = 6; // Meters per second
+    public static final double MAX_LINEAR_SPEED = 3.5; // Meters per second
+    public static final double MAX_LINEAR_ACCELERATION = 3; // Meters per second squared
     public static final double MAX_ROTATION_SPEED = 15.1; // Radians per second
+    public static final double MAX_ROTATION_ACCELERATION = Math.PI; // Radians per second squared
 
-    // Command that calls drive method with user input.
-    private DriveCommand driveCommand;
+    public PIDController xController;
+    public PIDController yController;
+    public PIDController thetaController;
+
 
     // Used to convert from ChassisSpeeds to SwerveModuleStates
     private SwerveDriveKinematics kinematics;
@@ -68,8 +72,6 @@ public abstract class SwerveDrivetrain extends SubsystemBase {
      */
     public void init(Map<String, Integer> portAssignments, Map<String, Double> wheelOffsets) throws Exception {
         initializeSwerveModules(portAssignments, wheelOffsets);
-        // Create a new drive command to be reused later
-        driveCommand = new DriveCommand(this);
 
         // Pass in the coordinates of each wheel relative to the center of the bot.
         kinematics = new SwerveDriveKinematics(
@@ -92,6 +94,8 @@ public abstract class SwerveDrivetrain extends SubsystemBase {
 
         anglePid.enableContinuousInput(0, 360);
         anglePid.setTolerance(3);
+
+        setDefaultCommand(new DriveCommand(this));
 
         // Add the encoder readings to shuffleboard
         tab.addNumber("FL angle", () -> frontLeftModule.getAngle().getDegrees());
@@ -116,9 +120,6 @@ public abstract class SwerveDrivetrain extends SubsystemBase {
     @Override
     public void periodic() {
         // Run the drive command periodically
-        if(driveCommand != null) {
-            driveCommand.schedule();
-        }
     }
 
     /** 
