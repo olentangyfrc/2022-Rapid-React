@@ -1,5 +1,6 @@
 package frc.robot.subsystems.Climber.commands;
 
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.subsystems.Climber.Climber;
@@ -21,18 +22,21 @@ public class ClimbToNextBar extends SequentialCommandGroup{
         logger.info("Climb To Next Bar");
 
         addCommands(
-            new ExtendArmsToPosition(elevator, 2),
-            new PushArmsForwardToPosition(climber, 0.9),
-            new ExtendArmsToPosition(elevator, 9),
-            new PushArmsForwardToPosition(climber, 0.84),
-            new ExtendArmsToPosition(elevator, 7.1),
-            new LetGoOfBar(climber),
-            new ExtendArmsToPosition(elevator, 5),
-            new PushArmsForwardToPosition(climber, 0),
-            new WaitCommand(10),
-            new ExtendArmsToPosition(elevator, 0.5),
-            new PushArmsForwardToPosition(climber, 0.2),
-            new LatchOntoBar(climber)
+            new ExtendArmsToPosition(el, 2),
+            new PushArmsForwardToPosition(cb, 0),
+            new ExtendArmsToPosition(el, 0),
+            new PushArmsForwardToPosition(cb, 0.4),
+            new ExtendArmsToPosition(el, 9),
+            new PushArmsForwardToPosition(cb, 0.55),
+            new ExtendArmsToPosition(el, 7.2),
+            new LetGoOfBar(cb),
+            new ParallelCommandGroup(
+                new ExtendArmsToPosition(el, 5),
+                new SequentialCommandGroup(
+                    new WaitCommand(0.4),
+                    new PushArmsForwardToPosition(cb, 0)
+                )
+            )
         );
     }
 }

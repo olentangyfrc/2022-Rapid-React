@@ -22,6 +22,7 @@ import frc.robot.subsystems.IO.ButtonActionType;
 import frc.robot.subsystems.IO.StickButton;
 import frc.robot.subsystems.Climber.Climber;
 import frc.robot.subsystems.Climber.ClimberSBTab;
+import frc.robot.subsystems.Climber.commands.ClimbToFinalBar;
 import frc.robot.subsystems.Climber.commands.ClimbToFirstBar;
 import frc.robot.subsystems.Climber.commands.ClimbToNextBar;
 import frc.robot.subsystems.Climber.commands.LatchOntoBar;
@@ -29,6 +30,7 @@ import frc.robot.subsystems.Climber.commands.LetGoOfBar;
 import frc.robot.subsystems.Climber.commands.PullArmsBack;
 import frc.robot.subsystems.Climber.commands.PushArmsForward;
 import frc.robot.subsystems.Climber.commands.PushArmsForwardToPosition;
+import frc.robot.subsystems.Climber.commands.ReachForFirstBar;
 import frc.robot.subsystems.Elevator.Elevator;
 import frc.robot.subsystems.Elevator.commands.ExtendArms;
 import frc.robot.subsystems.Elevator.commands.ExtendArmsToPosition;
@@ -279,8 +281,10 @@ public class SubsystemFactory {
     io.bind(new LatchOntoBar(climber), Button.kX, StickButton.LEFT_10, ButtonActionType.WHEN_PRESSED);
     io.bind(new LetGoOfBar(climber), Button.kA, StickButton.LEFT_11, ButtonActionType.WHEN_PRESSED);
 
+    Shuffleboard.getTab("Climber").add("Reach for first bar", new ReachForFirstBar(climber, elevator));
     Shuffleboard.getTab("Climber").add("Climb to first bar", new ClimbToFirstBar(climber, elevator));
     Shuffleboard.getTab("Climber").add("Climb to next bar", new ClimbToNextBar(climber, elevator));
+    Shuffleboard.getTab("Climber").add("Climb to final bar", new ClimbToFinalBar(climber, elevator));
     // io.bind(new ClimbToFirstBar(climber, elevator), Button.k, StickButton.RIGHT_11, ButtonActionType.WHEN_PRESSED);
     
     io.bind(new ExtendArmsToPosition(elevator, 10.3), Button.kBack, StickButton.RIGHT_8, ButtonActionType.WHEN_PRESSED);

@@ -65,7 +65,7 @@ public class Climber extends SubsystemBase{
     //Creating a new Shuffleboard Tab
     private ShuffleboardTab tab = Shuffleboard.getTab("Climber");
 
-    private PIDController armsController = new PIDController(180, 0, 0);
+    private PIDController armsController = new PIDController(130, 0, 0);
     public static final double MAX_ARM_ERROR = 0.05;
     private static final double ARMS_TOLERANCE = 0.01;
 
