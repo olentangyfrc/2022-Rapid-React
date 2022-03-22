@@ -95,5 +95,9 @@ public class AutonTrajectory {
     public boolean isCompleted(double timeSeconds) {
         return timeSeconds > getTotalTimeSeconds();
     }
+
+    public List<AutonTrajectorySegment> getSegments() {
+        return segments;
+    }
     
 }

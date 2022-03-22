@@ -5,9 +5,16 @@
 package frc.robot;
 
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.subsystems.SubsystemFactory;
+import frc.robot.subsystems.auton.AutonTrajectory;
+import frc.robot.subsystems.auton.commands.FollowTrajectoryCommand;
+import frc.robot.subsystems.drivetrain.SwerveDrivetrain;
 import frc.robot.subsystems.shooter.commands.takeInBall;
 
 /**
@@ -45,6 +52,19 @@ public class Robot extends TimedRobot {
   public void autonomousInit() {
     SubsystemFactory.getInstance().getBallIntake().putIntakeDown();
     (new takeInBall(SubsystemFactory.getInstance().getShooter())).schedule();
+
+    SubsystemFactory.getInstance().getDrivetrain().resetLocation(new Pose2d(0, 0, Rotation2d.fromDegrees(0)));
+
+    TrajectoryConfig config = new TrajectoryConfig(SwerveDrivetrain.MAX_LINEAR_SPEED, SwerveDrivetrain.MAX_LINEAR_ACCELERATION);
+
+    //AutonTrajectory trajectory = new AutonTrajectory(new Pose2d(8.266, 2.052, Rotation2d.fromDegrees(90.509)), new Pose2d(7.893, 1.307, Rotation2d.fromDegrees(249.535)), config);
+    AutonTrajectory trajectory = new AutonTrajectory(new Pose2d(0, 0, Rotation2d.fromDegrees(0)), new Pose2d(3, 0, Rotation2d.fromDegrees(0)), config);
+    System.out.println("SEGMENTS IN TRAJECTORY: " + trajectory.getSegments().size());
+    try {
+      (new FollowTrajectoryCommand(SubsystemFactory.getInstance().getDrivetrain(), trajectory)).schedule();
+    } catch(Exception ex) {
+      ex.printStackTrace();
+    }
   }
 
   @Override

@@ -81,6 +81,7 @@ public class IO extends SubsystemBase {
 
     public void init() throws Exception{
         inputMethod = determineInputMethod();
+        invertForwards.setBoolean(true);
 
         if(inputMethod.equals(InputMethod.XBOX)) {
             xbox = new XboxController(XBOX_PORT);

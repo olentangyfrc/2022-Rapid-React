@@ -132,20 +132,17 @@ public abstract class SwerveDrivetrain extends SubsystemBase {
                 speeds.vyMetersPerSecond,
                 speeds.omegaRadiansPerSecond, 
                 Rotation2d.fromDegrees(-gyro.getAngle())
-                );
-            }
-            
-            if(!Double.isNaN(targetAngle)) {
-                speeds.omegaRadiansPerSecond = -anglePid.calculate(gyro.getAngle());
-            }
-            
-            SwerveModuleState[] states = kinematics.toSwerveModuleStates(speeds);
-            SwerveDriveKinematics.desaturateWheelSpeeds(states, MAX_LINEAR_SPEED); // Normalize wheel speeds so we don't go faster than 100%
-        try{
-            odometry.update(gyro.getRotation2d(), getModuleStates());
-        }catch(Exception e){
-
+            );
         }
+            
+        if(!Double.isNaN(targetAngle)) {
+            speeds.omegaRadiansPerSecond = -anglePid.calculate(gyro.getAngle());
+        }
+        
+        SwerveModuleState[] states = kinematics.toSwerveModuleStates(speeds);
+        SwerveDriveKinematics.desaturateWheelSpeeds(states, MAX_LINEAR_SPEED); // Normalize wheel speeds so we don't go faster than 100%
+        
+        odometry.update(gyro.getRotation2d(), getModuleStates());
 
         field.setRobotPose(
             odometry.getPoseMeters().getX(),

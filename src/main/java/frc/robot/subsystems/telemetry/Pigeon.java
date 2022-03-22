@@ -75,7 +75,7 @@ public class Pigeon implements Gyro {
      * @param angle the angle to reset to as a rotation2d
      */
     public void reset(Rotation2d angle) {
-        imu.setFusedHeading(angle.getDegrees() * 64);
+        imu.setFusedHeading(-angle.getDegrees() * 64);
     }
 
     public void setInverted(boolean inverted) {

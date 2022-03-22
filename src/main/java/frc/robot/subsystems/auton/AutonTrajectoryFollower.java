@@ -67,7 +67,7 @@ public class AutonTrajectoryFollower {
         
         // Rotate the vector so that it is field oriented and we don't have to worry about rotation.
         Vector2d translation = new Vector2d(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond); // bot-oriented
-        translation.rotate(goal.getReferenceAngle().getDegrees()); // rotate to field-oriented
+        translation.rotate(360 - goal.getReferenceAngle().getDegrees()); // rotate to field-oriented
         //translation.rotate(currentPosition.getRotation().getDegrees());
         speeds.vxMetersPerSecond = translation.x;
         speeds.vyMetersPerSecond = translation.y;
