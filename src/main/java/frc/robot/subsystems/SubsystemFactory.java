@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.XboxController;
@@ -216,6 +217,7 @@ public class SubsystemFactory {
 
     
     // Create and initialize all subsystems:
+    CameraServer.startAutomaticCapture();
     driveTrain = new SingleFalconDrivetrain();
     driveTrain.init(portAssignments, wheelOffsets);
 
