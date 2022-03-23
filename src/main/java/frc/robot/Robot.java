@@ -7,6 +7,8 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+
+
 import frc.robot.subsystems.SubsystemFactory;
 import frc.robot.subsystems.shooter.commands.takeInBall;
 
@@ -29,7 +31,6 @@ public class Robot extends TimedRobot {
     
     try {
       SubsystemFactory.getInstance().init();
-      
     } catch (Exception exception) {
       exception.printStackTrace();
     }

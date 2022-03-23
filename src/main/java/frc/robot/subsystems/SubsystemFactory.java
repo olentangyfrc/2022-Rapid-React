@@ -1,3 +1,4 @@
+
 // Copyright (c) FIRST and other WPILib contributors.
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
@@ -18,6 +19,8 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.XboxController.Button;
 import frc.robot.subsystems.IO.ButtonActionType;
 import frc.robot.subsystems.IO.StickButton;
+import frc.robot.subsystems.Climber.Climber;
+import frc.robot.subsystems.Elevator.Elevator;
 import frc.robot.subsystems.drivetrain.SingleFalconDrivetrain;
 import frc.robot.subsystems.drivetrain.SparkMaxDrivetrain;
 // Project imports:
@@ -39,6 +42,9 @@ public class SubsystemFactory {
   // SubsystemFactory is a singleton, so keep a static instance.
   private static SubsystemFactory instance;
 
+  private PowerDistribution pdp;
+  private Climber climber;
+  private Elevator elevator;
   private Logger logger = Logger.getLogger("Subsystem Factory");
 
   /**
@@ -50,13 +56,15 @@ public class SubsystemFactory {
     "00:80:2F:25:B4:CA", BotType.RAPID_REACT,
     "00:80:2F:28:64:39", BotType.RIO99,
     "00:80:2F:28:64:38", BotType.RIO99,
-    "00:80:2F:17:F8:3F", BotType.RIO1,
-    "00:80:2F:17:F8:40", BotType.RIO1 //usb
+    "00:80:2F:17:F8:3F", BotType.RIO1, //radio
+    "00:80:2F:17:F8:40", BotType.RIO1, //usb
+    "00:80:2F:17:D7:4B", BotType.RIO2,
+    "00:80:2F:27:04:C7", BotType.RIO3,
+    "00:80:2F:27:04:C6", BotType.RIO3
   );
 
   private BotType botType;
   private Telemetry telemetry;
-  private PowerDistribution pdp;
 
   // Variables for all subsystems:
   private PortManager portManager;
@@ -144,6 +152,13 @@ public class SubsystemFactory {
     vision = new networkTables();
     
     io.bind(new ZeroGyro(telemetry.getGyro()), Button.kY, StickButton.RIGHT_2, ButtonActionType.WHEN_PRESSED);
+
+    climber = new Climber();
+    climber.init();
+
+    elevator = new Elevator();
+    elevator.init();
+
   }
 
   /**
@@ -227,18 +242,38 @@ public class SubsystemFactory {
 
     ballIntake = new BallIntake();
     
+    climber = new Climber();
+    climber.init();
+
+    elevator = new Elevator();
+    elevator.init();
+
     io.bind(new ZeroGyro(telemetry.getGyro()), Button.kY, StickButton.RIGHT_2, ButtonActionType.WHEN_PRESSED);
     io.bind(new shootBall(driveTrain, shooter, SubsystemFactory.getInstance().getBallIntake(), 20), XboxController.Button.kX, StickButton.LEFT_1, ButtonActionType.WHEN_HELD);
     io.bind(new PutIntakeDown(ballIntake), Button.kStart, StickButton.LEFT_5, ButtonActionType.WHEN_PRESSED);
     io.bind(new StartIntake(ballIntake), Button.kRightBumper, StickButton.RIGHT_6, ButtonActionType.WHEN_PRESSED);
     io.bind(new StopIntake(ballIntake), Button.kRightBumper, StickButton.RIGHT_7, ButtonActionType.WHEN_RELEASED);
-
   }
 
   /**
    * Initializes the RIO99 subsystems
    */
   public void initRIO99() {
+    
+  }
+
+  /**
+   * Initializes the RIO2 subsystems
+   */
+  public void initRIO2() {
+    
+  }
+
+  /**
+   * Initializes the RIO3 subsystems
+   */
+  public void initRIO3() {
+    
   }
   
   // Getter methods for all of the subsystems:
@@ -341,6 +376,8 @@ public class SubsystemFactory {
     RAPID_REACT,
     RIO99,
     RIO1,
+    RIO2, 
+    RIO3,
     UNRECOGNIZED
   }
 }
