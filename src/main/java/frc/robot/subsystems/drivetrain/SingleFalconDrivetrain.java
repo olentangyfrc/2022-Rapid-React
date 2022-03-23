@@ -20,7 +20,7 @@ public class SingleFalconDrivetrain extends SwerveDrivetrain {
 
         xController = new PIDController(10, 0, 0);
         yController = new PIDController(10, 0, 0);
-        thetaController = new PIDController(0.08, 0, 0);
+        thetaController = new PIDController(0.1, 0, 0);
 
         PortManager portManager = SubsystemFactory.getInstance().getPortManager();
         // Initialize swerve modules

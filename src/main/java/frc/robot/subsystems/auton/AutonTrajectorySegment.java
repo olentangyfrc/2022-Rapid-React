@@ -34,7 +34,8 @@ public class AutonTrajectorySegment {
         // Relative coordinates of the end position in reference to the starting position.
         Pose2d relativePosition = end.relativeTo(start);
 
-        referenceAngle = new Rotation2d(-Math.atan2(relativePosition.getY(), relativePosition.getX()));
+        referenceAngle = new Rotation2d(Math.atan2(relativePosition.getY(), relativePosition.getX()));
+        System.out.println("REFERENCE ANGLE: " + referenceAngle.getDegrees());
 
         Pose2d angleCorrectedStart = new Pose2d(start.getTranslation(), referenceAngle);
         Pose2d angleCorrectedEnd = new Pose2d(end.getTranslation(), referenceAngle);
