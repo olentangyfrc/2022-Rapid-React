@@ -1,5 +1,6 @@
 package frc.robot.subsystems.auton;
 
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -24,6 +25,8 @@ public class RoutineChooser {
         autonChooser.addOption("RedStartOne_TwoCargo", new RedStartOne_TwoCargo(drivetrain, intake, shooter, paths));
         autonChooser.addOption("RedStartTwo_FourCargo", new RedStartTwo_FourCargo(drivetrain, intake, shooter, paths));
         autonChooser.addOption("RedStartThree_FourCargo", new RedStartThree_FourCargo(drivetrain, intake, shooter, paths));
+
+        Shuffleboard.getTab("Auton").add(autonChooser);
     }
 
     public CommandBase get() {
