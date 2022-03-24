@@ -13,13 +13,12 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj.XboxController.Button;
-import edu.wpi.first.wpilibj.command.InstantCommand;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 // Project imports
@@ -41,7 +40,7 @@ public class IO extends SubsystemBase {
     private HashMap<Binding, Command> buttonBindings = new HashMap<Binding, Command>();
 
     private InputMethod inputMethod;
-    private boolean useButtonBox = false;
+    private boolean useButtonBox = true;
 
     private XboxController xbox;
 
@@ -54,13 +53,12 @@ public class IO extends SubsystemBase {
     private Logger logger = Logger.getLogger("IO");
     private ShuffleboardTab ioTab = Shuffleboard.getTab("IO");
     
-    private NetworkTableEntry invertForwards = ioTab.add("Invert Forwards", false).withWidget(BuiltInWidgets.kToggleSwitch).getEntry();
+    private NetworkTableEntry invertForwards = ioTab.add("Invert Forwards", true).withWidget(BuiltInWidgets.kToggleSwitch).getEntry();
     private NetworkTableEntry invertStrafe = ioTab.add("Invert Strafe", false).withWidget(BuiltInWidgets.kToggleSwitch).getEntry();
     private NetworkTableEntry invertRotation = ioTab.add("Invert Rotation", false).withWidget(BuiltInWidgets.kToggleSwitch).getEntry();
     
     public IO() {
         // Add a command to reset IO
-        ioTab.add("Reset IO", new ResetIOCommand(this));
     }
 
     @Override
@@ -77,7 +75,6 @@ public class IO extends SubsystemBase {
 
     public void init() throws Exception{
         inputMethod = determineInputMethod();
-        invertForwards.setBoolean(true);
 
         if(inputMethod.equals(InputMethod.XBOX)) {
             xbox = new XboxController(XBOX_PORT);

@@ -5,7 +5,6 @@
 package frc.robot.subsystems.shooter.commands;
 
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
