@@ -40,7 +40,7 @@ public class Elevator extends SubsystemBase{
     private double maxHeight;
     
     // Constraints for the movement of the elevator.
-    private final TrapezoidProfile.Constraints SPEED_CONSTRAINTS = new TrapezoidProfile.Constraints(4, 4);
+    private final TrapezoidProfile.Constraints SPEED_CONSTRAINTS = new TrapezoidProfile.Constraints(6, 4);
     // Do not change these directly! Use SysID.
     private ProfiledPIDController elevatorController = new ProfiledPIDController(57.839, 0, 0, SPEED_CONSTRAINTS);
     //private ProfiledPIDController elevatorController = new ProfiledPIDController(10.038, 0, 4.1283, SPEED_CONSTRAINTS);

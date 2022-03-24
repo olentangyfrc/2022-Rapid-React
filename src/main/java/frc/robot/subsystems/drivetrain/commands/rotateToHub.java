@@ -4,6 +4,8 @@ import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.drive.Vector2d;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.drivetrain.SwerveDrivetrain;
 
@@ -16,6 +18,7 @@ public class rotateToHub extends CommandBase {
     public rotateToHub(SwerveDrivetrain driveTrain) {
         this.driveTrain = driveTrain;
         // Hub position in meters
+        addRequirements(driveTrain);
     }
     
     @Override
@@ -30,15 +33,24 @@ public class rotateToHub extends CommandBase {
     
         // Relative hub position
         Translation2d relativeHubLocation = hubLocation.minus(botLocation);
+
+        relativeHubLocation = relativeHubLocation.times(0.21/relativeHubLocation.getNorm());
+        
+        Translation2d hubTranslation2d = new Translation2d(relativeHubLocation.getY(), - relativeHubLocation.getX());
+
+        relativeHubLocation.plus(hubTranslation2d);
     
         angle = new Rotation2d(Math.atan2(relativeHubLocation.getY(), relativeHubLocation.getX()));
+        angle = Rotation2d.fromDegrees(angle.getDegrees() + 2);
         driveTrain.setTargetAngle(angle);
-
+        driveTrain.drive(new ChassisSpeeds(), true);
     }
 
     @Override
     public void end(boolean interrupted) {
         driveTrain.removeTargetAngle();
+        driveTrain.stop();
+        
     }
 
     @Override

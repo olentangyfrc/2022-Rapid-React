@@ -13,6 +13,8 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.XboxController;
@@ -20,16 +22,32 @@ import edu.wpi.first.wpilibj.XboxController.Button;
 import frc.robot.subsystems.IO.ButtonActionType;
 import frc.robot.subsystems.IO.StickButton;
 import frc.robot.subsystems.Climber.Climber;
+import frc.robot.subsystems.Climber.commands.NudgeArmsBackwards;
+import frc.robot.subsystems.Climber.commands.NudgeArmsForwards;
+import frc.robot.subsystems.Climber.commands.auton.ClimbToFinalBar;
+import frc.robot.subsystems.Climber.commands.auton.ClimbToFirstBar;
+import frc.robot.subsystems.Climber.commands.auton.ClimbToNextBar;
+import frc.robot.subsystems.Climber.commands.auton.ReachForFirstBar;
+import frc.robot.subsystems.Climber.commands.auton.ReachForLastBar;
+import frc.robot.subsystems.Climber.commands.auton.ReachForNextBar;
 import frc.robot.subsystems.Elevator.Elevator;
+import frc.robot.subsystems.Elevator.commands.NudgeArmsDown;
+import frc.robot.subsystems.Elevator.commands.NudgeArmsUp;
 import frc.robot.subsystems.drivetrain.SingleFalconDrivetrain;
 import frc.robot.subsystems.drivetrain.SparkMaxDrivetrain;
 // Project imports:
 import frc.robot.subsystems.drivetrain.SwerveDrivetrain;
+import frc.robot.subsystems.drivetrain.commands.DisableBrakeMode;
+import frc.robot.subsystems.drivetrain.commands.EnableBrakeMode;
+import frc.robot.subsystems.drivetrain.commands.LockToAngle;
+import frc.robot.subsystems.drivetrain.commands.RemoveLockedAngle;
 import frc.robot.subsystems.intake.BallIntake;
+import frc.robot.subsystems.intake.commands.BringIntakeUp;
 import frc.robot.subsystems.intake.commands.PutIntakeDown;
 import frc.robot.subsystems.intake.commands.StartIntake;
 import frc.robot.subsystems.intake.commands.StopIntake;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
+import frc.robot.subsystems.shooter.commands.ShootAtSpeed;
 import frc.robot.subsystems.shooter.commands.shootBallTeleop;
 import frc.robot.subsystems.telemetry.Telemetry;
 import frc.robot.subsystems.telemetry.commands.ZeroGyro;
@@ -248,10 +266,47 @@ public class SubsystemFactory {
     elevator = new Elevator();
     elevator.init();
 
-    io.bind(new ZeroGyro(telemetry.getGyro()), Button.kY, StickButton.RIGHT_2, ButtonActionType.WHEN_PRESSED);
     io.bind(new shootBallTeleop(driveTrain, shooter, SubsystemFactory.getInstance().getBallIntake()), XboxController.Button.kX, StickButton.LEFT_1, ButtonActionType.WHEN_HELD);
+    io.bind(new ZeroGyro(telemetry.getGyro()), Button.kY, StickButton.LEFT_1, ButtonActionType.WHEN_PRESSED);
+    // Might need to be changed...
     io.bind(new StartIntake(ballIntake), Button.kRightBumper, StickButton.RIGHT_6, ButtonActionType.WHEN_PRESSED);
     io.bind(new StopIntake(ballIntake), Button.kRightBumper, StickButton.RIGHT_7, ButtonActionType.WHEN_RELEASED);
+
+    // Climber commands
+    io.bindButtonBox(new ReachForFirstBar(climber, elevator), StickButton.RIGHT_3, ButtonActionType.WHEN_PRESSED);
+    io.bindButtonBox(new ClimbToFirstBar(climber, elevator), StickButton.RIGHT_2, ButtonActionType.WHEN_PRESSED);
+
+    io.bindButtonBox(new ReachForNextBar(elevator, climber), StickButton.RIGHT_1, ButtonActionType.WHEN_PRESSED);
+    io.bindButtonBox(new ClimbToNextBar(climber, elevator), StickButton.RIGHT_5, ButtonActionType.WHEN_PRESSED);
+
+    io.bindButtonBox(new ReachForLastBar(elevator, climber), StickButton.RIGHT_8, ButtonActionType.WHEN_PRESSED);
+    io.bindButtonBox(new ClimbToFinalBar(climber, elevator), StickButton.RIGHT_7, ButtonActionType.WHEN_PRESSED);
+
+    io.bindButtonBox(new NudgeArmsDown(elevator), StickButton.LEFT_9, ButtonActionType.WHEN_PRESSED);
+    io.bindButtonBox(new NudgeArmsUp(elevator), StickButton.LEFT_8, ButtonActionType.WHEN_PRESSED);
+
+    io.bindButtonBox(new NudgeArmsBackwards(climber), StickButton.LEFT_11, ButtonActionType.WHEN_PRESSED);
+    io.bindButtonBox(new NudgeArmsForwards(climber), StickButton.LEFT_10, ButtonActionType.WHEN_PRESSED);
+
+    // Lock to hanger
+    io.bindButtonBox(new LockToAngle(driveTrain, Rotation2d.fromDegrees(180)), StickButton.RIGHT_4, ButtonActionType.WHEN_PRESSED);
+
+    io.bindButtonBox(new ZeroGyro(telemetry.getGyro()), StickButton.LEFT_5, ButtonActionType.WHEN_PRESSED);
+    io.bindButtonBox(new EnableBrakeMode(driveTrain), StickButton.LEFT_1, ButtonActionType.WHEN_PRESSED);
+    io.bindButtonBox(new DisableBrakeMode(driveTrain), StickButton.LEFT_4, ButtonActionType.WHEN_PRESSED);
+
+    io.bindButtonBox(new PutIntakeDown(ballIntake), StickButton.LEFT_2, ButtonActionType.WHEN_PRESSED);
+    io.bindButtonBox(new BringIntakeUp(ballIntake), StickButton.LEFT_3, ButtonActionType.WHEN_PRESSED);
+
+    // Shooter
+    // Eject ball
+    io.bindButtonBox(new ShootAtSpeed(shooter, ballIntake, 27), StickButton.LEFT_7, ButtonActionType.WHEN_HELD);
+
+    // Shoot from tarmac edge
+    io.bindButtonBox(new ShootAtSpeed(shooter, ballIntake, 42.5), StickButton.LEFT_6, ButtonActionType.WHEN_HELD);
+
+    io.bindButtonBox(new RemoveLockedAngle(driveTrain), StickButton.RIGHT_9, ButtonActionType.WHEN_PRESSED);
+
   }
 
   /**

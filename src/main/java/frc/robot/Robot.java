@@ -14,7 +14,6 @@ import frc.robot.subsystems.auton.RoutineChooser;
 import frc.robot.subsystems.drivetrain.SwerveDrivetrain;
 import frc.robot.subsystems.intake.BallIntake;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
-import frc.robot.subsystems.shooter.commands.takeInBall;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -32,8 +31,6 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotInit() {
-
-    
     try {
       SubsystemFactory.getInstance().init();
     } catch (Exception exception) {
@@ -42,7 +39,7 @@ public class Robot extends TimedRobot {
     ShooterSubsystem shooter = SubsystemFactory.getInstance().getShooter();
     SwerveDrivetrain drivetrain = SubsystemFactory.getInstance().getDrivetrain();
     BallIntake intake = SubsystemFactory.getInstance().getBallIntake();
-    AutonPaths paths = new AutonPaths(new TrajectoryConfig(SwerveDrivetrain.MAX_LINEAR_SPEED - 1, SwerveDrivetrain.MAX_LINEAR_ACCELERATION));
+    AutonPaths paths = new AutonPaths(new TrajectoryConfig(SwerveDrivetrain.MAX_LINEAR_SPEED - 2, SwerveDrivetrain.MAX_LINEAR_ACCELERATION));
 
     chooser = new RoutineChooser(drivetrain, shooter, intake, paths);
 
@@ -55,7 +52,6 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     SubsystemFactory.getInstance().getBallIntake().putIntakeDown();
-    (new takeInBall(SubsystemFactory.getInstance().getShooter())).schedule();
     chooser.get().schedule();
   }
 

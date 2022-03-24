@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.SubsystemFactory;
 import frc.robot.subsystems.drivetrain.commands.DriveCommand;
@@ -133,6 +134,7 @@ public abstract class SwerveDrivetrain extends SubsystemBase {
             frontRightModule.updateState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
             backLeftModule.updateState(new SwerveModuleState(0, Rotation2d.fromDegrees(225)));
             backRightModule.updateState(new SwerveModuleState(0, Rotation2d.fromDegrees(135)));
+            return;
         }
         Gyro gyro = SubsystemFactory.getInstance().getTelemetry().getGyro();
         if(fieldOriented) {
@@ -143,7 +145,7 @@ public abstract class SwerveDrivetrain extends SubsystemBase {
                 Rotation2d.fromDegrees(-gyro.getAngle())
             );
         }
-            
+        SmartDashboard.putNumber("Target angle: ", targetAngle);
         if(!Double.isNaN(targetAngle)) {
             speeds.omegaRadiansPerSecond = -anglePid.calculate(gyro.getAngle());
         }

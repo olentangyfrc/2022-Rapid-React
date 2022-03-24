@@ -74,19 +74,12 @@ public class IO extends SubsystemBase {
     }
 
     public void init() throws Exception{
-        inputMethod = determineInputMethod();
-
-        if(inputMethod.equals(InputMethod.XBOX)) {
-            xbox = new XboxController(XBOX_PORT);
-        } else {
-            leftStick = new Joystick(LEFT_STICK_PORT);
-            rightStick = new Joystick(RIGHT_STICK_PORT);
-        }
-
-        if(useButtonBox) {
-            leftButtonBox = new GenericHID(LEFT_BUTTON_BOX_PORT);
-            rightButtonBox = new GenericHID(RIGHT_BUTTON_BOX_PORT);
-        }
+        inputMethod = InputMethod.XBOX;
+        // leftStick = new Joystick(LEFT_STICK_PORT);
+        // rightStick = new Joystick(RIGHT_STICK_PORT);
+        leftButtonBox = new GenericHID(LEFT_BUTTON_BOX_PORT);
+        rightButtonBox = new GenericHID(RIGHT_BUTTON_BOX_PORT);
+        xbox = new XboxController(XBOX_PORT);
     }
 
     /**

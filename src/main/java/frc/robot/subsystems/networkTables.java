@@ -176,9 +176,7 @@ public class networkTables extends SubsystemBase {
 
       SmartDashboard.putNumber("x", final_position.getX());
       SmartDashboard.putNumber("y", final_position.getY());
-      if (final_position.getY() == 0){
-       odometry.resetPosition(final_position, gyro.getRotation2d());
-      }  
+      odometry.resetPosition(final_position, gyro.getRotation2d());
     }
     
 
@@ -195,7 +193,7 @@ public class networkTables extends SubsystemBase {
 
   public double getDistanceFromHub() {
     Translation2d botPosition = SubsystemFactory.getInstance().getDrivetrain().getSwerveDriveOdometry().getPoseMeters().getTranslation();
-    Translation2d hubPosition = new Translation2d(8.23, 4.115);
+    Translation2d hubPosition = new Translation2d(8.25, 4.10);
 
     return botPosition.getDistance(hubPosition);
   }

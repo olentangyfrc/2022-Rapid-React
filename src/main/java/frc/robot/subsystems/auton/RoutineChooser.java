@@ -18,6 +18,7 @@ public class RoutineChooser {
     private SendableChooser<CommandBase> autonChooser;
 
     public RoutineChooser(SwerveDrivetrain drivetrain, ShooterSubsystem shooter, BallIntake intake, AutonPaths paths) {
+        autonChooser = new SendableChooser<CommandBase>();
         autonChooser.setDefaultOption("None", new WaitCommand(0));
         autonChooser.addOption("BlueStartOne_TwoCargo", new BlueStartOne_TwoCargo(drivetrain, intake, shooter, paths));
         autonChooser.addOption("BlueStartTwo_FourCargo", new BlueStartTwo_FourCargo(drivetrain, intake, shooter, paths));

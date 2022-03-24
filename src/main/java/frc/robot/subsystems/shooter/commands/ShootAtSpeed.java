@@ -13,18 +13,18 @@ import frc.robot.subsystems.shooter.ShooterSubsystem;
 // information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 public class ShootAtSpeed extends SequentialCommandGroup {
-  public static final double EJECT_SPEED = 27;
-
   private ShooterSubsystem shooter;
+  private double flySpeed;
 
 
   /** Creates a new EjectBall. */
-  public ShootAtSpeed(ShooterSubsystem shooter, BallIntake intake) {
+  public ShootAtSpeed(ShooterSubsystem shooter, BallIntake intake, double flySpeed) {
     this.shooter = shooter;
+    this.flySpeed = flySpeed;
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(
-      new SpeedUpShooter(shooter, EJECT_SPEED),
+      new SpeedUpShooter(shooter, flySpeed),
       new feedBall(shooter),
       new WaitUntilCommand(()->false) // Never ends by itself
     );
