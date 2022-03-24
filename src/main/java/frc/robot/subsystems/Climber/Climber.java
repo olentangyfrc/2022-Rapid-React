@@ -154,6 +154,15 @@ public class Climber extends SubsystemBase{
         leftLinearActuator.set(0.2);
     }
 
+    /**
+     * Get the average position of the left and right arms.
+     * 
+     * @return The average position of the right and left arms.
+     */
+    public double getAverageArmPosition() {
+        return (getRightPotentiometerPosition() + getLeftPotentiometerPosition()) / 2;
+    }
+
     public boolean armsAtPosition(){
         return armsController.atSetpoint();
     }

@@ -99,5 +99,9 @@ public class AutonTrajectory {
     public List<AutonTrajectorySegment> getSegments() {
         return segments;
     }
+
+    public Pose2d getStartPosition() {
+        return segments.get(0).getStart();
+    }
     
 }

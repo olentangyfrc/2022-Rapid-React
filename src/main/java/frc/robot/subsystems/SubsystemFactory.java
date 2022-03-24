@@ -30,7 +30,7 @@ import frc.robot.subsystems.intake.commands.PutIntakeDown;
 import frc.robot.subsystems.intake.commands.StartIntake;
 import frc.robot.subsystems.intake.commands.StopIntake;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
-import frc.robot.subsystems.shooter.commands.shootBall;
+import frc.robot.subsystems.shooter.commands.shootBallTeleop;
 import frc.robot.subsystems.telemetry.Telemetry;
 import frc.robot.subsystems.telemetry.commands.ZeroGyro;
 
@@ -249,8 +249,7 @@ public class SubsystemFactory {
     elevator.init();
 
     io.bind(new ZeroGyro(telemetry.getGyro()), Button.kY, StickButton.RIGHT_2, ButtonActionType.WHEN_PRESSED);
-    io.bind(new shootBall(driveTrain, shooter, SubsystemFactory.getInstance().getBallIntake(), 20), XboxController.Button.kX, StickButton.LEFT_1, ButtonActionType.WHEN_HELD);
-    io.bind(new PutIntakeDown(ballIntake), Button.kStart, StickButton.LEFT_5, ButtonActionType.WHEN_PRESSED);
+    io.bind(new shootBallTeleop(driveTrain, shooter, SubsystemFactory.getInstance().getBallIntake()), XboxController.Button.kX, StickButton.LEFT_1, ButtonActionType.WHEN_HELD);
     io.bind(new StartIntake(ballIntake), Button.kRightBumper, StickButton.RIGHT_6, ButtonActionType.WHEN_PRESSED);
     io.bind(new StopIntake(ballIntake), Button.kRightBumper, StickButton.RIGHT_7, ButtonActionType.WHEN_RELEASED);
   }

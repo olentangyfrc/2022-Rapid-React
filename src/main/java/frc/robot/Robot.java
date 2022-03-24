@@ -5,11 +5,15 @@
 package frc.robot;
 
 
+import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-
-
 import frc.robot.subsystems.SubsystemFactory;
+import frc.robot.subsystems.auton.AutonPaths;
+import frc.robot.subsystems.auton.RoutineChooser;
+import frc.robot.subsystems.drivetrain.SwerveDrivetrain;
+import frc.robot.subsystems.intake.BallIntake;
+import frc.robot.subsystems.shooter.ShooterSubsystem;
 import frc.robot.subsystems.shooter.commands.takeInBall;
 
 /**
@@ -19,6 +23,7 @@ import frc.robot.subsystems.shooter.commands.takeInBall;
  * project.
  */
 public class Robot extends TimedRobot {
+  private RoutineChooser chooser;
   
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -34,7 +39,12 @@ public class Robot extends TimedRobot {
     } catch (Exception exception) {
       exception.printStackTrace();
     }
-    
+    ShooterSubsystem shooter = SubsystemFactory.getInstance().getShooter();
+    SwerveDrivetrain drivetrain = SubsystemFactory.getInstance().getDrivetrain();
+    BallIntake intake = SubsystemFactory.getInstance().getBallIntake();
+    AutonPaths paths = new AutonPaths(new TrajectoryConfig(SwerveDrivetrain.MAX_LINEAR_SPEED - 1, SwerveDrivetrain.MAX_LINEAR_ACCELERATION));
+
+    chooser = new RoutineChooser(drivetrain, shooter, intake, paths);
 
   }
 
@@ -46,10 +56,7 @@ public class Robot extends TimedRobot {
   public void autonomousInit() {
     SubsystemFactory.getInstance().getBallIntake().putIntakeDown();
     (new takeInBall(SubsystemFactory.getInstance().getShooter())).schedule();
-
-    // Determine which trajectory to follow
-    // Reset drivetrain position to starting location
-    // Follow trajectory
+    chooser.get().schedule();
   }
 
   @Override

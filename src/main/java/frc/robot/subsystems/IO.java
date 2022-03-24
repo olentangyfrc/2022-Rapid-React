@@ -79,6 +79,18 @@ public class IO extends SubsystemBase {
         }.with(this));
     }
 
+    @Override
+    public void periodic() {
+        // If we can't find input, try again
+        if(inputMethod == InputMethod.UNKNOWN) {
+            try {
+                init();
+            } catch(Exception ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
+
     public void init() throws Exception{
         inputMethod = determineInputMethod();
         invertForwards.setBoolean(true);

@@ -1,7 +1,9 @@
-package frc.robot.subsystems.Climber.commands;
+package frc.robot.subsystems.Climber.commands.auton;
 
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.Climber.Climber;
+import frc.robot.subsystems.Climber.commands.LatchOntoBar;
+import frc.robot.subsystems.Climber.commands.PushArmsForwardToPosition;
 import frc.robot.subsystems.Elevator.Elevator;
 import frc.robot.subsystems.Elevator.commands.ExtendArmsToPosition;
 
@@ -20,8 +22,6 @@ public class ClimbToFirstBar extends SequentialCommandGroup{
         logger.info("Climb to First Bar");
 
         addCommands(
-            new ExtendArmsToPosition(elevator, 3),
-            new PushArmsForwardToPosition(climber, 0),
             new ExtendArmsToPosition(elevator, 0.8),
             new PushArmsForwardToPosition(climber, 0.08),
             new LatchOntoBar(climber)

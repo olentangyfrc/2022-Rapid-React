@@ -8,17 +8,17 @@ import frc.robot.subsystems.drivetrain.SwerveDrivetrain;
 import frc.robot.subsystems.intake.BallIntake;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
 
-public class shootBall extends SequentialCommandGroup {
+public class shootBallTeleop extends SequentialCommandGroup {
 
     private ShooterSubsystem shooter;
     private BallIntake intake;
     
-    public shootBall(SwerveDrivetrain driveTrain,ShooterSubsystem shooterSubsystem, BallIntake intake, double flyWheelRPS) {
+    public shootBallTeleop(SwerveDrivetrain driveTrain,ShooterSubsystem shooterSubsystem, BallIntake intake) {
 
         addCommands(
-            new prepareToShoot(driveTrain, shooterSubsystem, intake, flyWheelRPS),
+            new prepareToShoot(driveTrain, shooterSubsystem, intake),
             new feedBall(shooterSubsystem),
-            new WaitCommand(1)
+            new WaitUntilCommand(()->false) // Never ends by itself
         );
 
         this.shooter = shooterSubsystem;
@@ -30,7 +30,6 @@ public class shootBall extends SequentialCommandGroup {
         super.end(interrupted);
         shooter.stop();
         shooter.stopTrigger();
-        intake.stopNoodleMotor();
 
         (new takeInBall(shooter)).schedule();
     }

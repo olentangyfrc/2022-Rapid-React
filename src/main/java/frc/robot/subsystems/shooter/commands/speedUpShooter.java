@@ -1,37 +1,45 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 package frc.robot.subsystems.shooter.commands;
 
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.SubsystemFactory;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
 
-public class speedUpShooter extends CommandBase {
+public class SpeedUpShooter extends CommandBase {
+  private ShooterSubsystem shooter;
+  private double flySpeed;
 
-    ShooterSubsystem shooterSubsystem;
-    double flyWheelRPS;
-    //private NetworkTableEntry targetSpeed = Shuffleboard.getTab("Shooter").add("Target speed", 0.0).withWidget(BuiltInWidgets.kTextView).getEntry();
+  /**
+   * Creates a new SpeedUpShooter command
+   * 
+   * @param shooter the shooter subsystem
+   * @param flySpeed flywheel speed in rps
+   */
+  public SpeedUpShooter(ShooterSubsystem shooter, double flySpeed) {
+    // Use addRequirements() here to declare subsystem dependencies.
+    this.shooter = shooter;
+    this.flySpeed = flySpeed;
+  }
 
-    public speedUpShooter(ShooterSubsystem shooterSubsystem, double flyWheelRPS) {
-        this.shooterSubsystem = shooterSubsystem;
-        this.flyWheelRPS = flyWheelRPS;
-    
-    }
+  // Called when the command is initially scheduled.
+  @Override
+  public void initialize() {
+    shooter.setSpeed(flySpeed);
+  }
 
-    @Override
-    public void initialize() {
-    }
+  // Called every time the scheduler runs while the command is scheduled.
+  @Override
+  public void execute() {}
 
-    @Override
-    public void execute() {
-        double distance = SubsystemFactory.getInstance().getVision().getDistanceFromHub();
+  // Called once the command ends or is interrupted.
+  @Override
+  public void end(boolean interrupted) {}
 
-        shooterSubsystem.setSpeed(distance * 4.8771 + 29.143);
-    }
-
-    @Override
-    public boolean isFinished() {
-        return false;
-    }
+  // Returns true when the command should end.
+  @Override
+  public boolean isFinished() {
+    return shooter.isReady();
+  }
 }

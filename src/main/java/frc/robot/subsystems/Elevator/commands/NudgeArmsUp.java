@@ -6,18 +6,21 @@ import frc.robot.subsystems.Elevator.Elevator;
 
 import java.util.logging.Logger;
 
-public class RetractArms extends InstantCommand {
+/**
+ * Nudge arms up. For use with operator control to make adjustments.
+ */
+public class NudgeArmsUp extends InstantCommand{
     private Elevator elevator;
 
-    private static Logger logger = Logger.getLogger(RetractArms.class.getName());
+    private static Logger logger = Logger.getLogger(NudgeArmsDown.class.getName());
 
-    public RetractArms(Elevator el) {
+    public NudgeArmsUp(Elevator el) {
         elevator = el;
     }
 
     @Override
     public void initialize(){
         logger.info("Extend Arms");
-        elevator.setTargetRotations(elevator.getTargetRotations() - 0.2);
+        elevator.setTargetRotations(elevator.getTargetRotations() + 0.2);
     }
 }

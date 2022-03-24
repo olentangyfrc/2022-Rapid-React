@@ -2,10 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.subsystems.Climber.commands;
+package frc.robot.subsystems.Climber.commands.auton;
 
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import frc.robot.subsystems.Climber.Climber;
+import frc.robot.subsystems.Climber.commands.PushArmsForwardToPosition;
 import frc.robot.subsystems.Elevator.Elevator;
 import frc.robot.subsystems.Elevator.commands.ExtendArmsToPosition;
 

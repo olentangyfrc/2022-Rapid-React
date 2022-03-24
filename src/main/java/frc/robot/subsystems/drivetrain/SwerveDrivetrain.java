@@ -62,6 +62,8 @@ public abstract class SwerveDrivetrain extends SubsystemBase {
     private PIDController anglePid = new PIDController(.12, 0, 0);
     private double targetAngle = Double.NaN;
 
+    private boolean isInBrakeMode = false;
+
     /**
      * Initialize the drivetrain subsystem
      */
@@ -125,6 +127,13 @@ public abstract class SwerveDrivetrain extends SubsystemBase {
      * @param speeds Chassis speeds with vx and vy <= max linear speed and omega < max rotation speed
     */
     public void drive(ChassisSpeeds speeds, boolean fieldOriented) {
+        if(isInBrakeMode) {
+            // Rotate all the wheels to point to the center of the bot so we are hard to move.
+            frontLeftModule.updateState(new SwerveModuleState(0, Rotation2d.fromDegrees(315)));
+            frontRightModule.updateState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
+            backLeftModule.updateState(new SwerveModuleState(0, Rotation2d.fromDegrees(225)));
+            backRightModule.updateState(new SwerveModuleState(0, Rotation2d.fromDegrees(135)));
+        }
         Gyro gyro = SubsystemFactory.getInstance().getTelemetry().getGyro();
         if(fieldOriented) {
             speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
@@ -237,5 +246,13 @@ public abstract class SwerveDrivetrain extends SubsystemBase {
      */
     public SwerveDriveOdometry getSwerveDriveOdometry(){
         return odometry;
+    }
+
+    public void enableBrakeMode() {
+        isInBrakeMode = true;
+    }
+
+    public void disableBrakeMode() {
+        isInBrakeMode = false;
     }
 }
