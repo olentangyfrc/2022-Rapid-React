@@ -33,20 +33,26 @@ public class IO extends SubsystemBase {
     public static final int XBOX_PORT = 0;
     public static final int LEFT_STICK_PORT = 1;
     public static final int RIGHT_STICK_PORT = 2;
+    public static final int LEFT_BUTTON_BOX_PORT = 3;
+    public static final int RIGHT_BUTTON_BOX_PORT = 4;
+
     public static final double DEADZONE = 0.09;
 
     private HashMap<Binding, Command> buttonBindings = new HashMap<Binding, Command>();
 
     private InputMethod inputMethod;
+    private boolean useButtonBox = false;
 
     private XboxController xbox;
 
     private Joystick leftStick;
     private Joystick rightStick;
 
+    private GenericHID leftButtonBox;
+    private GenericHID rightButtonBox;
+
     private Logger logger = Logger.getLogger("IO");
     private ShuffleboardTab ioTab = Shuffleboard.getTab("IO");
-
     
     private NetworkTableEntry invertForwards = ioTab.add("Invert Forwards", false).withWidget(BuiltInWidgets.kToggleSwitch).getEntry();
     private NetworkTableEntry invertStrafe = ioTab.add("Invert Strafe", false).withWidget(BuiltInWidgets.kToggleSwitch).getEntry();
@@ -54,29 +60,7 @@ public class IO extends SubsystemBase {
     
     public IO() {
         // Add a command to reset IO
-        ioTab.add("Reset IO", new InstantCommand() {
-            private IO io;
-
-            public InstantCommand with(IO io) {
-                this.io = io;
-                return this;
-            }
-
-            @Override
-            public void initialize() {
-                try {
-                    io.init();
-                } catch(Exception ex) {
-                    ex.printStackTrace();
-                }
-            }
-
-            @Override
-            public String toString() {
-                return "Reset";
-            }
-
-        }.with(this));
+        ioTab.add("Reset IO", new ResetIOCommand(this));
     }
 
     @Override
@@ -100,6 +84,11 @@ public class IO extends SubsystemBase {
         } else {
             leftStick = new Joystick(LEFT_STICK_PORT);
             rightStick = new Joystick(RIGHT_STICK_PORT);
+        }
+
+        if(useButtonBox) {
+            leftButtonBox = new GenericHID(LEFT_BUTTON_BOX_PORT);
+            rightButtonBox = new GenericHID(RIGHT_BUTTON_BOX_PORT);
         }
     }
 
@@ -225,6 +214,59 @@ public class IO extends SubsystemBase {
         buttonBindings.put(binding, command);
 
         JoystickButton jButton = new JoystickButton(joystick, button);
+
+        switch(type) {
+            case CANCEL_WHEN_PRESSED:
+                jButton.cancelWhenPressed(command);
+                break;
+            case TOGGLE_WHEN_PRESSED:
+                jButton.toggleWhenPressed(command);
+                break;
+            case WHEN_HELD:
+                jButton.whenHeld(command);
+                break;
+            case WHEN_PRESSED:
+                jButton.whenPressed(command);
+                break;
+            case WHEN_RELEASED:
+                jButton.whenReleased(command);
+                break;
+            case WHILE_HELD:
+                jButton.whileHeld(command);
+                break;
+        }
+    }
+
+    /**
+     * Bind a button to the button box.
+     * <p>
+     * Do not look at this code as an example! It is repetitive, but competition is in a week.
+     * 
+     * @param command The command to assign
+     * @param buttonBoxButton The button to assign to.
+     * @param type The type of action
+     */
+    public void bindButtonBox(Command command, StickButton buttonBoxButton, ButtonActionType type) {
+        GenericHID buttonBoxSide;
+        int button;
+
+        if(buttonBoxButton.ordinal() <= 10) {
+            buttonBoxSide = leftButtonBox;
+            button = buttonBoxButton.ordinal() + 1;
+        } else {
+            buttonBoxSide = rightButtonBox;
+            button = buttonBoxButton.ordinal() - 10;
+        }
+
+        Binding binding = new Binding(buttonBoxSide, button, type);
+
+        if(buttonBindings.containsKey(binding)) {
+            logger.severe("Failed to assign: " + binding.toString() + " is already assigned to Command [" + buttonBindings.get(binding).getName() + "]");
+            return;
+        }
+        buttonBindings.put(binding, command);
+
+        JoystickButton jButton = new JoystickButton(buttonBoxSide, button);
 
         switch(type) {
             case CANCEL_WHEN_PRESSED:
