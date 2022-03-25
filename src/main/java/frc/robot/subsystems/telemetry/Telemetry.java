@@ -9,6 +9,9 @@ import frc.robot.subsystems.SubsystemFactory.BotType;
 // Java imports
 import java.util.logging.Logger;
 
+import com.revrobotics.ColorSensorV3;
+
+import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
 // WPILib imports
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -20,6 +23,7 @@ public class Telemetry extends SubsystemBase {
     
     // Variables for all sensors
     private Gyro gyro;
+    private ColorSensor colorSensor;
 
     private Logger logger = Logger.getLogger("Telemetry");
 
@@ -79,9 +83,11 @@ public class Telemetry extends SubsystemBase {
     private void initRAPID_REACT() throws Exception {
         PortManager pm = SubsystemFactory.getInstance().getPortManager();
         Pigeon pigeon = new Pigeon(pm.aquirePort(PortType.CAN, 21, "Pigeon IMU"));
+        ColorSensor colorSensor = new ColorSensor();
         pigeon.init();
 
         gyro = pigeon;
+        this.colorSensor = colorSensor;
     }
 
 
@@ -97,5 +103,12 @@ public class Telemetry extends SubsystemBase {
      */
     public Gyro getGyro() {
         return gyro;
+    }
+
+    /**
+     * @return The active color sensor
+     */
+    public ColorSensor getColorSensor() {
+        return colorSensor;
     }
 }
