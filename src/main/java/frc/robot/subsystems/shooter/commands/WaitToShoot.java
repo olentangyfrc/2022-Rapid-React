@@ -48,13 +48,12 @@ public class WaitToShoot extends CommandBase {
   public boolean isFinished() {
     SmartDashboard.putBoolean("At target angle", drivetrain.atTargetAngle());
     SmartDashboard.putBoolean("Shooter at speed", shooter.isReady());
-    SmartDashboard.putBoolean("HAS SEEN HUB", SubsystemFactory.getInstance().getVision().getLastVisionTime() > startTimeSeconds);
-    SmartDashboard.putBoolean("2 Visiions Measurement", SubsystemFactory.getInstance().getVision().checkAmountofMeasurements() );
+    SmartDashboard.putBoolean("HAS SEEN HUB", SubsystemFactory.getInstance().getVision().getSecondToLastVisionTime() > startTimeSeconds);
 
     if(DriverStation.isAutonomous()) {
       return drivetrain.atTargetAngle() && shooter.isReady();
     } else {
-      return drivetrain.atTargetAngle() && shooter.isReady() && ((SubsystemFactory.getInstance().getVision().getLastVisionTime() - startTimeSeconds) > 1) && SubsystemFactory.getInstance().getVision().checkAmountofMeasurements();
+      return drivetrain.atTargetAngle() && shooter.isReady() && ((SubsystemFactory.getInstance().getVision().getSecondToLastVisionTime() - startTimeSeconds) > 1) && SubsystemFactory.getInstance().getVision().checkAmountofMeasurements();
     }
   }
 }

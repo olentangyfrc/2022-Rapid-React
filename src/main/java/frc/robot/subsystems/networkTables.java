@@ -29,6 +29,7 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.TimesliceRobot;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -40,6 +41,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class networkTables extends SubsystemBase {
 
   private SwerveDriveOdometry odometry;
+  private ArrayList<Double> timeStorage = new ArrayList<Double>(2);
   private boolean visionReady;
   private ArrayList<past_object> past_positions = new ArrayList<past_object>(100);
 
@@ -176,11 +178,11 @@ public class networkTables extends SubsystemBase {
 
       Pose2d final_position = odometry.getPoseMeters().plus(visiontoodermetry.times(1));
 
-
       SmartDashboard.putNumber("x", final_position.getX());
       SmartDashboard.putNumber("y", final_position.getY());
       odometry.resetPosition(final_position, gyro.getRotation2d());
       lastVisionTime = Timer.getFPGATimestamp();
+      timeStorage.add(lastVisionTime);
       SmartDashboard.putNumber("Last Vision Time", lastVisionTime);
 
     }
@@ -188,11 +190,9 @@ public class networkTables extends SubsystemBase {
 
   }
 
-  public boolean checkAmountofMeasurements(){
-    return past_positions.size() > 2;
-  }
 
-  public double getLastVisionTime() {
+  public double getSecondToLastVisionTime() {
+    timeStorage.remove(0);
     return lastVisionTime;
   }
 
