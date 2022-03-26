@@ -25,7 +25,7 @@ public class ShootAtSpeed extends SequentialCommandGroup {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(
-      new SpeedUpShooter(shooter, flySpeed),
+      new speedUpShooter(shooter, flySpeed),
       new feedBall(shooter),
       new WaitUntilCommand(()->false) // Never ends by itself
     );

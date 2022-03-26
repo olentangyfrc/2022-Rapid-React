@@ -27,8 +27,8 @@ public class ReachForLastBar extends SequentialCommandGroup {
       new PushArmsForwardToPosition(c, 0),
       new ExtendArmsToPosition(e, -0.88),
       new PushArmsForwardToPosition(c, 0.4),
-      new ExtendArmsToPosition(e, 7.9),
-      new PushArmsForwardToPosition(c, 0.6),
+      new ExtendArmsToPosition(e, 8.9),
+      new PushArmsForwardToPosition(c, 0.67),
       new ExtendArmsToPosition(e, 6.5)
     );
   }
