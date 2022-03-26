@@ -139,6 +139,7 @@ public class Climber extends SubsystemBase{
         pins.set(Value.kOff);
 
         targetArmPosition = 0;
+        letGoOfBar();
     }
 
     @Override

@@ -4,11 +4,9 @@
 
 package frc.robot.subsystems.auton.commands;
 
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.SubsystemFactory;
 import frc.robot.subsystems.auton.AutonTrajectory;
 import frc.robot.subsystems.auton.AutonTrajectoryFollower;
 import frc.robot.subsystems.drivetrain.SwerveDrivetrain;
@@ -47,7 +45,7 @@ public class FollowTrajectoryCommand extends CommandBase {
       drivetrain::getLocation
     );
 
-    startTime = (double) System.currentTimeMillis() / 1000;
+    startTime = Timer.getFPGATimestamp();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -75,6 +73,6 @@ public class FollowTrajectoryCommand extends CommandBase {
    * @return the time since the start in seconds.
    */
   private double getCurrentTime() {
-    return ((double) System.currentTimeMillis() / 1000) - startTime;
+    return Timer.getFPGATimestamp() - startTime;
   }
 }

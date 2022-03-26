@@ -28,6 +28,7 @@ public class BlueStartThree_FourCargo extends SequentialCommandGroup {
       new StartIntake(intake),
       new FollowTrajectoryCommand(drivetrain, paths.getStartB3ToCargo6_3()),
       new ShootBallAuton(drivetrain, shooter, intake, 2),
+      //        \/ Wrong \/
       new FollowTrajectoryCommand(drivetrain, paths.getCargo6ToCargo5_3()),
       new ShootBallAuton(drivetrain, shooter, intake, 1),
       new FollowTrajectoryCommand(drivetrain, paths.getCargo5ToCargo13_3()),
