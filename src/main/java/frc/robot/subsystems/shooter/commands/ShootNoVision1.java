@@ -8,6 +8,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.drivetrain.SwerveDrivetrain;
 import frc.robot.subsystems.drivetrain.commands.LockToAngle;
+import frc.robot.subsystems.drivetrain.commands.RotateToAngle;
 import frc.robot.subsystems.intake.BallIntake;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
 
@@ -23,7 +24,7 @@ public class ShootNoVision1 extends SequentialCommandGroup {
     // addCommands(new FooCommand(), new BarCommand());
     this.drivetrain = drivetrain;
     addCommands(
-      new LockToAngle(drivetrain, Rotation2d.fromDegrees(335.339)),
+      new RotateToAngle(drivetrain, Rotation2d.fromDegrees(335.339)),
       new ShootAtSpeed(shooter, intake, 42.6)
     );
 

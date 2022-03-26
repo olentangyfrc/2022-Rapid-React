@@ -53,7 +53,7 @@ public class WaitToShoot extends CommandBase {
     if(DriverStation.isAutonomous()) {
       return drivetrain.atTargetAngle() && shooter.isReady();
     } else {
-      return drivetrain.atTargetAngle() && shooter.isReady() && ((SubsystemFactory.getInstance().getVision().getSecondToLastVisionTime() - startTimeSeconds) > 1) && SubsystemFactory.getInstance().getVision().checkAmountofMeasurements();
+      return drivetrain.atTargetAngle() && shooter.isReady() && ((SubsystemFactory.getInstance().getVision().getSecondToLastVisionTime() - startTimeSeconds) > 1);
     }
   }
 }

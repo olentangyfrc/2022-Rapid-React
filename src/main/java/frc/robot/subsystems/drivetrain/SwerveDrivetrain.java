@@ -34,9 +34,9 @@ public abstract class SwerveDrivetrain extends SubsystemBase {
     public SwerveModule backRightModule;
 
     // Distance from center of wheel to center of wheel across the side of the bot in meters
-    public static final double WHEEL_BASE = 0.9144;
+    public static final double WHEEL_BASE = 0.4445;
     // Distance from center of wheel to center of wheel across the front of the bot in meters
-    public static final double TRACK_WIDTH = 0.9144;
+    public static final double TRACK_WIDTH = 0.4445;
 
     public static final double MAX_LINEAR_SPEED = 3.5; // Meters per second
     public static final double MAX_LINEAR_ACCELERATION = 3; // Meters per second squared
