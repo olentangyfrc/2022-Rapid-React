@@ -20,16 +20,16 @@ public class ReachForLastBar extends SequentialCommandGroup {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(
-      new ExtendArmsToPosition(e, 0.8),
-      new PushArmsForwardToPosition(c, 0.08),
+      new ExtendArmsToPosition(e, 0.015 - 0.15),
+      new PushArmsForwardToPosition(c, 0.1),
       new LatchOntoBar(c),
-      new ExtendArmsToPosition(e, 2),
+      new ExtendArmsToPosition(e, 1.7),
       new PushArmsForwardToPosition(c, 0),
-      new ExtendArmsToPosition(e, 0),
+      new ExtendArmsToPosition(e, -0.88),
       new PushArmsForwardToPosition(c, 0.4),
-      new ExtendArmsToPosition(e, 9),
+      new ExtendArmsToPosition(e, 7.9),
       new PushArmsForwardToPosition(c, 0.6),
-      new ExtendArmsToPosition(e, 7.2)
+      new ExtendArmsToPosition(e, 6.5)
     );
   }
 }

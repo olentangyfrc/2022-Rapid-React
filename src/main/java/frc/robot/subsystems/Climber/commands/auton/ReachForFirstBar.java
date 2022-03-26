@@ -20,7 +20,7 @@ public class ReachForFirstBar extends ParallelCommandGroup {
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(
       new PushArmsForwardToPosition(c, 0),
-      new ExtendArmsToPosition(e, 9.7)
+      new ExtendArmsToPosition(e, 9.4)
     );
   }
 }

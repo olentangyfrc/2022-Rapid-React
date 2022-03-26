@@ -1,5 +1,7 @@
 package frc.robot.subsystems.auton;
 
+import java.util.List;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
@@ -80,9 +82,9 @@ public class AutonPaths {
             config
         );
 
-        cargo5ToCargo13_3 = new AutonTrajectory(
+        cargo5ToCargo13_3 = new AutonTrajectory(List.of(
             new Pose2d(5.532, 1.628, Rotation2d.fromDegrees(144.784)),
-            new Pose2d(1.585, 1.596, Rotation2d.fromDegrees(224.110)),
+            new Pose2d(1.585, 1.596, Rotation2d.fromDegrees(224.110))),
             config
         );
 

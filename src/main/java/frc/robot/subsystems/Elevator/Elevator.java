@@ -12,6 +12,7 @@ import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.PortManager;
 import frc.robot.subsystems.PortManager.PortType;
@@ -80,6 +81,7 @@ public class Elevator extends SubsystemBase{
         // Constantly try to adhere to our target position.
 
         setVoltageToWinchMotor();
+        SmartDashboard.putNumber("Elevator pos", getPosition());    
 
         //setTargetRotations(targetElevatorPosition.getDouble(0));
     }

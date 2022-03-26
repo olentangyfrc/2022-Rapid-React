@@ -19,9 +19,12 @@ import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.XboxController.Button;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.IO.ButtonActionType;
 import frc.robot.subsystems.IO.StickButton;
 import frc.robot.subsystems.Climber.Climber;
+import frc.robot.subsystems.Climber.ToggleLatch;
 import frc.robot.subsystems.Climber.commands.NudgeArmsBackwards;
 import frc.robot.subsystems.Climber.commands.NudgeArmsForwards;
 import frc.robot.subsystems.Climber.commands.auton.ClimbToFinalBar;
@@ -48,6 +51,8 @@ import frc.robot.subsystems.intake.commands.StartIntake;
 import frc.robot.subsystems.intake.commands.StopIntake;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
 import frc.robot.subsystems.shooter.commands.ShootAtSpeed;
+import frc.robot.subsystems.shooter.commands.ShootNoVision1;
+import frc.robot.subsystems.shooter.commands.ShootNoVision2;
 import frc.robot.subsystems.shooter.commands.shootBallTeleop;
 import frc.robot.subsystems.telemetry.Telemetry;
 import frc.robot.subsystems.telemetry.commands.ZeroGyro;
@@ -247,10 +252,8 @@ public class SubsystemFactory {
     wheelOffsets.put("BL", 293.53);
     wheelOffsets.put("BR", 249.6);
 
-
-    
     // Create and initialize all subsystems:
-    CameraServer.startAutomaticCapture();
+    CameraServer.startAutomaticCapture(0);
     driveTrain = new SingleFalconDrivetrain();
     driveTrain.init(portAssignments, wheelOffsets);
 
@@ -271,6 +274,8 @@ public class SubsystemFactory {
     // Might need to be changed...
     io.bind(new StartIntake(ballIntake), Button.kRightBumper, StickButton.RIGHT_6, ButtonActionType.WHEN_PRESSED);
     io.bind(new StopIntake(ballIntake), Button.kRightBumper, StickButton.RIGHT_7, ButtonActionType.WHEN_RELEASED);
+
+    io.bindButtonBox(new ShootAtSpeed(shooter, ballIntake, 42.6), StickButton.LEFT_6, ButtonActionType.WHEN_HELD);
 
     // Climber commands
     io.bindButtonBox(new ReachForFirstBar(climber, elevator), StickButton.RIGHT_3, ButtonActionType.WHEN_PRESSED);
@@ -301,19 +306,25 @@ public class SubsystemFactory {
     // Shooter
     // Eject ball
     io.bindButtonBox(new ShootAtSpeed(shooter, ballIntake, 27), StickButton.LEFT_7, ButtonActionType.WHEN_HELD);
+    io.bindButtonBox(new ToggleLatch(climber), StickButton.RIGHT_11, ButtonActionType.WHEN_PRESSED);
 
     // Shoot from tarmac edge
-    io.bindButtonBox(new ShootAtSpeed(shooter, ballIntake, 42.5), StickButton.LEFT_6, ButtonActionType.WHEN_HELD);
+    io.bind(new ShootNoVision1(driveTrain, shooter, ballIntake), Button.kB, StickButton.LEFT_10, ButtonActionType.WHEN_HELD);
+    io.bind(new ShootNoVision2(driveTrain, shooter, ballIntake), Button.kA, StickButton.LEFT_11, ButtonActionType.WHEN_HELD);
 
-    io.bindButtonBox(new RemoveLockedAngle(driveTrain), StickButton.RIGHT_9, ButtonActionType.WHEN_PRESSED);
-
+    io.bindButtonBox(new RemoveLockedAngle(driveTrain), StickButton.RIGHT_11, ButtonActionType.WHEN_PRESSED);
+    io.bindButtonBox(new InstantCommand() {
+      @Override
+      public void initialize() {
+        CommandScheduler.getInstance().cancelAll();
+      }
+    }, StickButton.RIGHT_10, ButtonActionType.WHEN_PRESSED);
   }
 
   /**
    * Initializes the RIO99 subsystems
    */
   public void initRIO99() {
-    
   }
 
   /**

@@ -31,7 +31,7 @@ public class BlueStartThree_FourCargo extends SequentialCommandGroup {
       new FollowTrajectoryCommand(drivetrain, paths.getCargo6ToCargo5_3()),
       new ShootBallAuton(drivetrain, shooter, intake, 1),
       new FollowTrajectoryCommand(drivetrain, paths.getCargo5ToCargo13_3()),
-      new WaitCommand(1), // Wait for human player to add cargo
+      new WaitCommand(1.5), // Wait for human player to add cargo
       new ShootBallAuton(drivetrain, shooter, intake, 2)
     );
   }

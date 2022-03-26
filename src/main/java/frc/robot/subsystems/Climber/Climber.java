@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.PortManager;
 import frc.robot.subsystems.SubsystemFactory;
@@ -51,6 +52,8 @@ public class Climber extends SubsystemBase{
     //The maximum and minimum positions for the left linear actuator.
     private double maxLeftForwardPosition;
     private double minLeftBackPosition;
+
+    private boolean isLatched = false;
 
     //Declaration of Compressor for Pneumatics
     private Compressor compressor;
@@ -138,6 +141,13 @@ public class Climber extends SubsystemBase{
         targetArmPosition = 0;
     }
 
+    @Override
+    public void periodic() {
+        SmartDashboard.putNumber("Arm pos", getAverageArmPosition());
+        SmartDashboard.putNumber("Left arm pos", getLeftPotentiometerPosition());
+        SmartDashboard.putNumber("Right arm pos", getRightPotentiometerPosition());
+    }
+
     /*public void pushArmsForward() {
         rightPidController.setReference(maxRightForwardPosition, CANSparkMax.ControlType.kPosition);
         leftPidController.setReference(maxLeftForwardPosition, CANSparkMax.ControlType.kPosition);
@@ -186,10 +196,12 @@ public class Climber extends SubsystemBase{
 
     public void latchOntoBar(){
         pins.set(Value.kForward);
+        isLatched = true;
     }
 
     public void letGoOfBar(){
         pins.set(Value.kReverse);
+        isLatched = false;
     }
 
     public void stopRightLinearActuator(){
@@ -222,5 +234,9 @@ public class Climber extends SubsystemBase{
 
     public double getLeftMinBackPosition() {
         return minLeftBackPosition;
+    }
+
+    public boolean isLatched() {
+        return isLatched;
     }
 }

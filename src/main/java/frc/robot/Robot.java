@@ -7,6 +7,7 @@ package frc.robot;
 
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.subsystems.SubsystemFactory;
 import frc.robot.subsystems.auton.AutonPaths;
@@ -23,6 +24,7 @@ import frc.robot.subsystems.shooter.ShooterSubsystem;
  */
 public class Robot extends TimedRobot {
   private RoutineChooser chooser;
+  private CommandBase autonCommand;
   
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -52,7 +54,8 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     SubsystemFactory.getInstance().getBallIntake().putIntakeDown();
-    chooser.get().schedule();
+    autonCommand = chooser.get();
+    autonCommand.schedule();
   }
 
   @Override
@@ -62,6 +65,9 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
+    if(autonCommand != null) {
+      autonCommand.cancel();
+    }
   }
 
   @Override

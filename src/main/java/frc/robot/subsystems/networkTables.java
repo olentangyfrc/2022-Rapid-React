@@ -40,6 +40,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class networkTables extends SubsystemBase {
 
   private SwerveDriveOdometry odometry;
+  private boolean visionReady;
   private ArrayList<past_object> past_positions = new ArrayList<past_object>(100);
 
   private int fieldlength = 16;
@@ -48,6 +49,8 @@ public class networkTables extends SubsystemBase {
   NetworkTableInstance inst;
   Gyro gyro;
   NetworkTableEntry Time, XEntry, YEntry, ZEntry;
+
+  double lastVisionTime = Timer.getFPGATimestamp();
 
   public class past_object{
     private Pose2d estimate;
@@ -79,7 +82,7 @@ public class networkTables extends SubsystemBase {
     YEntry = Tvecs.getEntry("Y");
     ZEntry = Tvecs.getEntry("Z");
 
-    Time.addListener(event -> {onVisionUpdate(event);}, EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
+    Time.addListener(event -> {onVisionUpdate(event);}, EntryListenerFlags.kUpdate);
    
   }
 
@@ -168,18 +171,25 @@ public class networkTables extends SubsystemBase {
       SmartDashboard.putNumber("offset", visiontoodermetry.getX()); 
 
       for (past_object past_object : past_positions) {
-        past_object.estimate = past_object.estimate.plus(visiontoodermetry.times(0.6));
+        past_object.estimate = past_object.estimate.plus(visiontoodermetry.times(1));
       }
 
-      Pose2d final_position = odometry.getPoseMeters().plus(visiontoodermetry.times(0.6));
+      Pose2d final_position = odometry.getPoseMeters().plus(visiontoodermetry.times(1));
 
 
       SmartDashboard.putNumber("x", final_position.getX());
       SmartDashboard.putNumber("y", final_position.getY());
       odometry.resetPosition(final_position, gyro.getRotation2d());
+      lastVisionTime = Timer.getFPGATimestamp();
+      SmartDashboard.putNumber("Last Vision Time", lastVisionTime);
+
     }
     
 
+  }
+
+  public double getLastVisionTime() {
+    return lastVisionTime;
   }
 
   public int getPastPose(double elapsedtime){

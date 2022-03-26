@@ -6,8 +6,11 @@ package frc.robot.subsystems.shooter.commands;
 
 import java.time.Instant;
 
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.subsystems.SubsystemFactory;
 import frc.robot.subsystems.drivetrain.SwerveDrivetrain;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
 
@@ -16,6 +19,7 @@ public class WaitToShoot extends CommandBase {
   private ShooterSubsystem shooter;
 
   private Instant startTime;
+  private double startTimeSeconds;
 
   /** Creates a new WaitToShoot. */
   public WaitToShoot(SwerveDrivetrain drivetrain, ShooterSubsystem shooter) {
@@ -28,6 +32,7 @@ public class WaitToShoot extends CommandBase {
   @Override
   public void initialize() {
     startTime = Instant.now();
+    startTimeSeconds = Timer.getFPGATimestamp();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -43,6 +48,11 @@ public class WaitToShoot extends CommandBase {
   public boolean isFinished() {
     SmartDashboard.putBoolean("At target angle", drivetrain.atTargetAngle());
     SmartDashboard.putBoolean("Shooter at speed", shooter.isReady());
-    return drivetrain.atTargetAngle() && shooter.isReady();
+    SmartDashboard.putBoolean("HAS SEEN HUB", SubsystemFactory.getInstance().getVision().getLastVisionTime() > startTimeSeconds);
+    if(DriverStation.isAutonomous()) {
+      return drivetrain.atTargetAngle() && shooter.isReady();
+    } else {
+      return drivetrain.atTargetAngle() && shooter.isReady() && SubsystemFactory.getInstance().getVision().getLastVisionTime() > startTimeSeconds;
+    }
   }
 }

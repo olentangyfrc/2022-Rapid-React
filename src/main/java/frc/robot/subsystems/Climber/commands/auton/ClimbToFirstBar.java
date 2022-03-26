@@ -22,8 +22,8 @@ public class ClimbToFirstBar extends SequentialCommandGroup{
         logger.info("Climb to First Bar");
 
         addCommands(
-            new ExtendArmsToPosition(elevator, 0.8),
-            new PushArmsForwardToPosition(climber, 0.08),
+            new ExtendArmsToPosition(elevator, 0.1),
+            new PushArmsForwardToPosition(climber, 0.089),
             new LatchOntoBar(climber)
         );
     }

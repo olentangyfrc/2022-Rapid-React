@@ -4,37 +4,33 @@
 
 package frc.robot.subsystems.shooter.commands;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
+import frc.robot.subsystems.drivetrain.SwerveDrivetrain;
+import frc.robot.subsystems.drivetrain.commands.LockToAngle;
 import frc.robot.subsystems.intake.BallIntake;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
 
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
-public class ShootAtSpeed extends SequentialCommandGroup {
-  private ShooterSubsystem shooter;
-  private double flySpeed;
+public class ShootNoVision2 extends SequentialCommandGroup {
+  private SwerveDrivetrain drivetrain;
 
-
-  /** Creates a new EjectBall. */
-  public 
-  ShootAtSpeed(ShooterSubsystem shooter, BallIntake intake, double flySpeed) {
-    this.shooter = shooter;
-    this.flySpeed = flySpeed;
+  /** Creates a new ShootNoVision. */
+  public ShootNoVision2(SwerveDrivetrain drivetrain, ShooterSubsystem shooter, BallIntake intake) {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
+    this.drivetrain = drivetrain;
     addCommands(
-      new SpeedUpShooter(shooter, flySpeed),
-      new feedBall(shooter),
-      new WaitUntilCommand(()->false) // Never ends by itself
+      new LockToAngle(drivetrain, Rotation2d.fromDegrees(70.178)),
+      new ShootAtSpeed(shooter, intake, 42.6)
     );
-  }
 
+  }
   @Override
   public void end(boolean interrupted) {
     super.end(interrupted);
-    shooter.stop();
-    shooter.stopTrigger();
+    drivetrain.removeTargetAngle();
   }
 }
