@@ -34,11 +34,11 @@ public class rotateToHub extends CommandBase {
         // Relative hub position
         Translation2d relativeHubLocation = hubLocation.minus(botLocation);
 
-        relativeHubLocation = relativeHubLocation.times(0.40/relativeHubLocation.getNorm());
+        relativeHubLocation = relativeHubLocation.times(0.21/relativeHubLocation.getNorm());
         
         Translation2d hubTranslation2d = new Translation2d(relativeHubLocation.getY(), - relativeHubLocation.getX());
 
-        relativeHubLocation.plus(hubTranslation2d);
+        relativeHubLocation = relativeHubLocation.plus(hubTranslation2d);
     
         angle = new Rotation2d(Math.atan2(relativeHubLocation.getY(), relativeHubLocation.getX()));
         angle = Rotation2d.fromDegrees(angle.getDegrees());

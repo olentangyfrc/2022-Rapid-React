@@ -7,7 +7,7 @@ package frc.robot.subsystems.shooter.commands;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
 
-public class SpeedUpShooter extends CommandBase {
+public class speedUpShooter extends CommandBase {
   private ShooterSubsystem shooter;
   private double flySpeed;
 
@@ -17,7 +17,7 @@ public class SpeedUpShooter extends CommandBase {
    * @param shooter the shooter subsystem
    * @param flySpeed flywheel speed in rps
    */
-  public SpeedUpShooter(ShooterSubsystem shooter, double flySpeed) {
+  public speedUpShooter(ShooterSubsystem shooter, double flySpeed) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.shooter = shooter;
     this.flySpeed = flySpeed;

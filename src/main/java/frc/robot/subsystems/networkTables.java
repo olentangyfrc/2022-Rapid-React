@@ -188,6 +188,10 @@ public class networkTables extends SubsystemBase {
 
   }
 
+  public boolean checkAmountofMeasurements(){
+    return past_positions.size() > 2;
+  }
+
   public double getLastVisionTime() {
     return lastVisionTime;
   }
