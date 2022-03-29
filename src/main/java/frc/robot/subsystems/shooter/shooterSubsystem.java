@@ -7,7 +7,6 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -17,9 +16,7 @@ import frc.robot.subsystems.PortManager.PortType;
 import frc.robot.subsystems.SubsystemFactory;
 import frc.robot.subsystems.SubsystemFactory.BotType;
 
-/**
- * 
- */
+
 public class ShooterSubsystem extends SubsystemBase {
 
     private Logger logger = Logger.getLogger("Subsystem Factory");
@@ -105,14 +102,23 @@ public class ShooterSubsystem extends SubsystemBase {
         }
     }
 
+    /**
+     * Stops the fly wheel
+     */
     public void stop() {
         isStopped = true;
     }
 
+    /**
+     * @return The current of the trigger wheel
+     */
     public double getTriggerCurrent() {
         return SubsystemFactory.getInstance().getPdp().getCurrent(8);
     }
 
+    /**
+     * Sets low voltage to the trigger wheel to lodge ball
+     */
     public void takeInBall() {
         triggerWheel.setVoltage(.75);
     }
@@ -134,14 +140,23 @@ public class ShooterSubsystem extends SubsystemBase {
         return -flyWheel.getSelectedSensorVelocity()/sensorUnitsPerRotation*10;
     }
 
+    /**
+     * @return The current speed of the trigger wheel
+     */
     public double getTriggerSpeed() {
         return triggerWheel.getSelectedSensorVelocity();
     }
 
+    /**
+     * @return The previous speed of the trigger wheel
+     */
     public double getPreviousTriggerSpeed() {
         return previousTriggerSpeed;
     }
 
+    /**
+     * @return if the fly wheel is at it's set speed
+     */
     public boolean isReady() {
         return getFlyWheelState().equals(flyWheelState.ready);
     }
@@ -173,14 +188,25 @@ public class ShooterSubsystem extends SubsystemBase {
         previousTriggerSpeed = 10;
     }
 
+    /**
+     * Sets the state of the trigger wheel
+     * @param state The new state of the trigger wheel
+     */
     public void setTriggerState(TriggerWheelState state) {
         triggerState = state;
     }
 
+    /**
+     * Sets the voltage of the trigger wheel
+     * @param voltage The voltage to be applied to the trigger wheel
+     */
     public void setTriggerVoltage(double voltage) {
         triggerWheel.setVoltage(voltage);
     }
 
+    /**
+     * @return If the trigger wheel is moving
+     */
     public boolean isTriggerMoving() {
         SmartDashboard.putNumber("Trigger moving", Math.abs(triggerWheel.getSelectedSensorVelocity()));
         return (int) Math.abs(triggerWheel.getSelectedSensorVelocity()) > 0;
@@ -194,10 +220,16 @@ public class ShooterSubsystem extends SubsystemBase {
         previousTriggerSpeed = 0;
     }
 
+    /**
+     * Stops the fly wheel
+     */
     public void stopFlywheel() {
         setSpeed(0);
     }
 
+    /**
+     * Various states used for the trigger wheel
+     */
     public enum TriggerWheelState {
         LOADING,
         HAS_BALL,
@@ -205,6 +237,9 @@ public class ShooterSubsystem extends SubsystemBase {
         SHOOTING
     }
     
+    /**
+     * Various states used for the fly wheel
+     */
     private enum flyWheelState {
         ready,
         intermediate,

@@ -5,13 +5,9 @@ import java.util.logging.Logger;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
-import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.PortManager;
 import frc.robot.subsystems.PortManager.PortType;
@@ -45,7 +41,10 @@ public class Elevator extends SubsystemBase{
     private ProfiledPIDController elevatorController = new ProfiledPIDController(57.839, 0, 0, SPEED_CONSTRAINTS);
     //private ProfiledPIDController elevatorController = new ProfiledPIDController(10.038, 0, 4.1283, SPEED_CONSTRAINTS);
 
-
+    /**
+     * Initializes the elevator
+     * @throws Exception If the elevator cannot be initialized
+     */
     public void init() throws Exception {
         logger.info("Setting Up Elevator");
         //PortManager makes sure that a port is not used for two different objects.
@@ -75,6 +74,10 @@ public class Elevator extends SubsystemBase{
 
     //NetworkTableEntry targetElevatorPosition = Shuffleboard.getTab("Climber").add("Target Position", 0).withWidget(BuiltInWidgets.kTextView).getEntry();
 
+    /**
+     * Sets the voltage of the winch motors
+     * THIS MUST BE CALLED PERIODICALLY
+     */
     @Override
     public void periodic() {
         // Constantly try to adhere to our target position.
@@ -84,32 +87,43 @@ public class Elevator extends SubsystemBase{
         //setTargetRotations(targetElevatorPosition.getDouble(0));
     }
 
-    //Moves the arms up using percent output.
+    /**
+     * Moves the arms up using percent output.
+     */ 
     public void extendArms() {
         winchMotor.set(verticalPercentOutput);
     }
 
-    //Moves the arms down using percent output.
+    /**
+     * Moves the arms down using percent output.
+     */
     public void retractArms() {
         winchMotor.set(-verticalPercentOutput);
     }
 
-    //Stops the winch motor.
+    /**
+     * Stops the winch motor.
+     */
     public void stopWinch(){
         winchMotor.stopMotor();
     }
 
+    /**
+     * Sets the appropriate voltage to the winch motors
+     */
     public void setVoltageToWinchMotor(){
         winchMotor.setVoltage(elevatorController.calculate(getPosition()));
     }
 
+    /**
+     * @return The number of target rotations
+     */
     public double getTargetRotations() {
         return elevatorController.getGoal().position;
     }
 
     /**
      * Set the percent output of the winch motor.
-     * 
      * @param verticalPercentOutput The percent output (-1 to 1)
      */
     public void setVerticalPercentOutput(double output) {
@@ -120,7 +134,6 @@ public class Elevator extends SubsystemBase{
 
     /**
      * Get the percent output of the winch motor.
-     * 
      * @return the percent output
      */
     public void getVerticalPercentOutput() {
@@ -129,7 +142,6 @@ public class Elevator extends SubsystemBase{
 
     /**
      * Get the maximum height of the elevator
-     * 
      * @return the maximum height
      */
     public double getMaxHeight() {
@@ -138,7 +150,6 @@ public class Elevator extends SubsystemBase{
 
     /**
      * Get the minimum height of the elevator
-     * 
      * @return the minimum height
      */
     public double getMinHeight() {
@@ -147,7 +158,6 @@ public class Elevator extends SubsystemBase{
 
     /**
      * Set the target position of the elevator.
-     * 
      * @param targetRotations The target position in rotations (up is positive)
      */
     public void setTargetRotations(double targetRotations) {
@@ -155,6 +165,9 @@ public class Elevator extends SubsystemBase{
         elevatorController.setGoal(targetRotations);
     }
 
+    /**
+     * @return If the winch is at it's goal
+     */
     public boolean isWinchAtGoal()
     {
        return elevatorController.atGoal();
@@ -162,7 +175,6 @@ public class Elevator extends SubsystemBase{
 
     /**
      * Get the position of the elevator in rotations (up is positive)
-     * 
      * @return the position of the elevator in rotations
      */
     public double getPosition(){
@@ -174,8 +186,7 @@ public class Elevator extends SubsystemBase{
      * Get the current velocity of the winch motor in rotations per second.
      * <p>
      * This uses the integrated sensor as it has better support for velocity.
-     * 
-     * @return
+     * @return The velocity of the winch motors in rotations
      */
     public double getVelocity(){
         return winchMotor.getSelectedSensorVelocity() / MOTOR_ENCODER_TICKS / WINCH_GEAR_RATIO;

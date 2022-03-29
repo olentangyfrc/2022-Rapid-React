@@ -5,16 +5,15 @@
 package frc.robot.subsystems.intake;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
-import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
+import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.PortManager;
-import frc.robot.subsystems.SubsystemFactory;
 import frc.robot.subsystems.PortManager.PortType;
+import frc.robot.subsystems.SubsystemFactory;
 
 public class BallIntake extends SubsystemBase {
   private static final int INTAKE_MOTOR_CAN = 30;
@@ -23,7 +22,6 @@ public class BallIntake extends SubsystemBase {
   private static final int DOWN_PCM = 4;
 
   private static final double INTAKE_PERCENT_OUTPUT = 1.0;
-  private static final double NOODLE_PERCENT_OUTPUT = 0.5;
 
   private WPI_TalonSRX intakeMotor;
   private WPI_TalonSRX noodleMotor;
@@ -92,10 +90,16 @@ public class BallIntake extends SubsystemBase {
     noodleMotor.set(ControlMode.PercentOutput, 0);
   }
 
+  /** 
+   * @return if the intake running
+   */
   public boolean isIntakeRunning() {
     return isIntakeRunning;
   }
 
+  /**
+   * @return if the noodles are boiled
+   */
   public boolean isNoodleRunning() {
     return isNoodleRunning;
   }

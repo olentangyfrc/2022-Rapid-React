@@ -10,10 +10,16 @@ public class ColorSensor {
     
     ColorSensorV3 colorSensor;
 
+    /**
+     * Initializes ColorSensorV3 object
+     */
     public ColorSensor() {
         colorSensor = new ColorSensorV3(I2C.Port.kOnboard);
     }
 
+    /**
+     * Updated the ball color shuffleboard entry. THIS MUST BE CALLED PERIODICALLY
+     */
     public void periodic() {
         switch (getColor()) {
             case red:
@@ -28,12 +34,18 @@ public class ColorSensor {
         }
     }
 
+    /**
+     * @return The ballColor based on the color the sensor is detecting
+     */
     private ballColor getColor() {
         if (colorSensor.getColor().equals(Color.kBlue)) return ballColor.blue;
         else if (colorSensor.getColor().equals(Color.kRed)) return ballColor.red;
         else return null;
     }
 
+    /**
+     * Enum for valid ball colors
+     */
     private enum ballColor {
         red,
         blue

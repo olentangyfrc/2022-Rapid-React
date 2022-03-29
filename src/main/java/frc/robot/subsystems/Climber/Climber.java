@@ -1,5 +1,7 @@
 package frc.robot.subsystems.Climber;
 
+import java.util.logging.Logger;
+
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel;
 import com.revrobotics.SparkMaxAnalogSensor;
@@ -8,16 +10,14 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
-import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
+import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.PortManager;
-import frc.robot.subsystems.SubsystemFactory;
 import frc.robot.subsystems.PortManager.PortType;
-
-import java.util.logging.Logger;
+import frc.robot.subsystems.SubsystemFactory;
 
 public class Climber extends SubsystemBase{
     //logger
@@ -76,7 +76,9 @@ public class Climber extends SubsystemBase{
 
     private double targetArmPosition;
 
-    //Initialization of the Climber Subsystems
+    /**
+     * Initialization of the Climber Subsystems
+     */
     public void init() throws Exception {
         logger.info("Setting Up Climber");
 
@@ -156,21 +158,30 @@ public class Climber extends SubsystemBase{
 
     /**
      * Get the average position of the left and right arms.
-     * 
      * @return The average position of the right and left arms.
      */
     public double getAverageArmPosition() {
         return (getRightPotentiometerPosition() + getLeftPotentiometerPosition()) / 2;
     }
 
+    /**
+     * @return If the arms are at position
+     */
     public boolean armsAtPosition(){
         return armsController.atSetpoint();
     }
 
+    /**
+     * Sets the target position of the arms
+     * @param pos The new target position for the arms
+     */
     public void setTargetArmPosition(double pos){
         targetArmPosition = pos;
     }
 
+    /**
+     * Sets the voltage of arms
+     */
     public void setArmVoltage(){
         double averagePosition = (getLeftPotentiometerPosition() + getRightPotentiometerPosition()) / 2.0;
         double clampedPosition = MathUtil.clamp(averagePosition, targetArmPosition - MAX_ARM_ERROR, targetArmPosition + MAX_ARM_ERROR);
@@ -179,47 +190,80 @@ public class Climber extends SubsystemBase{
         rightLinearActuator.setVoltage(volts);
     }
 
+    /**
+     * Pulls the arms back with percent output
+     */
     public void pullArmsBackWithPercent(){
         rightLinearActuator.set(-0.2);
         leftLinearActuator.set(-0.2);
     }
 
+    /**
+     * Moves the churros to latch onto bar
+     */
     public void latchOntoBar(){
         pins.set(Value.kForward);
     }
 
+    /**
+     * Moves the churros to let go of bar
+     */
     public void letGoOfBar(){
         pins.set(Value.kReverse);
     }
 
+    /**
+     * Stops the right linear actuator
+     */
     public void stopRightLinearActuator(){
         rightLinearActuator.stopMotor();
     }
 
+    /**
+     * Stops the left linear actuator
+     */
     public void stopLeftLinearActuator(){
         leftLinearActuator.stopMotor();
     }
 
+    /**
+     * @return Gets the right Potentiometer's position
+     */
     public double getRightPotentiometerPosition() {
         return rightPotentiometer.getPosition() - RIGHT_ARM_OFFSET;
     }
 
+    /**
+     * @return Gets the left Potentiometer's position
+     */
     public double getLeftPotentiometerPosition(){
         return leftPotentiometer.getPosition() - LEFT_ARM_OFFSET;
     }
 
+    /**
+     * @return Gets the max forward position of the right arm
+     */
     public double getRightMaxForwardPosition() {
         return maxRightForwardPosition;
     }
 
+    /**
+     * @return Gets the max forward position of the left arm
+     */
     public double getLeftMaxForwardPosition() {
         return maxLeftForwardPosition;
     }
 
+    /**
+     * @return Gets the min backward position of the right arm
+     */
     public double getRightMinBackPosition() {
         return minRightBackPosition;
     }
 
+    /**
+     * @return Gets the min backward position of the left arm
+     */
     public double getLeftMinBackPosition() {
         return minLeftBackPosition;
     }

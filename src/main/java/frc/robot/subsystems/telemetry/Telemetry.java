@@ -1,20 +1,16 @@
 package frc.robot.subsystems.telemetry;
 
-// Package imports
-import frc.robot.subsystems.PortManager;
-import frc.robot.subsystems.SubsystemFactory;
-import frc.robot.subsystems.PortManager.PortType;
-import frc.robot.subsystems.SubsystemFactory.BotType;
-
 // Java imports
 import java.util.logging.Logger;
 
-import com.revrobotics.ColorSensorV3;
-
-import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
 // WPILib imports
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+// Package imports
+import frc.robot.subsystems.PortManager;
+import frc.robot.subsystems.PortManager.PortType;
+import frc.robot.subsystems.SubsystemFactory;
+import frc.robot.subsystems.SubsystemFactory.BotType;
 
 /**
  * This class creates and initializes all of the sensors and stores references to them
@@ -35,7 +31,7 @@ public class Telemetry extends SubsystemBase {
 
     /**
      *  Initializes sensors for each robot;
-     * @throws Exception
+     * @throws Exception if sensors could not be initialized
      */
     public void init() throws Exception {
         switch (botType) {
@@ -56,6 +52,10 @@ public class Telemetry extends SubsystemBase {
         }
     }
 
+    /**
+     *  Initializes RIO1 Bot sensors
+     * @throws Exception if sensors could not be initialized
+     */
     private void initRIO1() throws Exception {
         PortManager pm = SubsystemFactory.getInstance().getPortManager();
         Pigeon pigeon = new Pigeon(pm.aquirePort(PortType.CAN, 21, "Pigeon IMU"));
@@ -66,7 +66,7 @@ public class Telemetry extends SubsystemBase {
 
     /**
      *  Initializes COVID Bot sensors
-     * @throws Exception
+     * @throws Exception if sensors could not be initialized
      */
     private void initCOVID() throws Exception{
         PortManager pm = SubsystemFactory.getInstance().getPortManager();
@@ -79,6 +79,7 @@ public class Telemetry extends SubsystemBase {
 
     /**
      *  Initializes Rapid React Bot sensors
+     * @throws Exception if sensors could not be initialized
      */
     private void initRAPID_REACT() throws Exception {
         PortManager pm = SubsystemFactory.getInstance().getPortManager();
@@ -93,6 +94,7 @@ public class Telemetry extends SubsystemBase {
 
     /**
      *  Initializes RIO99 sensors
+     * @throws Exception if sensors could not be initialized
      */
     private void initRIO99() throws Exception {
         PortManager pm = SubsystemFactory.getInstance().getPortManager();
