@@ -80,7 +80,7 @@ public class ShooterSubsystem extends SubsystemBase {
                 logger.severe("Unknown bot");
                 break;
         }
-        pid = new PIDController(9, 0, 0.2);
+        pid = new PIDController(10, 0, 0.2);
         pid.setTolerance(0.3);
         flyWheel.setSelectedSensorPosition(0);
 

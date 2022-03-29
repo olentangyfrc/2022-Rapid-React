@@ -20,6 +20,6 @@ public class NudgeArmsDown extends InstantCommand {
     @Override
     public void initialize(){
         logger.info("Extend Arms");
-        elevator.setTargetRotations(elevator.getTargetRotations() - 0.2);
+        elevator.setTargetRotations(elevator.getTargetRotations() - 0.5);
     }
 }

@@ -5,7 +5,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Climber.Climber;
 
 public class NudgeArmsForwards extends CommandBase{
-    public static final double NUDGE_AMOUNT = 0.03;
+    public static final double NUDGE_AMOUNT = 0.05;
     private Climber climber;
 
     public NudgeArmsForwards(Climber cb) {

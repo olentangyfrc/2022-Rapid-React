@@ -5,16 +5,22 @@
 package frc.robot;
 
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.subsystems.SubsystemFactory;
 import frc.robot.subsystems.auton.AutonPaths;
 import frc.robot.subsystems.auton.RoutineChooser;
 import frc.robot.subsystems.drivetrain.SwerveDrivetrain;
+import frc.robot.subsystems.drivetrain.commands.ResetLocation;
 import frc.robot.subsystems.intake.BallIntake;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
+import frc.robot.subsystems.shooter.commands.ShootAtSpeed;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -51,9 +57,10 @@ public class Robot extends TimedRobot {
   public void robotPeriodic() {
   }
 
+  private double startTime;
+
   @Override
   public void autonomousInit() {
-    SubsystemFactory.getInstance().getBallIntake().putIntakeDown();
     autonCommand = chooser.get();
     autonCommand.schedule();
   }

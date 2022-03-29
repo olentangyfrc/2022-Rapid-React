@@ -41,7 +41,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class networkTables extends SubsystemBase {
 
   private SwerveDriveOdometry odometry;
-  private ArrayList<Double> timeStorage = new ArrayList<Double>(2);
   private boolean visionReady;
   private ArrayList<past_object> past_positions = new ArrayList<past_object>(100);
 
@@ -182,7 +181,6 @@ public class networkTables extends SubsystemBase {
       SmartDashboard.putNumber("y", final_position.getY());
       odometry.resetPosition(final_position, gyro.getRotation2d());
       lastVisionTime = Timer.getFPGATimestamp();
-      timeStorage.add(lastVisionTime);
       SmartDashboard.putNumber("Last Vision Time", lastVisionTime);
 
     }
@@ -192,7 +190,6 @@ public class networkTables extends SubsystemBase {
 
 
   public double getSecondToLastVisionTime() {
-    timeStorage.remove(0);
     return lastVisionTime;
   }
 
