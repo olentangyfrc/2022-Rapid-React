@@ -4,22 +4,18 @@
 
 package frc.robot.subsystems.drivetrain.commands;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.IO;
-import frc.robot.subsystems.SubsystemFactory;
 import frc.robot.subsystems.drivetrain.SwerveDrivetrain;
 
-/**
- * This command will grab user input from IO and call the drivetrain's drive method.
- * This should be called periodically by the drivetrain.
- */
-public class DriveCommand extends CommandBase {
+public class RotateToAngle extends CommandBase {
   private SwerveDrivetrain drivetrain;
-
-  public DriveCommand(SwerveDrivetrain drivetrain) {
+  private Rotation2d angle;
+  /** Creates a new RotateToAngle. */
+  public RotateToAngle(SwerveDrivetrain drivetrain, Rotation2d angle) {
     this.drivetrain = drivetrain;
-
+    this.angle = angle;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(drivetrain);
   }
@@ -27,22 +23,25 @@ public class DriveCommand extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    drivetrain.setTargetAngle(angle);
   }
   
+  // Called every time the scheduler runs while the command is scheduled.
+  @Override
   public void execute() {
-    IO io = SubsystemFactory.getInstance().getIO();
-    ChassisSpeeds speeds = new ChassisSpeeds(
-      io.getForward() * SwerveDrivetrain.MAX_LINEAR_SPEED,
-      io.getStrafe() * SwerveDrivetrain.MAX_LINEAR_SPEED,
-      io.getRotation() * SwerveDrivetrain.MAX_ROTATION_SPEED
-    );
-  
-    drivetrain.drive(speeds, drivetrain.getFieldOriented());
-
+    drivetrain.drive(new ChassisSpeeds(), true);
   }
 
+  // Called once the command ends or is interrupted.
+  @Override
+  public void end(boolean interrupted) {
+    drivetrain.removeTargetAngle();
+    drivetrain.stop();
+  }
+
+  // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return drivetrain.atTargetAngle();
   }
 }

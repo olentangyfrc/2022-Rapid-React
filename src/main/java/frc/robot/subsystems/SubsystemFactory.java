@@ -1,3 +1,4 @@
+
 // Copyright (c) FIRST and other WPILib contributors.
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
@@ -11,15 +12,50 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.XboxController.Button;
-// Project imports:
-import frc.robot.subsystems.drivetrain.SwerveDrivetrain;
-import frc.robot.subsystems.drivetrain.SingleFalconDrivetrain;
-import frc.robot.subsystems.drivetrain.SparkMaxDrivetrain;
-import frc.robot.subsystems.telemetry.Telemetry;
-import frc.robot.subsystems.telemetry.commands.ZeroGyro;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.IO.ButtonActionType;
 import frc.robot.subsystems.IO.StickButton;
+import frc.robot.subsystems.Climber.Climber;
+import frc.robot.subsystems.Climber.ToggleLatch;
+import frc.robot.subsystems.Climber.commands.NudgeArmsBackwards;
+import frc.robot.subsystems.Climber.commands.NudgeArmsForwards;
+import frc.robot.subsystems.Climber.commands.auton.ClimbToFinalBar;
+import frc.robot.subsystems.Climber.commands.auton.ClimbToFirstBar;
+import frc.robot.subsystems.Climber.commands.auton.ClimbToNextBar;
+import frc.robot.subsystems.Climber.commands.auton.ReachForFirstBar;
+import frc.robot.subsystems.Climber.commands.auton.ReachForLastBar;
+import frc.robot.subsystems.Climber.commands.auton.ReachForNextBar;
+import frc.robot.subsystems.Elevator.Elevator;
+import frc.robot.subsystems.Elevator.commands.NudgeArmsDown;
+import frc.robot.subsystems.Elevator.commands.NudgeArmsUp;
+import frc.robot.subsystems.drivetrain.SingleFalconDrivetrain;
+import frc.robot.subsystems.drivetrain.SparkMaxDrivetrain;
+// Project imports:
+import frc.robot.subsystems.drivetrain.SwerveDrivetrain;
+import frc.robot.subsystems.drivetrain.commands.DisableBrakeMode;
+import frc.robot.subsystems.drivetrain.commands.EnableBrakeMode;
+import frc.robot.subsystems.drivetrain.commands.LockToAngle;
+import frc.robot.subsystems.drivetrain.commands.RemoveLockedAngle;
+import frc.robot.subsystems.intake.BallIntake;
+import frc.robot.subsystems.intake.commands.BringIntakeUp;
+import frc.robot.subsystems.intake.commands.PutIntakeDown;
+import frc.robot.subsystems.intake.commands.StartIntake;
+import frc.robot.subsystems.intake.commands.StopIntake;
+import frc.robot.subsystems.shooter.ShooterSubsystem;
+import frc.robot.subsystems.shooter.commands.ShootAtSpeed;
+import frc.robot.subsystems.shooter.commands.ShootNoVision1;
+import frc.robot.subsystems.shooter.commands.ShootNoVision2;
+import frc.robot.subsystems.shooter.commands.shootBallTeleop;
+import frc.robot.subsystems.telemetry.Telemetry;
+import frc.robot.subsystems.telemetry.commands.ZeroGyro;
 
 /**
  * This class instantiates and initializes all of the subsystems and stores references to them.
@@ -29,6 +65,9 @@ public class SubsystemFactory {
   // SubsystemFactory is a singleton, so keep a static instance.
   private static SubsystemFactory instance;
 
+  private PowerDistribution pdp;
+  private Climber climber;
+  private Elevator elevator;
   private Logger logger = Logger.getLogger("Subsystem Factory");
 
   /**
@@ -37,11 +76,14 @@ public class SubsystemFactory {
   private Map<String, BotType> allMACs = Map.of(
     "00:80:2F:30:DB:F8", BotType.COVID,
     "00:80:2F:30:DB:F9", BotType.COVID,
-    "00:80:2F:25:B4:CA", BotType.CALIFORNIA,
+    "00:80:2F:25:B4:CA", BotType.RAPID_REACT,
     "00:80:2F:28:64:39", BotType.RIO99,
     "00:80:2F:28:64:38", BotType.RIO99,
-    "00:80:2F:17:F8:3F", BotType.RIO1,
-    "00:80:2F:17:F8:40", BotType.RIO1 //usb
+    "00:80:2F:17:F8:3F", BotType.RIO1, //radio
+    "00:80:2F:17:F8:40", BotType.RIO1, //usb
+    "00:80:2F:17:D7:4B", BotType.RIO2,
+    "00:80:2F:27:04:C7", BotType.RIO3,
+    "00:80:2F:27:04:C6", BotType.RIO3
   );
 
   private BotType botType;
@@ -51,6 +93,9 @@ public class SubsystemFactory {
   private PortManager portManager;
   private IO io;
   private SwerveDrivetrain driveTrain;
+  private ShooterSubsystem shooter;
+  private networkTables vision;
+  private BallIntake ballIntake;
 
   // Should not be used outside of this class!
   private SubsystemFactory() {}
@@ -72,6 +117,7 @@ public class SubsystemFactory {
    * Create and initialize all of the subsystems.
    */
   public void init() throws Exception {
+    pdp = new PowerDistribution(1, ModuleType.kRev);
     botType = getBotType();
     portManager = new PortManager();
     telemetry = new Telemetry(botType);
@@ -82,8 +128,8 @@ public class SubsystemFactory {
       case COVID:
         initCOVID();
         break;
-      case CALIFORNIA:
-        initCALIFORNIA();
+      case RAPID_REACT:
+        initRAPID_REACT();
         break;
       case RIO99:
         initRIO99();
@@ -116,17 +162,26 @@ public class SubsystemFactory {
     portAssignments.put("BR.Encoder", 2);
 
     HashMap<String, Double> wheelOffsets = new HashMap<String, Double>();
-    wheelOffsets.put("FL", 55.28);
-    wheelOffsets.put("FR", 276.42);
-    wheelOffsets.put("BL", 82.63);
-    wheelOffsets.put("BR", 47.19);
+    wheelOffsets.put("FL", 54.58);
+    wheelOffsets.put("FR", 277.12);
+    wheelOffsets.put("BL", 6.06);
+    wheelOffsets.put("BR", 160.48);
 
     
     // Create and initialize all subsystems:
     driveTrain = new SingleFalconDrivetrain();
     driveTrain.init(portAssignments, wheelOffsets);
+
+    vision = new networkTables();
     
     io.bind(new ZeroGyro(telemetry.getGyro()), Button.kY, StickButton.RIGHT_2, ButtonActionType.WHEN_PRESSED);
+
+    climber = new Climber();
+    climber.init();
+
+    elevator = new Elevator();
+    elevator.init();
+
   }
 
   /**
@@ -152,57 +207,138 @@ public class SubsystemFactory {
     portAssignments.put("BR.Encoder", 3);
 
     HashMap<String, Double> wheelOffsets = new HashMap<String, Double>();
-    wheelOffsets.put("FL", 121.46);
-    wheelOffsets.put("FR", 36.38);
-    wheelOffsets.put("BL", 218.4);
-    wheelOffsets.put("BR", 105.08);
+    wheelOffsets.put("FL", 337.5);
+    wheelOffsets.put("FR", 214.54);
+    wheelOffsets.put("BL", 40.16);
+    wheelOffsets.put("BR", 283.18);
 
     // Create and initialize all subsystems:
     driveTrain = new SparkMaxDrivetrain();
     driveTrain.init(portAssignments, wheelOffsets);
+    shooter = new ShooterSubsystem();
+    shooter.init(botType);
+    vision = new networkTables();
+
+    io.bind(new ZeroGyro(telemetry.getGyro()), Button.kY, StickButton.RIGHT_2, ButtonActionType.WHEN_PRESSED);
+
   }
 
   /**
    * Initializes Califorinia Bot subsystems
    * @throws Exception
    */
-  public void initCALIFORNIA() throws Exception{
+  public void initRAPID_REACT() throws Exception{
     HashMap<String, Integer> portAssignments = new HashMap<String, Integer>();
-    portAssignments.put("FL.SwerveMotor", 17);
+    portAssignments.put("FL.SwerveMotor", 59);
     portAssignments.put("FL.DriveMotor", 41);
-    portAssignments.put("FL.Encoder", 0);
+    portAssignments.put("FL.Encoder", 1);
     
 
-    portAssignments.put("FR.SwerveMotor", 14);
+    portAssignments.put("FR.SwerveMotor", 8);
     portAssignments.put("FR.DriveMotor", 40);
-    portAssignments.put("FR.Encoder", 1);
+    portAssignments.put("FR.Encoder", 3);
 
-    portAssignments.put("BL.SwerveMotor", 15);
+    portAssignments.put("BL.SwerveMotor", 17);
     portAssignments.put("BL.DriveMotor", 42);
     portAssignments.put("BL.Encoder", 2);
 
-    portAssignments.put("BR.SwerveMotor", 59);
+    portAssignments.put("BR.SwerveMotor", 15);
     portAssignments.put("BR.DriveMotor", 43);
-    portAssignments.put("BR.Encoder", 3);
+    portAssignments.put("BR.Encoder", 0);
 
     HashMap<String, Double> wheelOffsets = new HashMap<String, Double>();
-    wheelOffsets.put("FL", 229.7);
-    wheelOffsets.put("FR", 142.77);
-    wheelOffsets.put("BL", 114.2);
-    wheelOffsets.put("BR", 70.84);
+    wheelOffsets.put("FL", 51.1);
+    wheelOffsets.put("FR", 322.77);
+    wheelOffsets.put("BL", 293.53);
+    wheelOffsets.put("BR", 249.6);
 
-    
     // Create and initialize all subsystems:
+    CameraServer.startAutomaticCapture(0);
     driveTrain = new SingleFalconDrivetrain();
     driveTrain.init(portAssignments, wheelOffsets);
+
+    shooter = new ShooterSubsystem();
+    shooter.init(botType);
+    vision = new networkTables();
+
+    ballIntake = new BallIntake();
     
-    io.bind(new ZeroGyro(telemetry.getGyro()), Button.kY, StickButton.RIGHT_2, ButtonActionType.WHEN_PRESSED);
+    climber = new Climber();
+    climber.init();
+
+    elevator = new Elevator();
+    elevator.init();
+
+    io.bind(new shootBallTeleop(driveTrain, shooter, SubsystemFactory.getInstance().getBallIntake()), XboxController.Button.kX, StickButton.LEFT_1, ButtonActionType.WHEN_HELD);
+    io.bind(new ZeroGyro(telemetry.getGyro()), Button.kY, StickButton.LEFT_1, ButtonActionType.WHEN_PRESSED);
+    // Might need to be changed...
+    io.bind(new StartIntake(ballIntake), Button.kRightBumper, StickButton.RIGHT_6, ButtonActionType.WHEN_PRESSED);
+    io.bind(new StopIntake(ballIntake), Button.kRightBumper, StickButton.RIGHT_7, ButtonActionType.WHEN_RELEASED);
+
+    io.bindButtonBox(new ShootAtSpeed(shooter, ballIntake, 42.6), StickButton.LEFT_6, ButtonActionType.WHEN_HELD);
+
+    // Climber commands
+    io.bindButtonBox(new ReachForFirstBar(climber, elevator), StickButton.RIGHT_3, ButtonActionType.WHEN_PRESSED);
+    io.bindButtonBox(new ClimbToFirstBar(climber, elevator), StickButton.RIGHT_2, ButtonActionType.WHEN_PRESSED);
+
+    io.bindButtonBox(new ReachForNextBar(elevator, climber), StickButton.RIGHT_1, ButtonActionType.WHEN_PRESSED);
+    io.bindButtonBox(new ClimbToNextBar(climber, elevator), StickButton.RIGHT_5, ButtonActionType.WHEN_PRESSED);
+
+    io.bindButtonBox(new ReachForLastBar(elevator, climber), StickButton.RIGHT_8, ButtonActionType.WHEN_PRESSED);
+    io.bindButtonBox(new ClimbToFinalBar(climber, elevator), StickButton.RIGHT_7, ButtonActionType.WHEN_PRESSED);
+
+    io.bindButtonBox(new NudgeArmsDown(elevator), StickButton.LEFT_9, ButtonActionType.WHEN_PRESSED);
+    io.bindButtonBox(new NudgeArmsUp(elevator), StickButton.LEFT_8, ButtonActionType.WHEN_PRESSED);
+
+    io.bindButtonBox(new NudgeArmsBackwards(climber), StickButton.LEFT_11, ButtonActionType.WHEN_PRESSED);
+    io.bindButtonBox(new NudgeArmsForwards(climber), StickButton.LEFT_10, ButtonActionType.WHEN_PRESSED);
+
+    // Lock to hanger
+    io.bindButtonBox(new LockToAngle(driveTrain, Rotation2d.fromDegrees(180)), StickButton.RIGHT_4, ButtonActionType.WHEN_PRESSED);
+
+    io.bindButtonBox(new ZeroGyro(telemetry.getGyro()), StickButton.LEFT_5, ButtonActionType.WHEN_PRESSED);
+    io.bindButtonBox(new EnableBrakeMode(driveTrain), StickButton.LEFT_1, ButtonActionType.WHEN_PRESSED);
+    io.bindButtonBox(new DisableBrakeMode(driveTrain), StickButton.LEFT_4, ButtonActionType.WHEN_PRESSED);
+
+    io.bindButtonBox(new PutIntakeDown(ballIntake), StickButton.LEFT_2, ButtonActionType.WHEN_PRESSED);
+    io.bindButtonBox(new BringIntakeUp(ballIntake), StickButton.LEFT_3, ButtonActionType.WHEN_PRESSED);
+
+    // Shooter
+    // Eject ball
+    io.bindButtonBox(new ShootAtSpeed(shooter, ballIntake, 27), StickButton.LEFT_7, ButtonActionType.WHEN_HELD);
+    io.bindButtonBox(new ToggleLatch(climber), StickButton.RIGHT_11, ButtonActionType.WHEN_PRESSED);
+
+    // Shoot from tarmac edge
+    io.bind(new ShootNoVision1(driveTrain, shooter, ballIntake), Button.kB, StickButton.LEFT_10, ButtonActionType.WHEN_HELD);
+    io.bind(new ShootNoVision2(driveTrain, shooter, ballIntake), Button.kA, StickButton.LEFT_11, ButtonActionType.WHEN_HELD);
+
+    io.bindButtonBox(new RemoveLockedAngle(driveTrain), StickButton.RIGHT_11, ButtonActionType.WHEN_PRESSED);
+    io.bindButtonBox(new InstantCommand() {
+      @Override
+      public void initialize() {
+        CommandScheduler.getInstance().cancelAll();
+      }
+    }, StickButton.RIGHT_10, ButtonActionType.WHEN_PRESSED);
   }
 
   /**
    * Initializes the RIO99 subsystems
    */
   public void initRIO99() {
+  }
+
+  /**
+   * Initializes the RIO2 subsystems
+   */
+  public void initRIO2() {
+    
+  }
+
+  /**
+   * Initializes the RIO3 subsystems
+   */
+  public void initRIO3() {
+    
   }
   
   // Getter methods for all of the subsystems:
@@ -212,6 +348,10 @@ public class SubsystemFactory {
    */
   public PortManager getPortManager() {
     return portManager;
+  }
+
+  public PowerDistribution getPdp() {
+    return pdp;
   }
 
   /**
@@ -228,8 +368,26 @@ public class SubsystemFactory {
     return telemetry;
   }
 
+  /**
+   * @return The active drivetrain
+   */
   public SwerveDrivetrain getDrivetrain() {
     return driveTrain;
+  }
+
+  public networkTables getVision() {
+    return vision;
+  }
+
+  public BallIntake getBallIntake() {
+    return ballIntake;
+  }
+
+  /**
+   * @return the active shooter
+   */
+  public ShooterSubsystem getShooter() {
+    return shooter;
   }
 
   /**
@@ -280,9 +438,11 @@ public class SubsystemFactory {
    */
   public enum BotType {
     COVID,
-    CALIFORNIA,
+    RAPID_REACT,
     RIO99,
     RIO1,
+    RIO2, 
+    RIO3,
     UNRECOGNIZED
   }
 }

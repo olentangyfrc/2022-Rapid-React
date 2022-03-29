@@ -77,6 +77,10 @@ public abstract class SwerveModule {
         setDriveVoltage(voltage);
     }
 
+    public void stop() {
+        updateState(new SwerveModuleState(0.0, getAngle()));
+    }
+
     /**
      * Set the voltage of the drive motor
      * <p>
@@ -96,6 +100,15 @@ public abstract class SwerveModule {
     public void updateState(SwerveModuleState newState) {
         setAngle(newState.angle);
         setDriveVelocity(newState.speedMetersPerSecond);
+    }
+
+    /**
+     * Get the current state of the module
+     * 
+     * @return the current state of the module
+     */
+    public SwerveModuleState getState() {
+        return new SwerveModuleState(getVelocity(), Rotation2d.fromDegrees(-getAngle().getDegrees()));
     }
 
     /**

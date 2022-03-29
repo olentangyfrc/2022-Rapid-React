@@ -3,15 +3,13 @@ package frc.robot.subsystems.drivetrain;
 import java.util.Map;
 import java.util.logging.Logger;
 
-// WPILib imports
-import edu.wpi.first.math.MatBuilder;
-import edu.wpi.first.math.Nat;
-import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
@@ -19,11 +17,13 @@ import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.SubsystemFactory;
 import frc.robot.subsystems.drivetrain.commands.DriveCommand;
 import frc.robot.subsystems.drivetrain.modules.SwerveModule;
 import frc.robot.subsystems.telemetry.Pigeon;
+
 
 public abstract class SwerveDrivetrain extends SubsystemBase {
 
@@ -38,11 +38,15 @@ public abstract class SwerveDrivetrain extends SubsystemBase {
     // Distance from center of wheel to center of wheel across the front of the bot in meters
     public static final double TRACK_WIDTH = 0.4445;
 
-    public static final double MAX_LINEAR_SPEED = 6; // Meters per second
+    public static final double MAX_LINEAR_SPEED = 3.5; // Meters per second
+    public static final double MAX_LINEAR_ACCELERATION = 3; // Meters per second squared
     public static final double MAX_ROTATION_SPEED = 15.1; // Radians per second
+    public static final double MAX_ROTATION_ACCELERATION = Math.PI; // Radians per second squared
 
-    // Command that calls drive method with user input.
-    private DriveCommand driveCommand;
+    public PIDController xController;
+    public PIDController yController;
+    public PIDController thetaController;
+
 
     // Used to convert from ChassisSpeeds to SwerveModuleStates
     private SwerveDriveKinematics kinematics;
@@ -50,20 +54,22 @@ public abstract class SwerveDrivetrain extends SubsystemBase {
     private Logger logger = Logger.getLogger("DrivetrainSubsystem");
     
     // Odometry
-    private SwerveDrivePoseEstimator poseEstimator;
+    private SwerveDriveOdometry odometry;
     private Field2d field = new Field2d();
     
     private ShuffleboardTab tab = Shuffleboard.getTab("Drive");
     private NetworkTableEntry fieldOrientedToggle = tab.add("Field Oriented", true).withWidget(BuiltInWidgets.kToggleButton).getEntry();
+
+    private PIDController anglePid = new PIDController(.12, 0, 0);
+    private double targetAngle = Double.NaN;
+
+    private boolean isInBrakeMode = false;
 
     /**
      * Initialize the drivetrain subsystem
      */
     public void init(Map<String, Integer> portAssignments, Map<String, Double> wheelOffsets) throws Exception {
         initializeSwerveModules(portAssignments, wheelOffsets);
-
-        // Create a new drive command to be reused later
-        driveCommand = new DriveCommand(this);
 
         // Pass in the coordinates of each wheel relative to the center of the bot.
         kinematics = new SwerveDriveKinematics(
@@ -73,11 +79,21 @@ public abstract class SwerveDrivetrain extends SubsystemBase {
             new Translation2d(-WHEEL_BASE / 2, TRACK_WIDTH / 2) // BR
         );
 
+        odometry = new SwerveDriveOdometry(kinematics, new Rotation2d());
+
+    /*
+
         poseEstimator = new SwerveDrivePoseEstimator(new Rotation2d(), new Pose2d(), kinematics,
-            new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0.02, 0.02, 0.01), 
-            new MatBuilder<>(Nat.N1(), Nat.N1()).fill(0.02),
-            new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0.1, 0.1, 0.01)
+            new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0.05, 0.05, Units.degreesToRadians(5)), 
+            new MatBuilder<>(Nat.N1(), Nat.N1()).fill(Units.degreesToRadians(0.01)),
+            new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0.01, 0.01, Units.degreesToRadians(30))
         );
+    */
+
+        anglePid.enableContinuousInput(0, 360);
+        anglePid.setTolerance(3);
+
+        setDefaultCommand(new DriveCommand(this));
 
         // Add the encoder readings to shuffleboard
         tab.addNumber("FL angle", () -> frontLeftModule.getAngle().getDegrees());
@@ -97,14 +113,11 @@ public abstract class SwerveDrivetrain extends SubsystemBase {
      * @param wheelOffsets The offsets for the modules
      * @throws Exception If there is an issue acquiring a port.
      */
-    public abstract void initializeSwerveModules(Map<String, Integer> portAssignments, Map<String, Double> wheelOffsets) throws Exception;
+    protected abstract void initializeSwerveModules(Map<String, Integer> portAssignments, Map<String, Double> wheelOffsets) throws Exception;
 
     @Override
     public void periodic() {
         // Run the drive command periodically
-        if(driveCommand != null) {
-            driveCommand.schedule();
-        }
     }
 
     /** 
@@ -114,25 +127,37 @@ public abstract class SwerveDrivetrain extends SubsystemBase {
      * 
      * @param speeds Chassis speeds with vx and vy <= max linear speed and omega < max rotation speed
     */
-    public void drive(ChassisSpeeds speeds) {
-        
+    public void drive(ChassisSpeeds speeds, boolean fieldOriented) {
+        if(isInBrakeMode) {
+            // Rotate all the wheels to point to the center of the bot so we are hard to move.
+            frontLeftModule.updateState(new SwerveModuleState(0, Rotation2d.fromDegrees(315)));
+            frontRightModule.updateState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
+            backLeftModule.updateState(new SwerveModuleState(0, Rotation2d.fromDegrees(225)));
+            backRightModule.updateState(new SwerveModuleState(0, Rotation2d.fromDegrees(135)));
+            return;
+        }
         Gyro gyro = SubsystemFactory.getInstance().getTelemetry().getGyro();
-        if(getFieldOriented()) {
+        if(fieldOriented) {
             speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
                 speeds.vxMetersPerSecond, 
                 speeds.vyMetersPerSecond,
                 speeds.omegaRadiansPerSecond, 
-                gyro.getRotation2d()
+                Rotation2d.fromDegrees(-gyro.getAngle())
             );
         }
-
+        SmartDashboard.putNumber("Target angle: ", targetAngle);
+        if(!Double.isNaN(targetAngle)) {
+            speeds.omegaRadiansPerSecond = -anglePid.calculate(gyro.getAngle());
+        }
+        
         SwerveModuleState[] states = kinematics.toSwerveModuleStates(speeds);
         SwerveDriveKinematics.desaturateWheelSpeeds(states, MAX_LINEAR_SPEED); // Normalize wheel speeds so we don't go faster than 100%
         
-        poseEstimator.update(gyro.getRotation2d(), states);
+        odometry.update(gyro.getRotation2d(), getModuleStates());
+
         field.setRobotPose(
-            poseEstimator.getEstimatedPosition().getX(),
-            poseEstimator.getEstimatedPosition().getY(),
+            odometry.getPoseMeters().getX(),
+            odometry.getPoseMeters().getY(),
             gyro.getRotation2d()
         );
 
@@ -141,6 +166,43 @@ public abstract class SwerveDrivetrain extends SubsystemBase {
         frontRightModule.updateState(SwerveModuleState.optimize(states[1], frontRightModule.getAngle()));
         backLeftModule.updateState(SwerveModuleState.optimize(states[2], backLeftModule.getAngle()));
         backRightModule.updateState(SwerveModuleState.optimize(states[3], backRightModule.getAngle()));
+    }
+
+    public SwerveModuleState[] getModuleStates() {
+        return new SwerveModuleState[]{
+            frontLeftModule.getState(),
+            frontRightModule.getState(),
+            backLeftModule.getState(),
+            backRightModule.getState()
+        };
+    }
+
+    public void stop() {
+        frontLeftModule.stop();
+        frontRightModule.stop();
+        backLeftModule.stop();
+        backRightModule.stop();
+    }
+
+    /**
+     * Set the target angle for the bot to rotate to.
+     * 
+     * @param targetAngle The target angle.
+     */
+    public void setTargetAngle(Rotation2d targetAngle) {
+        this.targetAngle = targetAngle.getDegrees();
+        anglePid.setSetpoint(this.targetAngle);
+    }
+
+    /**
+     * Remove the target angle so that the bot can freely rotate.
+     */
+    public void removeTargetAngle() {
+        targetAngle = Double.NaN;
+    }
+
+    public boolean atTargetAngle() {
+        return anglePid.atSetpoint();
     }
 
     /**
@@ -159,5 +221,39 @@ public abstract class SwerveDrivetrain extends SubsystemBase {
      */
     public boolean getFieldOriented() {
         return fieldOrientedToggle.getBoolean(true);
+    }
+
+    /**
+     * Get the current estimated position of the robot in meters.
+     * <p>
+     * x+ is forwards, y+ is right.
+     * 
+     * @return The estimated position of the bot.
+     */
+    public Pose2d getLocation() {
+        Pigeon pigeon = (Pigeon) SubsystemFactory.getInstance().getTelemetry().getGyro();
+        return new Pose2d(odometry.getPoseMeters().getTranslation(), pigeon.getRotation2d());
+    }
+
+    public void resetLocation(Pose2d botLocation) {
+        Pigeon pigeon = (Pigeon) SubsystemFactory.getInstance().getTelemetry().getGyro();
+        odometry.resetPosition(botLocation, botLocation.getRotation());
+        pigeon.reset(botLocation.getRotation());
+    }
+
+    /**
+     * 
+     * @return Returns PoseEstimator
+     */
+    public SwerveDriveOdometry getSwerveDriveOdometry(){
+        return odometry;
+    }
+
+    public void enableBrakeMode() {
+        isInBrakeMode = true;
+    }
+
+    public void disableBrakeMode() {
+        isInBrakeMode = false;
     }
 }
