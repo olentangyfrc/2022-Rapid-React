@@ -68,7 +68,8 @@ public class Climber extends SubsystemBase{
     //Creating a new Shuffleboard Tab
     private ShuffleboardTab tab = Shuffleboard.getTab("Climber");
 
-    private PIDController armsController = new PIDController(130, 0, 0);
+    private PIDController leftArmController = new PIDController(130, 0, 0);
+    private PIDController rightArmController = new PIDController(130, 0, 0);
     public static final double MAX_ARM_ERROR = 0.05;
     private static final double ARMS_TOLERANCE = 0.01;
 
@@ -95,7 +96,8 @@ public class Climber extends SubsystemBase{
         rightPotentiometer.setPositionConversionFactor(1);
         leftPotentiometer.setPositionConversionFactor(1);
 
-        armsController.setTolerance(ARMS_TOLERANCE);
+        leftArmController.setTolerance(ARMS_TOLERANCE);
+        rightArmController.setTolerance(ARMS_TOLERANCE);
         /*rightPidController = rightLinearActuator.getPIDController();
         leftPidController = leftLinearActuator.getPIDController();
 
@@ -174,8 +176,17 @@ public class Climber extends SubsystemBase{
         return (getRightPotentiometerPosition() + getLeftPotentiometerPosition()) / 2;
     }
 
+    public boolean isLeftArmAtPosiiton() {
+        return leftArmController.atSetpoint();
+    }
+
+    public boolean isRightArmAtPosition() {
+        return rightArmController.atSetpoint();
+    }
+
     public boolean armsAtPosition(){
-        return armsController.atSetpoint();
+        if (isLeftArmAtPosiiton() && isRightArmAtPosition()) return true;
+        return false;
     }
 
     public void setTargetArmPosition(double pos){
@@ -183,11 +194,14 @@ public class Climber extends SubsystemBase{
     }
 
     public void setArmVoltage(){
-        double averagePosition = (getLeftPotentiometerPosition() + getRightPotentiometerPosition()) / 2.0;
-        double clampedPosition = MathUtil.clamp(averagePosition, targetArmPosition - MAX_ARM_ERROR, targetArmPosition + MAX_ARM_ERROR);
-        double volts = armsController.calculate(clampedPosition, targetArmPosition);
-        leftLinearActuator.setVoltage(volts);
-        rightLinearActuator.setVoltage(volts);
+        double leftPosition = getLeftPotentiometerPosition();
+        double rightPosition = getRightPotentiometerPosition();
+        double leftClampedPosition = MathUtil.clamp(leftPosition, targetArmPosition - MAX_ARM_ERROR, targetArmPosition + MAX_ARM_ERROR);
+        double rightClampedPosition = MathUtil.clamp(rightPosition, targetArmPosition - MAX_ARM_ERROR, targetArmPosition + MAX_ARM_ERROR);
+        double leftVolts = leftArmController.calculate(leftClampedPosition, targetArmPosition);
+        double rightVolts = rightArmController.calculate(rightClampedPosition, targetArmPosition);
+        leftLinearActuator.setVoltage(leftVolts);
+        rightLinearActuator.setVoltage(rightVolts);
     }
 
     public void pullArmsBackWithPercent(){
