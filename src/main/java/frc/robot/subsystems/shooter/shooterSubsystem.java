@@ -40,6 +40,7 @@ public class ShooterSubsystem extends SubsystemBase {
     private ShuffleboardTab tab = Shuffleboard.getTab("Shooter");
 
     private boolean isStopped = true;
+    private boolean isFlywheelAtSetpoint = false;
     private TriggerWheelState triggerState = TriggerWheelState.EMPTY;
 
     // For tuning purposes only
@@ -81,7 +82,7 @@ public class ShooterSubsystem extends SubsystemBase {
                 break;
         }
         pid = new PIDController(10, 0, 0.2);
-        pid.setTolerance(0.3);
+        pid.setTolerance(1);
         flyWheel.setSelectedSensorPosition(0);
 
         tab.addNumber("Distance from hub: ", () -> {
@@ -90,6 +91,9 @@ public class ShooterSubsystem extends SubsystemBase {
         });
 
         tab.addNumber("Current Shooter Speed", this::getFlySpeed);
+        tab.addNumber("Target shooter speed", () -> {
+            return targetSpeed;
+        });
     }
 
     /**
@@ -99,9 +103,11 @@ public class ShooterSubsystem extends SubsystemBase {
     public void periodic() {
         if(isStopped) {
             flyWheel.setVoltage(0.0);
+            isFlywheelAtSetpoint = false;
         } else {
             double targetVolts = -feedForward.calculate(targetSpeed, pid.calculate(getFlySpeed()));
             flyWheel.setVoltage(targetVolts);
+            isFlywheelAtSetpoint = pid.atSetpoint();
         }
     }
 
@@ -150,7 +156,7 @@ public class ShooterSubsystem extends SubsystemBase {
      * @return The active state of the fly wheel
      */
     public flyWheelState getFlyWheelState() {
-        if (pid.atSetpoint() && pid.getSetpoint() != 0) { return flyWheelState.ready; }
+        if (isFlywheelAtSetpoint && pid.getSetpoint() != 0) { return flyWheelState.ready; }
         else if (!pid.atSetpoint()) { return flyWheelState.intermediate; }
         else { return flyWheelState.off; }
     }
@@ -196,6 +202,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
     public void stopFlywheel() {
         setSpeed(0);
+        isFlywheelAtSetpoint = false;
     }
 
     public enum TriggerWheelState {

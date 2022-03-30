@@ -18,7 +18,6 @@ public class WaitToShoot extends CommandBase {
   private SwerveDrivetrain drivetrain;
   private ShooterSubsystem shooter;
 
-  private Instant startTime;
   private double startTimeSeconds;
 
   /** Creates a new WaitToShoot. */
@@ -31,7 +30,6 @@ public class WaitToShoot extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    startTime = Instant.now();
     startTimeSeconds = Timer.getFPGATimestamp();
   }
 
@@ -49,10 +47,6 @@ public class WaitToShoot extends CommandBase {
     SmartDashboard.putBoolean("At target angle", drivetrain.atTargetAngle());
     SmartDashboard.putBoolean("Shooter at speed", shooter.isReady());
 
-    if(DriverStation.isAutonomous()) {
-      return drivetrain.atTargetAngle() && shooter.isReady();
-    } else {
-      return drivetrain.atTargetAngle() && shooter.isReady();
-    }
+    return drivetrain.atTargetAngle() && shooter.isReady();
   }
 }
