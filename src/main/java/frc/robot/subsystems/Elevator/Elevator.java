@@ -44,8 +44,6 @@ public class Elevator extends SubsystemBase{
     private final TrapezoidProfile.Constraints SPEED_CONSTRAINTS = new TrapezoidProfile.Constraints(6, 4);
     // Do not change these directly! Use SysID.
     private ProfiledPIDController elevatorController = new ProfiledPIDController(57.839, 0, 0, SPEED_CONSTRAINTS);
-    //private ProfiledPIDController elevatorController = new ProfiledPIDController(10.038, 0, 4.1283, SPEED_CONSTRAINTS);
-
 
     public void init() throws Exception {
         logger.info("Setting Up Elevator");
@@ -74,16 +72,11 @@ public class Elevator extends SubsystemBase{
         setTargetRotations(getPosition());
     }
 
-    //NetworkTableEntry targetElevatorPosition = Shuffleboard.getTab("Climber").add("Target Position", 0).withWidget(BuiltInWidgets.kTextView).getEntry();
-
     @Override
     public void periodic() {
         // Constantly try to adhere to our target position.
-
         setVoltageToWinchMotor();
         SmartDashboard.putNumber("Elevator pos", getPosition());    
-
-        //setTargetRotations(targetElevatorPosition.getDouble(0));
     }
 
     //Moves the arms up using percent output.
@@ -101,10 +94,12 @@ public class Elevator extends SubsystemBase{
         winchMotor.stopMotor();
     }
 
+    //Sets the voltage to the elevator using the profiled pid controller
     public void setVoltageToWinchMotor(){
         winchMotor.setVoltage(elevatorController.calculate(getPosition()));
     }
 
+    //Gets the target rotations for the elevator
     public double getTargetRotations() {
         return elevatorController.getGoal().position;
     }
@@ -157,6 +152,7 @@ public class Elevator extends SubsystemBase{
         elevatorController.setGoal(targetRotations);
     }
 
+    //Checks to see if the elevator has reached the target rotations
     public boolean isWinchAtGoal()
     {
        return elevatorController.atGoal();
@@ -177,7 +173,7 @@ public class Elevator extends SubsystemBase{
      * <p>
      * This uses the integrated sensor as it has better support for velocity.
      * 
-     * @return
+     * @return the velocity of the elevator
      */
     public double getVelocity(){
         return winchMotor.getSelectedSensorVelocity() / MOTOR_ENCODER_TICKS / WINCH_GEAR_RATIO;

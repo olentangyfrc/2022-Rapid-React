@@ -98,39 +98,12 @@ public class Climber extends SubsystemBase{
 
         leftArmController.setTolerance(ARMS_TOLERANCE);
         rightArmController.setTolerance(ARMS_TOLERANCE);
-        /*rightPidController = rightLinearActuator.getPIDController();
-        leftPidController = leftLinearActuator.getPIDController();
-
-        kP = 0.5;
-        kI = 0;
-        kD = 0;
-        kIz = 0;
-        kFF = 0;
-
-        kMaxOutput = 1;
-        kMinOutput = -1;
-        */
 
         maxRightForwardPosition = 1.05; //proto: 1.12 comp: 0.838
         minRightBackPosition = 0.0939; //proto: 0.171 comp: 0.111
 
         maxLeftForwardPosition = 1.12; //proto: 1.05 comp: 0.971
         minLeftBackPosition = 0.171; //proto: 0.0939 comp: 0.24
-
-        /*rightPidController.setP(kP);
-        rightPidController.setI(kI);
-        rightPidController.setD(kD);
-        rightPidController.setIZone(kIz);
-        rightPidController.setFF(kFF);
-        rightPidController.setOutputRange(kMinOutput, kMaxOutput);
-
-        leftPidController.setP(kP);
-        leftPidController.setI(kI);
-        leftPidController.setD(kD);
-        leftPidController.setIZone(kIz);
-        leftPidController.setFF(kFF);
-        leftPidController.setOutputRange(kMinOutput, kMaxOutput);
-        */
 
         pinsForward = 1;
         pinsReverse = 0;
@@ -150,17 +123,6 @@ public class Climber extends SubsystemBase{
         SmartDashboard.putNumber("Left arm pos", getLeftPotentiometerPosition());
         SmartDashboard.putNumber("Right arm pos", getRightPotentiometerPosition());
     }
-
-    /*public void pushArmsForward() {
-        rightPidController.setReference(maxRightForwardPosition, CANSparkMax.ControlType.kPosition);
-        leftPidController.setReference(maxLeftForwardPosition, CANSparkMax.ControlType.kPosition);
-    }
-
-    public void pullArmsBack() {
-        rightPidController.setReference(minRightBackPosition, CANSparkMax.ControlType.kPosition);
-        leftPidController.setReference(minLeftBackPosition, CANSparkMax.ControlType.kPosition);
-    }
-    */
 
     public void pushArmsForwardWithPercent(){
         rightLinearActuator.set(0.2);
