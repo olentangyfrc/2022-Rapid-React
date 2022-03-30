@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.SubsystemFactory;
+import frc.robot.subsystems.networkTables;
 import frc.robot.subsystems.drivetrain.SwerveDrivetrain;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
 
@@ -48,6 +49,7 @@ public class WaitToShoot extends CommandBase {
   public boolean isFinished() {
     SmartDashboard.putBoolean("At target angle", drivetrain.atTargetAngle());
     SmartDashboard.putBoolean("Shooter at speed", shooter.isReady());
+    SmartDashboard.putBoolean("Vision Ready", (networkTables.getlaststabletime()>startTimeSeconds));
 
     if(DriverStation.isAutonomous()) {
       return drivetrain.atTargetAngle() && shooter.isReady();

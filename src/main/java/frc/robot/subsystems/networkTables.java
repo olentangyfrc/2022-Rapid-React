@@ -43,8 +43,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class networkTables extends SubsystemBase {
 
   private SwerveDriveOdometry odometry;
-  private boolean visionReady;
-  private ArrayList<Pose2d> vision_check = new ArrayList<Pose2d>(2);
+  private static double laststabletime = Timer.getFPGATimestamp();
+  private Pose2d last_visionmeasurement;
   private ArrayList<past_object> past_positions = new ArrayList<past_object>(100);
 
   private int fieldlength = 16;
@@ -184,18 +184,23 @@ public class networkTables extends SubsystemBase {
       SmartDashboard.putNumber("y", final_position.getY());
       final_position = new Pose2d(position.get(0, 0), position.get(1,0), gyro.getRotation2d());
       odometry.resetPosition(final_position, gyro.getRotation2d());
-      vision_check.add(final_position);
+      if(0.20 > final_position.getTranslation().minus(last_visionmeasurement.getTranslation()).getNorm()){
+        laststabletime = Timer.getFPGATimestamp();
+      }
+      last_visionmeasurement = final_position;
       lastVisionTime = Timer.getFPGATimestamp();
       SmartDashboard.putNumber("Last Vision Time", lastVisionTime);
 
     }
-    
 
   }
 
 
-  public double getSecondToLastVisionTime() {
-    return lastVisionTime;
+
+
+
+  public static double getlaststabletime() {
+    return laststabletime;
   }
 
   public past_object getPastPose(double elapsedtime){
