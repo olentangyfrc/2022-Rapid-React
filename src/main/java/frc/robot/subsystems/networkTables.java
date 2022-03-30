@@ -20,6 +20,7 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
@@ -31,6 +32,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.TimesliceRobot;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -42,6 +44,7 @@ public class networkTables extends SubsystemBase {
 
   private SwerveDriveOdometry odometry;
   private boolean visionReady;
+  private ArrayList<Pose2d> vision_check = new ArrayList<Pose2d>(2);
   private ArrayList<past_object> past_positions = new ArrayList<past_object>(100);
 
   private int fieldlength = 16;
@@ -63,6 +66,7 @@ public class networkTables extends SubsystemBase {
     public Pose2d getEstimatedPosition(){
       return estimate;
     }
+    
     public double getFPGATimestamp(){
       return timestamp;
     }
@@ -145,7 +149,7 @@ public class networkTables extends SubsystemBase {
     
     
    
-    gyro_angle = past_positions.get(getPastPose(elapsedtime)).getEstimatedPosition().getRotation().getRadians();
+    gyro_angle = getPastPose(elapsedtime).getEstimatedPosition().getRotation().getRadians();
     c = Math.cos(gyro_angle);
     s = Math.sin(gyro_angle);
     var bot_to_field = Matrix.mat(Nat.N3(), Nat.N3()).fill(
@@ -165,21 +169,22 @@ public class networkTables extends SubsystemBase {
     SmartDashboard.putNumber("position_vecz", position.get(2, 0)); 
 
     if( (position.get(0,0) > 0 ) && (position.get(0,0) < fieldlength ) && (position.get(1,0) > 0) && (position.get(1,0) < fieldwidth) && (position.get(2,0) > - 0.9) && (position.get(2,0) <  0.9)){
+ 
+      var o2vtranslation = (new Translation2d(position.get(0, 0),position.get(1, 0)).minus(getPastPose(elapsedtime).getEstimatedPosition().getTranslation()));
+      var o2vtransform = new Transform2d(o2vtranslation, new Rotation2d(0));
+      SmartDashboard.putNumber("offset", o2vtransform.getX()); 
 
-      Transform2d visiontoodermetry = new Transform2d();       
-      visiontoodermetry = (new Pose2d(position.get(0, 0),position.get(1, 0), gyro.getRotation2d()).minus(past_positions.get(getPastPose(elapsedtime)).getEstimatedPosition()));
+      // for (past_object past_object : past_positions) {
+      //   past_object.estimate = past_object.estimate.plus(o2vtransform.times(1));
+      // }
 
-      SmartDashboard.putNumber("offset", visiontoodermetry.getX()); 
-
-      for (past_object past_object : past_positions) {
-        past_object.estimate = past_object.estimate.plus(visiontoodermetry.times(1));
-      }
-
-      Pose2d final_position = odometry.getPoseMeters().plus(visiontoodermetry.times(1));
+      Pose2d final_position = odometry.getPoseMeters().plus(o2vtransform.times(1));
 
       SmartDashboard.putNumber("x", final_position.getX());
       SmartDashboard.putNumber("y", final_position.getY());
+      final_position = new Pose2d(position.get(0, 0), position.get(1,0), gyro.getRotation2d());
       odometry.resetPosition(final_position, gyro.getRotation2d());
+      vision_check.add(final_position);
       lastVisionTime = Timer.getFPGATimestamp();
       SmartDashboard.putNumber("Last Vision Time", lastVisionTime);
 
@@ -193,13 +198,16 @@ public class networkTables extends SubsystemBase {
     return lastVisionTime;
   }
 
-  public int getPastPose(double elapsedtime){
+  public past_object getPastPose(double elapsedtime){
     for(int i = past_positions.size()-1; i >= 0; i--){
-      if ((Timer.getFPGATimestamp() - past_positions.get(i).getFPGATimestamp()) > elapsedtime){
-        return i;
+      var timeSinceMeasurement = Timer.getFPGATimestamp() - past_positions.get(i).getFPGATimestamp();
+      if (timeSinceMeasurement> elapsedtime){
+        SmartDashboard.putNumber("Index of Past Storage", i);
+        SmartDashboard.putNumber("Time since measurement", timeSinceMeasurement);
+        return past_positions.get(i);
       }
     } 
-    return 0;
+    return null;
   }
 
   public double getDistanceFromHub() {
