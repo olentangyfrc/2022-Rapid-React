@@ -44,7 +44,7 @@ public class networkTables extends SubsystemBase {
 
   private SwerveDriveOdometry odometry;
   private static double laststabletime = Timer.getFPGATimestamp();
-  private Pose2d last_visionmeasurement;
+  private Pose2d last_visionmeasurement = new Pose2d();
   private ArrayList<past_object> past_positions = new ArrayList<past_object>(100);
 
   private int fieldlength = 16;
@@ -142,7 +142,7 @@ public class networkTables extends SubsystemBase {
     var corrected_bot_oriented = camera_to_bot.times(corrected_vec);
 
 
-    var trans2_vec = VecBuilder.fill(0.0, -0.215, 0.813); //Change this where we know the displacement of the camera to the center of the robot
+    var trans2_vec = VecBuilder.fill(0.127, -0.315, 0.813); //Change this where we know the displacement of the camera to the center of the robot
 
     var out_vec = trans2_vec.plus(corrected_bot_oriented);
     double gyro_angle = 0; //add the heading by multipling by gyro angle
@@ -171,19 +171,21 @@ public class networkTables extends SubsystemBase {
     if( (position.get(0,0) > 0 ) && (position.get(0,0) < fieldlength ) && (position.get(1,0) > 0) && (position.get(1,0) < fieldwidth) && (position.get(2,0) > - 0.9) && (position.get(2,0) <  0.9)){
  
       var o2vtranslation = (new Translation2d(position.get(0, 0),position.get(1, 0)).minus(getPastPose(elapsedtime).getEstimatedPosition().getTranslation()));
-      var o2vtransform = new Transform2d(o2vtranslation, new Rotation2d(0));
-      SmartDashboard.putNumber("offset", o2vtransform.getX()); 
+      //var o2vtransform = new Transform2d(o2vtranslation, new Rotation2d(0));
+      SmartDashboard.putNumber("offset", o2vtranslation.getX()); 
 
-      // for (past_object past_object : past_positions) {
-      //   past_object.estimate = past_object.estimate.plus(o2vtransform.times(1));
-      // }
+      for (past_object past_object : past_positions) {
+       past_object.estimate = addTranslation( past_object.estimate, o2vtranslation);
+      }
 
-      Pose2d final_position = odometry.getPoseMeters().plus(o2vtransform.times(1));
+      Pose2d final_position = addTranslation(odometry.getPoseMeters(), o2vtranslation);
+      
 
       SmartDashboard.putNumber("x", final_position.getX());
       SmartDashboard.putNumber("y", final_position.getY());
-      final_position = new Pose2d(position.get(0, 0), position.get(1,0), gyro.getRotation2d());
+      // final_position = new Pose2d(position.get(0, 0), position.get(1,0), gyro.getRotation2d());
       odometry.resetPosition(final_position, gyro.getRotation2d());
+      SmartDashboard.putNumber("Difference in LastVision",  final_position.getTranslation().minus(last_visionmeasurement.getTranslation()).getNorm());
       if(0.20 > final_position.getTranslation().minus(last_visionmeasurement.getTranslation()).getNorm()){
         laststabletime = Timer.getFPGATimestamp();
       }
@@ -196,7 +198,9 @@ public class networkTables extends SubsystemBase {
   }
 
 
-
+  public Pose2d addTranslation(Pose2d pose, Translation2d translation){
+    return new Pose2d(pose.getTranslation().plus(translation), pose.getRotation());
+  }
 
 
   public static double getlaststabletime() {
