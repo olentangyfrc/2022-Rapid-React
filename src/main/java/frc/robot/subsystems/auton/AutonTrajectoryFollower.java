@@ -58,9 +58,8 @@ public class AutonTrajectoryFollower {
     public ChassisSpeeds calculate(double time) {
         AutonTrajectoryState goal = trajectory.sample(time);
         Pose2d currentPosition = positionSupplier.get();
-        //currentPosition = new Pose2d(currentPosition.getTranslation(), Rotation2d.fromDegrees(360 - currentPosition.getRotation().getDegrees()));
 
-        Pose2d angleCorrectedPosition = new Pose2d(currentPosition.getTranslation(), goal.getPosition().getRotation());
+        Pose2d angleCorrectedPosition = new Pose2d(currentPosition.getTranslation(), goal.getReferenceAngle());
 
         // Calculate bot-oriented speeds to follow trajectory
         ChassisSpeeds speeds = driveController.calculate(angleCorrectedPosition, goal.getPosition(), goal.getVelocity(), goal.getPosition().getRotation());
@@ -68,10 +67,10 @@ public class AutonTrajectoryFollower {
         
         // Rotate the vector so that it is field oriented and we don't have to worry about rotation.
         Vector2d translation = new Vector2d(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond); // bot-oriented
-        translation.rotate(goal.getReferenceAngle().getDegrees()); // rotate to field-oriented
+        translation.rotate(-goal.getReferenceAngle().getDegrees()); // rotate to field-oriented
         //translation.rotate(currentPosition.getRotation().getDegrees());
         speeds.vxMetersPerSecond = translation.x;
-        speeds.vyMetersPerSecond = -translation.y;
+        speeds.vyMetersPerSecond = translation.y;
 
         speeds.omegaRadiansPerSecond = -thetaController.calculate(currentPosition.getRotation().getDegrees(), goal.getPosition().getRotation().getDegrees());
 

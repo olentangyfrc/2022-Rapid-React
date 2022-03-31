@@ -62,6 +62,7 @@ public abstract class SwerveDrivetrain extends SubsystemBase {
 
     private PIDController anglePid = new PIDController(.12, 0, 0);
     private double targetAngle = Double.NaN;
+    public boolean isAtTargetAngle = false;
 
     private boolean isInBrakeMode = false;
 
@@ -148,6 +149,7 @@ public abstract class SwerveDrivetrain extends SubsystemBase {
         SmartDashboard.putNumber("Target angle: ", targetAngle);
         if(!Double.isNaN(targetAngle)) {
             speeds.omegaRadiansPerSecond = -anglePid.calculate(gyro.getAngle());
+            isAtTargetAngle = anglePid.atSetpoint();
         }
         
         SwerveModuleState[] states = kinematics.toSwerveModuleStates(speeds);
@@ -199,10 +201,16 @@ public abstract class SwerveDrivetrain extends SubsystemBase {
      */
     public void removeTargetAngle() {
         targetAngle = Double.NaN;
+        anglePid.reset();
+        isAtTargetAngle = false;
+    }
+
+    public boolean hasTargetAngle() {
+        return !Double.isNaN(targetAngle);
     }
 
     public boolean atTargetAngle() {
-        return anglePid.atSetpoint();
+        return isAtTargetAngle;
     }
 
     /**

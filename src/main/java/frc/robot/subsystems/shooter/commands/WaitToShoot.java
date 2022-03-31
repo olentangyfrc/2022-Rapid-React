@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.SubsystemFactory;
+import frc.robot.subsystems.networkTables;
 import frc.robot.subsystems.drivetrain.SwerveDrivetrain;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
 
@@ -18,7 +19,6 @@ public class WaitToShoot extends CommandBase {
   private SwerveDrivetrain drivetrain;
   private ShooterSubsystem shooter;
 
-  private Instant startTime;
   private double startTimeSeconds;
 
   /** Creates a new WaitToShoot. */
@@ -31,7 +31,6 @@ public class WaitToShoot extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    startTime = Instant.now();
     startTimeSeconds = Timer.getFPGATimestamp();
   }
 
@@ -48,11 +47,10 @@ public class WaitToShoot extends CommandBase {
   public boolean isFinished() {
     SmartDashboard.putBoolean("At target angle", drivetrain.atTargetAngle());
     SmartDashboard.putBoolean("Shooter at speed", shooter.isReady());
+    SmartDashboard.putBoolean("Vision Ready", (networkTables.getlaststabletime()>startTimeSeconds));
 
-    if(DriverStation.isAutonomous()) {
-      return drivetrain.atTargetAngle() && shooter.isReady();
-    } else {
-      return drivetrain.atTargetAngle() && shooter.isReady();
-    }
+    return drivetrain.atTargetAngle() && shooter.isReady() 
+    
+    &&  (networkTables.getlaststabletime()>startTimeSeconds);
   }
 }
