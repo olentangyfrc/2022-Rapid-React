@@ -70,7 +70,7 @@ public class AutonTrajectory {
         Trajectory.State state = currentSegment.getWpiTrajectory().sample(secondsInTrajectory);
         Pose2d angleCorrectedPose = new Pose2d(state.poseMeters.getTranslation(), currentSegment.getAngle());
 
-        return new AutonTrajectoryState(state.velocityMetersPerSecond, angleCorrectedPose, currentSegment.getAngle());
+        return new AutonTrajectoryState(state.velocityMetersPerSecond, angleCorrectedPose, currentSegment.getReferenceAngle());
     }
 
     /**

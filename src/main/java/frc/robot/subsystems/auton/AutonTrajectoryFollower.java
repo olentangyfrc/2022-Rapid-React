@@ -21,6 +21,8 @@ public class AutonTrajectoryFollower {
     private AutonTrajectory trajectory;
     private HolonomicDriveController driveController;
     private PIDController thetaController;
+    private PIDController xController;
+    private PIDController yController;
     private Supplier<Pose2d> positionSupplier;
     private Rotation2d targetAngle;
 
@@ -38,11 +40,13 @@ public class AutonTrajectoryFollower {
         this.trajectory = trajectory;
         this.positionSupplier = positionSupplier;
         this.thetaController = thetaController;
+        this.xController = xController;
+        this.yController = yController;
         thetaController.enableContinuousInput(0, 360);
 
         driveController = new HolonomicDriveController(
-            xController,
-            yController,
+            new PIDController(0, 0, 0),
+            new PIDController(0, 0, 0),
             new ProfiledPIDController(0, 0, 0, new TrapezoidProfile.Constraints(0, 0)) // Just to satisfy requirements
         );
     }
@@ -66,11 +70,19 @@ public class AutonTrajectoryFollower {
 
         
         // Rotate the vector so that it is field oriented and we don't have to worry about rotation.
-        Vector2d translation = new Vector2d(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond); // bot-oriented
-        translation.rotate(-goal.getReferenceAngle().getDegrees()); // rotate to field-oriented
-        //translation.rotate(currentPosition.getRotation().getDegrees());
-        speeds.vxMetersPerSecond = translation.x;
-        speeds.vyMetersPerSecond = translation.y;
+        //Vector2d translation = new Vector2d(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond); // bot-oriented
+        double desiredVelocity = Math.sqrt(Math.pow(speeds.vxMetersPerSecond, 2) + Math.pow(speeds.vyMetersPerSecond, 2));
+        // System.out.println("X Translation: " + translation.x);
+        // System.out.println("Y Translation: " + translation.y);
+        // translation.rotate(goal.getReferenceAngle().getDegrees()); // rotate to field-oriented
+        // System.out.println("REFERENCE ANGLE: " + goal.getReferenceAngle().getDegrees());
+
+        double xCorrection = xController.calculate(currentPosition.getX(), goal.getPosition().getX());
+        double yCorrection = yController.calculate(currentPosition.getY(), goal.getPosition().getY());
+
+
+        speeds.vxMetersPerSecond = desiredVelocity * Math.cos(goal.getReferenceAngle().getRadians()) + xCorrection;
+        speeds.vyMetersPerSecond = desiredVelocity * Math.sin(goal.getReferenceAngle().getRadians()) + yCorrection;
 
         speeds.omegaRadiansPerSecond = -thetaController.calculate(currentPosition.getRotation().getDegrees(), goal.getPosition().getRotation().getDegrees());
 
