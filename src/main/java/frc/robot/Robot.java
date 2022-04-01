@@ -11,6 +11,8 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.subsystems.SubsystemFactory;
@@ -63,12 +65,13 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
-    // autonCommand = chooser.get();
-    // autonCommand.schedule();
-    (new ResetLocation(SubsystemFactory.getInstance().getDrivetrain(), new Pose2d(0, 0, Rotation2d.fromDegrees(0)))).schedule();
-    AutonTrajectory trajectory = new AutonTrajectory(new Pose2d(0, 0, Rotation2d.fromDegrees(0)), new Pose2d(0, 4, Rotation2d.fromDegrees(0)), new TrajectoryConfig(SwerveDrivetrain.MAX_LINEAR_SPEED - 3, SwerveDrivetrain.MAX_LINEAR_ACCELERATION));
-    CommandBase autonCommand = new FollowTrajectoryCommand(SubsystemFactory.getInstance().getDrivetrain(), trajectory);
+    autonCommand = chooser.get();
     autonCommand.schedule();
+    // (new ResetLocation(SubsystemFactory.getInstance().getDrivetrain(), new Pose2d(0, 0, Rotation2d.fromDegrees(90)))).schedule();
+    // AutonTrajectory trajectory = new AutonTrajectory(new Pose2d(0, 0, Rotation2d.fromDegrees(90)), new Pose2d(5, 0, Rotation2d.fromDegrees(90)), new TrajectoryConfig(SwerveDrivetrain.MAX_LINEAR_SPEED - 1, SwerveDrivetrain.MAX_LINEAR_ACCELERATION));
+    // CommandBase autonCommand = new FollowTrajectoryCommand(SubsystemFactory.getInstance().getDrivetrain(), trajectory);
+    // autonCommand.schedule();
+
   }
 
   @Override

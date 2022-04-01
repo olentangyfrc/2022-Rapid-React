@@ -39,7 +39,7 @@ public abstract class SwerveDrivetrain extends SubsystemBase {
     public static final double TRACK_WIDTH = 0.4445;
 
     public static final double MAX_LINEAR_SPEED = 3.5; // Meters per second
-    public static final double MAX_LINEAR_ACCELERATION = 3; // Meters per second squared
+    public static final double MAX_LINEAR_ACCELERATION = 2; // Meters per second squared
     public static final double MAX_ROTATION_SPEED = 15.1; // Radians per second
     public static final double MAX_ROTATION_ACCELERATION = Math.PI; // Radians per second squared
 
@@ -143,20 +143,23 @@ public abstract class SwerveDrivetrain extends SubsystemBase {
                 speeds.vxMetersPerSecond, 
                 speeds.vyMetersPerSecond,
                 speeds.omegaRadiansPerSecond, 
-                Rotation2d.fromDegrees(-gyro.getAngle())
-            );
+                Rotation2d.fromDegrees(gyro.getAngle())
+                );
         }
         SmartDashboard.putNumber("Target angle: ", targetAngle);
         if(!Double.isNaN(targetAngle)) {
             speeds.omegaRadiansPerSecond = -anglePid.calculate(gyro.getAngle());
             isAtTargetAngle = anglePid.atSetpoint();
         }
-        
+        // Negate the vyMetersPerSecond so that a positive value will drive in the positive y direction. This must be done
+        // Because for the wheels, clockwise is positive.
+        // TODO: Make counter-clockwise positive for swerve modules.
+        speeds.vyMetersPerSecond = -speeds.vyMetersPerSecond;
         SwerveModuleState[] states = kinematics.toSwerveModuleStates(speeds);
         SwerveDriveKinematics.desaturateWheelSpeeds(states, MAX_LINEAR_SPEED); // Normalize wheel speeds so we don't go faster than 100%
         
         odometry.update(gyro.getRotation2d(), getModuleStates());
-
+        
         field.setRobotPose(
             odometry.getPoseMeters().getX(),
             odometry.getPoseMeters().getY(),

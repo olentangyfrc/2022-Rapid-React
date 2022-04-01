@@ -52,7 +52,7 @@ public class FollowTrajectoryCommand extends CommandBase {
   @Override
   public void execute() {
     ChassisSpeeds speeds = follower.calculate(getCurrentTime());
-    drivetrain.drive(speeds, true);
+    drivetrain.drive(speeds, false);
   }
 
   // Called once the command ends or is interrupted.
