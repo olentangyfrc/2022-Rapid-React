@@ -105,13 +105,13 @@ public class Climber extends SubsystemBase{
         maxLeftForwardPosition = 1.12; //proto: 1.05 comp: 0.971
         minLeftBackPosition = 0.171; //proto: 0.0939 comp: 0.24
 
-        pinsForward = 1;
-        pinsReverse = 0;
+        //pinsForward = 1;
+        //pinsReverse = 0;
 
         compressor = new Compressor(pm.aquirePort(PortType.CAN, PCMCANID, "Compressor"), PneumaticsModuleType.CTREPCM);
         compressor.enableDigital();
-        pins = new DoubleSolenoid(PCMCANID, PneumaticsModuleType.CTREPCM, pinsForward, pinsReverse);
-        pins.set(Value.kOff);
+        // pins = new DoubleSolenoid(PCMCANID, PneumaticsModuleType.CTREPCM, pinsForward, pinsReverse);
+        // pins.set(Value.kOff);
 
         targetArmPosition = 0;
         letGoOfBar();
@@ -172,13 +172,13 @@ public class Climber extends SubsystemBase{
     }
 
     public void latchOntoBar(){
-        pins.set(Value.kForward);
-        isLatched = true;
+        // pins.set(Value.kForward);
+        // isLatched = true;
     }
 
     public void letGoOfBar(){
-        pins.set(Value.kReverse);
-        isLatched = false;
+        // pins.set(Value.kReverse);
+        // isLatched = false;
     }
 
     public void stopRightLinearActuator(){
