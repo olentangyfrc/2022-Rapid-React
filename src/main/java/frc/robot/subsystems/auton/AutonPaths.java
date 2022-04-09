@@ -72,12 +72,12 @@ public class AutonPaths {
         // Routine 3
         startB3ToCargo6_3 = new AutonTrajectory(
             START_B3,
-            new Pose2d(7.87, 0.92, Rotation2d.fromDegrees(251.653)),
+            new Pose2d(7.819, 0.776, Rotation2d.fromDegrees(250.957)),
             config
         );
 
         cargo6ToCargo5_3 = new AutonTrajectory(
-            new Pose2d(7.87, 0.92, Rotation2d.fromDegrees(251.653)),
+            new Pose2d(7.819, 0.776, Rotation2d.fromDegrees(250.957)),
             new Pose2d(5.532, 1.628, Rotation2d.fromDegrees(144.784)),
             config
         );

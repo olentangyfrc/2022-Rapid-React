@@ -39,7 +39,7 @@ public abstract class SwerveDrivetrain extends SubsystemBase {
     public static final double TRACK_WIDTH = 0.4445;
 
     public static final double MAX_LINEAR_SPEED = 3.5; // Meters per second
-    public static final double MAX_LINEAR_ACCELERATION = 2; // Meters per second squared
+    public static final double MAX_LINEAR_ACCELERATION = 1.5; // Meters per second squared
     public static final double MAX_ROTATION_SPEED = 15.1; // Radians per second
     public static final double MAX_ROTATION_ACCELERATION = Math.PI; // Radians per second squared
 
@@ -183,6 +183,7 @@ public abstract class SwerveDrivetrain extends SubsystemBase {
     }
 
     public void stop() {
+        drive(new ChassisSpeeds(), false);
         frontLeftModule.stop();
         frontRightModule.stop();
         backLeftModule.stop();
