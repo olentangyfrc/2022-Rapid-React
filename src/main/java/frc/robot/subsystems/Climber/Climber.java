@@ -221,6 +221,14 @@ public class Climber extends SubsystemBase{
         return leftPotentiometer.getPosition() - LEFT_ARM_OFFSET;
     }
 
+    public double getLeftLinearActuatorPercentOutput(){
+        return leftLinearActuator.get();
+    }
+
+    public double getRightLinearActuatorPercentOutput(){
+        return rightLinearActuator.get();
+    }
+
     public double getRightMaxForwardPosition() {
         return maxRightForwardPosition;
     }
