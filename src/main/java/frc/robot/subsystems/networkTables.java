@@ -163,7 +163,6 @@ public class networkTables extends SubsystemBase {
     var position =  hub_coordinates.minus(final_vec);
 
     // Print output
-
     SmartDashboard.putNumber("position_vecx", position.get(0, 0));
     SmartDashboard.putNumber("position_vecy", position.get(1, 0));
     SmartDashboard.putNumber("position_vecz", position.get(2, 0)); 
@@ -175,14 +174,14 @@ public class networkTables extends SubsystemBase {
       SmartDashboard.putNumber("offset", o2vtranslation.getX()); 
 
       for (past_object past_object : past_positions) {
-       past_object.estimate = addTranslation( past_object.estimate, o2vtranslation);
+       past_object.estimate = addTranslation(past_object.estimate, o2vtranslation);
       }
 
       Pose2d final_position = addTranslation(odometry.getPoseMeters(), o2vtranslation);
       
 
-      SmartDashboard.putNumber("x", final_position.getX());
-      SmartDashboard.putNumber("y", final_position.getY());
+      SmartDashboard.putNumber("posx", final_position.getX());
+      SmartDashboard.putNumber("posy", final_position.getY());
       // final_position = new Pose2d(position.get(0, 0), position.get(1,0), gyro.getRotation2d());
       odometry.resetPosition(final_position, gyro.getRotation2d());
       SmartDashboard.putNumber("Difference in LastVision",  final_position.getTranslation().minus(last_visionmeasurement.getTranslation()).getNorm());
@@ -216,7 +215,7 @@ public class networkTables extends SubsystemBase {
         return past_positions.get(i);
       }
     } 
-    return null;
+    return new past_object(new Pose2d(), 0.0);
   }
 
   public double getDistanceFromHub() {

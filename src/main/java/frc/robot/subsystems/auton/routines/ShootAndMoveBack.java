@@ -23,7 +23,7 @@ public class ShootAndMoveBack extends SequentialCommandGroup {
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(
       new ResetLocation(drivetrain, startPos),
-      new ShootBallAuton(drivetrain, shooter, intake, 1.5),
+      new ShootBallAuton(drivetrain, shooter, intake, 2),
       new LeaveTarmac(drivetrain)
     );
   }

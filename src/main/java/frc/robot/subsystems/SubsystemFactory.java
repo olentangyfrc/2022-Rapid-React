@@ -323,7 +323,7 @@ public class SubsystemFactory {
     io.bind(new ShootNoVision1(driveTrain, shooter, ballIntake), Button.kB, StickButton.LEFT_10, ButtonActionType.WHEN_HELD);
     io.bind(new ShootNoVision2(driveTrain, shooter, ballIntake), Button.kA, StickButton.LEFT_11, ButtonActionType.WHEN_HELD);
 
-    io.bindButtonBox(new RemoveLockedAngle(driveTrain), StickButton.RIGHT_11, ButtonActionType.WHEN_PRESSED);
+    io.bindButtonBox(new RemoveLockedAngle(driveTrain), StickButton.RIGHT_9, ButtonActionType.WHEN_PRESSED);
     io.bindButtonBox(new InstantCommand() {
       @Override
       public void initialize() {

@@ -5,6 +5,8 @@
 package frc.robot;
 
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -13,8 +15,10 @@ import frc.robot.subsystems.SubsystemFactory;
 import frc.robot.subsystems.auton.AutonPaths;
 import frc.robot.subsystems.auton.routines.RoutineChooser;
 import frc.robot.subsystems.drivetrain.SwerveDrivetrain;
+import frc.robot.subsystems.drivetrain.commands.ResetLocation;
 import frc.robot.subsystems.intake.BallIntake;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
+import frc.robot.subsystems.shooter.commands.ShootBallAuton;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -56,6 +60,9 @@ public class Robot extends TimedRobot {
   public void autonomousInit() {
     autonCommand = chooser.get();
     autonCommand.schedule();
+
+    // (new ResetLocation(SubsystemFactory.getInstance().getDrivetrain(), new Pose2d(6.716, 2.487, Rotation2d.fromDegrees(46.762)))).schedule();
+    // (new ShootBallAuton(SubsystemFactory.getInstance().getDrivetrain(), SubsystemFactory.getInstance().getShooter(), SubsystemFactory.getInstance().getBallIntake(), 200)).schedule();
   }
 
   @Override
