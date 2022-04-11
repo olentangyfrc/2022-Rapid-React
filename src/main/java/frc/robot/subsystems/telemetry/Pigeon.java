@@ -38,7 +38,7 @@ public class Pigeon implements Gyro {
     @Override
     public double getAngle() {
         // Negate it to make it clockwise.
-        return (-imu.getFusedHeading() % 360);
+        return (-imu.getYaw() % 360);
     }
 
     /**
@@ -75,7 +75,8 @@ public class Pigeon implements Gyro {
      * @param angle the angle to reset to as a rotation2d
      */
     public void reset(Rotation2d angle) {
-        imu.setFusedHeading(-angle.getDegrees() * 64);
+        // imu.setFusedHeading(-angle.getDegrees() * 64);
+        imu.setYaw(-angle.getDegrees());
     }
 
     public void setInverted(boolean inverted) {

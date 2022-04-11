@@ -7,20 +7,18 @@ package frc.robot;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.subsystems.SubsystemFactory;
 import frc.robot.subsystems.auton.AutonPaths;
-import frc.robot.subsystems.auton.RoutineChooser;
+import frc.robot.subsystems.auton.routines.RoutineChooser;
 import frc.robot.subsystems.drivetrain.SwerveDrivetrain;
 import frc.robot.subsystems.drivetrain.commands.ResetLocation;
 import frc.robot.subsystems.intake.BallIntake;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
-import frc.robot.subsystems.shooter.commands.ShootAtSpeed;
+import frc.robot.subsystems.shooter.commands.ShootBallAuton;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -47,7 +45,7 @@ public class Robot extends TimedRobot {
     ShooterSubsystem shooter = SubsystemFactory.getInstance().getShooter();
     SwerveDrivetrain drivetrain = SubsystemFactory.getInstance().getDrivetrain();
     BallIntake intake = SubsystemFactory.getInstance().getBallIntake();
-    AutonPaths paths = new AutonPaths(new TrajectoryConfig(SwerveDrivetrain.MAX_LINEAR_SPEED - 2, SwerveDrivetrain.MAX_LINEAR_ACCELERATION));
+    AutonPaths paths = new AutonPaths(new TrajectoryConfig(SwerveDrivetrain.MAX_LINEAR_SPEED - 1, SwerveDrivetrain.MAX_LINEAR_ACCELERATION));
 
     chooser = new RoutineChooser(drivetrain, shooter, intake, paths);
 
@@ -57,12 +55,14 @@ public class Robot extends TimedRobot {
   public void robotPeriodic() {
   }
 
-  private double startTime;
 
   @Override
   public void autonomousInit() {
     autonCommand = chooser.get();
     autonCommand.schedule();
+
+    // (new ResetLocation(SubsystemFactory.getInstance().getDrivetrain(), new Pose2d(6.716, 2.487, Rotation2d.fromDegrees(46.762)))).schedule();
+    // (new ShootBallAuton(SubsystemFactory.getInstance().getDrivetrain(), SubsystemFactory.getInstance().getShooter(), SubsystemFactory.getInstance().getBallIntake(), 200)).schedule();
   }
 
   @Override

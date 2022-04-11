@@ -1,5 +1,7 @@
 package frc.robot.subsystems.Climber;
 
+import java.util.logging.Logger;
+
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel;
 import com.revrobotics.SparkMaxAnalogSensor;
@@ -9,16 +11,13 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
-import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.PortManager;
-import frc.robot.subsystems.SubsystemFactory;
 import frc.robot.subsystems.PortManager.PortType;
-
-import java.util.logging.Logger;
+import frc.robot.subsystems.SubsystemFactory;
 
 public class Climber extends SubsystemBase{
     //logger
@@ -73,10 +72,10 @@ public class Climber extends SubsystemBase{
     public static final double MAX_ARM_ERROR = 0.05;
     private static final double ARMS_TOLERANCE = 0.01;
 
-    private static final double LEFT_ARM_OFFSET = 0.19; //proto: 0.0763 comp: 
-    private static final double RIGHT_ARM_OFFSET = 0.08; //proto: 0.1837 comp:
+    private static final double LEFT_ARM_OFFSET = 0.189; //proto: 0.0763 comp: 
+    private static final double RIGHT_ARM_OFFSET = 0.11; //proto: 0.1837 comp:
 
-    public static final double MAX_ARM_POSITION = 0.7; //proto: 0.95 comp: 
+    public static final double MAX_ARM_POSITION = 0.72; //proto: 0.95 comp: 
 
     private double targetArmPosition;
 
@@ -114,12 +113,14 @@ public class Climber extends SubsystemBase{
         // pins.set(Value.kOff);
 
         targetArmPosition = 0;
-        letGoOfBar();
+        // letGoOfBar();
+        Shuffleboard.getTab("Climber").addNumber("Arm pos", this::getAverageArmPosition);
+        Shuffleboard.getTab("Climber").addNumber("Left Arm pos", this::getLeftPotentiometerPosition);
+        Shuffleboard.getTab("Climber").addNumber("Right Arm pos", this::getRightPotentiometerPosition);
     }
 
     @Override
     public void periodic() {
-        SmartDashboard.putNumber("Arm pos", getAverageArmPosition());
         SmartDashboard.putNumber("Left arm pos", getLeftPotentiometerPosition());
         SmartDashboard.putNumber("Right arm pos", getRightPotentiometerPosition());
     }
@@ -155,7 +156,7 @@ public class Climber extends SubsystemBase{
         targetArmPosition = pos;
     }
 
-    public void setArmVoltage(){
+    public void applyArmVoltage(){
         double leftPosition = getLeftPotentiometerPosition();
         double rightPosition = getRightPotentiometerPosition();
         double leftClampedPosition = MathUtil.clamp(leftPosition, targetArmPosition - MAX_ARM_ERROR, targetArmPosition + MAX_ARM_ERROR);
@@ -173,12 +174,12 @@ public class Climber extends SubsystemBase{
 
     public void latchOntoBar(){
         // pins.set(Value.kForward);
-        // isLatched = true;
+        isLatched = true;
     }
 
     public void letGoOfBar(){
         // pins.set(Value.kReverse);
-        // isLatched = false;
+        isLatched = false;
     }
 
     public void stopRightLinearActuator(){
