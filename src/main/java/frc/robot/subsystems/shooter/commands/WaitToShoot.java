@@ -49,8 +49,6 @@ public class WaitToShoot extends CommandBase {
     SmartDashboard.putBoolean("Shooter at speed", shooter.isReady());
     SmartDashboard.putBoolean("Vision Ready", (networkTables.getlaststabletime()>startTimeSeconds));
 
-    return drivetrain.atTargetAngle() && shooter.isReady() 
-    
-    &&  (networkTables.getlaststabletime()>startTimeSeconds);
+    return drivetrain.atTargetAngle() && shooter.isReady() && (DriverStation.isAutonomous() || networkTables.getlaststabletime()>startTimeSeconds);
   }
 }

@@ -72,10 +72,10 @@ public class Climber extends SubsystemBase{
     public static final double MAX_ARM_ERROR = 0.05;
     private static final double ARMS_TOLERANCE = 0.01;
 
-    private static final double LEFT_ARM_OFFSET = 0.19; //proto: 0.0763 comp: 
-    private static final double RIGHT_ARM_OFFSET = 0.08; //proto: 0.1837 comp:
+    private static final double LEFT_ARM_OFFSET = 0.189; //proto: 0.0763 comp: 
+    private static final double RIGHT_ARM_OFFSET = 0.11; //proto: 0.1837 comp:
 
-    public static final double MAX_ARM_POSITION = 0.7; //proto: 0.95 comp: 
+    public static final double MAX_ARM_POSITION = 0.72; //proto: 0.95 comp: 
 
     private double targetArmPosition;
 
@@ -135,16 +135,18 @@ public class Climber extends SubsystemBase{
 
         compressor = new Compressor(pm.aquirePort(PortType.CAN, PCMCANID, "Compressor"), PneumaticsModuleType.CTREPCM);
         compressor.enableDigital();
-        pins = new DoubleSolenoid(PCMCANID, PneumaticsModuleType.CTREPCM, pinsForward, pinsReverse);
-        pins.set(Value.kOff);
+        // pins = new DoubleSolenoid(PCMCANID, PneumaticsModuleType.CTREPCM, pinsForward, pinsReverse);
+        // pins.set(Value.kOff);
 
         targetArmPosition = 0;
-        letGoOfBar();
+        // letGoOfBar();
+        Shuffleboard.getTab("Climber").addNumber("Arm pos", this::getAverageArmPosition);
+        Shuffleboard.getTab("Climber").addNumber("Left Arm pos", this::getLeftPotentiometerPosition);
+        Shuffleboard.getTab("Climber").addNumber("Right Arm pos", this::getRightPotentiometerPosition);
     }
 
     @Override
     public void periodic() {
-        SmartDashboard.putNumber("Arm pos", getAverageArmPosition());
         SmartDashboard.putNumber("Left arm pos", getLeftPotentiometerPosition());
         SmartDashboard.putNumber("Right arm pos", getRightPotentiometerPosition());
     }
@@ -182,7 +184,7 @@ public class Climber extends SubsystemBase{
         targetArmPosition = pos;
     }
 
-    public void setArmVoltage(){
+    public void applyArmVoltage(){
         double averagePosition = (getLeftPotentiometerPosition() + getRightPotentiometerPosition()) / 2.0;
         double clampedPosition = MathUtil.clamp(averagePosition, targetArmPosition - MAX_ARM_ERROR, targetArmPosition + MAX_ARM_ERROR);
         double volts = armsController.calculate(clampedPosition, targetArmPosition);
@@ -196,12 +198,12 @@ public class Climber extends SubsystemBase{
     }
 
     public void latchOntoBar(){
-        pins.set(Value.kForward);
+        // pins.set(Value.kForward);
         isLatched = true;
     }
 
     public void letGoOfBar(){
-        pins.set(Value.kReverse);
+        // pins.set(Value.kReverse);
         isLatched = false;
     }
 

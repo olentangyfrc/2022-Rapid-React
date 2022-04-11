@@ -54,7 +54,7 @@ public class IO extends SubsystemBase {
     private ShuffleboardTab ioTab = Shuffleboard.getTab("IO");
     
     private NetworkTableEntry invertForwards = ioTab.add("Invert Forwards", true).withWidget(BuiltInWidgets.kToggleSwitch).getEntry();
-    private NetworkTableEntry invertStrafe = ioTab.add("Invert Strafe", false).withWidget(BuiltInWidgets.kToggleSwitch).getEntry();
+    private NetworkTableEntry invertStrafe = ioTab.add("Invert Strafe", true).withWidget(BuiltInWidgets.kToggleSwitch).getEntry();
     private NetworkTableEntry invertRotation = ioTab.add("Invert Rotation", false).withWidget(BuiltInWidgets.kToggleSwitch).getEntry();
     
     public IO() {

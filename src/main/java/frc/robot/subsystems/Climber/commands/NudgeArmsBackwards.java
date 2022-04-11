@@ -21,7 +21,7 @@ public class NudgeArmsBackwards extends CommandBase{
 
     @Override
     public void execute(){
-      climber.setArmVoltage();
+      climber.applyArmVoltage();
     }
 
     @Override

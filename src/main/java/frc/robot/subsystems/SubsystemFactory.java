@@ -25,6 +25,8 @@ import frc.robot.subsystems.IO.ButtonActionType;
 import frc.robot.subsystems.IO.StickButton;
 import frc.robot.subsystems.Climber.Climber;
 import frc.robot.subsystems.Climber.ToggleLatch;
+import frc.robot.subsystems.Climber.commands.ManualArmsBackwards;
+import frc.robot.subsystems.Climber.commands.ManualArmsForwards;
 import frc.robot.subsystems.Climber.commands.NudgeArmsBackwards;
 import frc.robot.subsystems.Climber.commands.NudgeArmsForwards;
 import frc.robot.subsystems.Climber.commands.auton.ClimbToFinalBar;
@@ -34,6 +36,8 @@ import frc.robot.subsystems.Climber.commands.auton.ReachForFirstBar;
 import frc.robot.subsystems.Climber.commands.auton.ReachForLastBar;
 import frc.robot.subsystems.Climber.commands.auton.ReachForNextBar;
 import frc.robot.subsystems.Elevator.Elevator;
+import frc.robot.subsystems.Elevator.commands.ManualElevatorDown;
+import frc.robot.subsystems.Elevator.commands.ManualElevatorUp;
 import frc.robot.subsystems.Elevator.commands.NudgeArmsDown;
 import frc.robot.subsystems.Elevator.commands.NudgeArmsUp;
 import frc.robot.subsystems.drivetrain.SingleFalconDrivetrain;
@@ -278,14 +282,21 @@ public class SubsystemFactory {
     io.bindButtonBox(new ShootAtSpeed(shooter, ballIntake, 42.6), StickButton.LEFT_6, ButtonActionType.WHEN_HELD);
 
     // Climber commands
-    io.bindButtonBox(new ReachForFirstBar(climber, elevator), StickButton.RIGHT_3, ButtonActionType.WHEN_PRESSED);
-    io.bindButtonBox(new ClimbToFirstBar(climber, elevator), StickButton.RIGHT_2, ButtonActionType.WHEN_PRESSED);
+    // io.bindButtonBox(new ReachForFirstBar(climber, elevator), StickButton.RIGHT_3, ButtonActionType.WHEN_PRESSED);
+    // io.bindButtonBox(new ClimbToFirstBar(climber, elevator), StickButton.RIGHT_2, ButtonActionType.WHEN_PRESSED);
 
-    io.bindButtonBox(new ReachForNextBar(elevator, climber), StickButton.RIGHT_1, ButtonActionType.WHEN_PRESSED);
-    io.bindButtonBox(new ClimbToNextBar(climber, elevator), StickButton.RIGHT_5, ButtonActionType.WHEN_PRESSED);
+    // io.bindButtonBox(new ReachForNextBar(elevator, climber), StickButton.RIGHT_1, ButtonActionType.WHEN_PRESSED);
+    // io.bindButtonBox(new ClimbToNextBar(climber, elevator), StickButton.RIGHT_5, ButtonActionType.WHEN_PRESSED);
 
-    io.bindButtonBox(new ReachForLastBar(elevator, climber), StickButton.RIGHT_8, ButtonActionType.WHEN_PRESSED);
-    io.bindButtonBox(new ClimbToFinalBar(climber, elevator), StickButton.RIGHT_7, ButtonActionType.WHEN_PRESSED);
+    // io.bindButtonBox(new ReachForLastBar(elevator, climber), StickButton.RIGHT_8, ButtonActionType.WHEN_PRESSED);
+    // io.bindButtonBox(new ClimbToFinalBar(climber, elevator), StickButton.RIGHT_7, ButtonActionType.WHEN_PRESSED);
+
+    io.bindButtonBox(new ManualArmsBackwards(climber), StickButton.RIGHT_3, ButtonActionType.WHEN_HELD);
+    io.bindButtonBox(new ManualArmsForwards(climber), StickButton.RIGHT_2, ButtonActionType.WHEN_HELD);
+
+    io.bindButtonBox(new ManualElevatorDown(elevator), StickButton.RIGHT_1, ButtonActionType.WHEN_HELD);
+    io.bindButtonBox(new ManualElevatorUp(elevator), StickButton.RIGHT_5, ButtonActionType.WHEN_HELD);
+
 
     io.bindButtonBox(new NudgeArmsDown(elevator), StickButton.LEFT_9, ButtonActionType.WHEN_PRESSED);
     io.bindButtonBox(new NudgeArmsUp(elevator), StickButton.LEFT_8, ButtonActionType.WHEN_PRESSED);
@@ -306,13 +317,13 @@ public class SubsystemFactory {
     // Shooter
     // Eject ball
     io.bindButtonBox(new ShootAtSpeed(shooter, ballIntake, 27), StickButton.LEFT_7, ButtonActionType.WHEN_HELD);
-    io.bindButtonBox(new ToggleLatch(climber), StickButton.RIGHT_11, ButtonActionType.WHEN_PRESSED);
+    // io.bindButtonBox(new ToggleLatch(climber), StickButton.RIGHT_11, ButtonActionType.WHEN_PRESSED);
 
     // Shoot from tarmac edge
     io.bind(new ShootNoVision1(driveTrain, shooter, ballIntake), Button.kB, StickButton.LEFT_10, ButtonActionType.WHEN_HELD);
     io.bind(new ShootNoVision2(driveTrain, shooter, ballIntake), Button.kA, StickButton.LEFT_11, ButtonActionType.WHEN_HELD);
 
-    io.bindButtonBox(new RemoveLockedAngle(driveTrain), StickButton.RIGHT_11, ButtonActionType.WHEN_PRESSED);
+    io.bindButtonBox(new RemoveLockedAngle(driveTrain), StickButton.RIGHT_9, ButtonActionType.WHEN_PRESSED);
     io.bindButtonBox(new InstantCommand() {
       @Override
       public void initialize() {

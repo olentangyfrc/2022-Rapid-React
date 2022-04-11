@@ -24,7 +24,7 @@ public class PushArmsForwardToPosition extends CommandBase{
 
     @Override
     public void execute(){
-        climber.setArmVoltage();
+        climber.applyArmVoltage();
     }
 
     @Override

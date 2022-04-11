@@ -5,12 +5,9 @@ import java.util.logging.Logger;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
-import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -45,6 +42,7 @@ public class Elevator extends SubsystemBase{
     // Do not change these directly! Use SysID.
     private ProfiledPIDController elevatorController = new ProfiledPIDController(57.839, 0, 0, SPEED_CONSTRAINTS);
     //private ProfiledPIDController elevatorController = new ProfiledPIDController(10.038, 0, 4.1283, SPEED_CONSTRAINTS);
+    private boolean manualMode = false;
 
 
     public void init() throws Exception {
@@ -65,13 +63,14 @@ public class Elevator extends SubsystemBase{
         //Minimum height of the arms in rotations (all the way down).
         minHeight = 0;
         //Maximum height of the arms in rotations (all the way up).
-        maxHeight = 10;
+        maxHeight = 7.89;
 
         //The percent output of the winch motor.
         verticalPercentOutput = 0.2; 
         
         // Set the initial goal to the current position.
         setTargetRotations(getPosition());
+        Shuffleboard.getTab("Climber").addNumber("Elevator height in rotations", this::getPosition);
     }
 
     //NetworkTableEntry targetElevatorPosition = Shuffleboard.getTab("Climber").add("Target Position", 0).withWidget(BuiltInWidgets.kTextView).getEntry();
@@ -79,11 +78,17 @@ public class Elevator extends SubsystemBase{
     @Override
     public void periodic() {
         // Constantly try to adhere to our target position.
-
-        setVoltageToWinchMotor();
+        if(!manualMode) {
+            setVoltageToWinchMotor();
+        }
         SmartDashboard.putNumber("Elevator pos", getPosition());    
 
         //setTargetRotations(targetElevatorPosition.getDouble(0));
+    }
+
+    public void setManualMode(boolean manualMode) {
+        this.manualMode = manualMode;
+        stopWinch();
     }
 
     //Moves the arms up using percent output.
