@@ -9,12 +9,14 @@ import java.net.NetworkInterface;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import com.ctre.phoenix.motorcontrol.can.TalonFX;
+
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.XboxController;
@@ -49,6 +51,7 @@ import frc.robot.subsystems.intake.commands.BringIntakeUp;
 import frc.robot.subsystems.intake.commands.PutIntakeDown;
 import frc.robot.subsystems.intake.commands.StartIntake;
 import frc.robot.subsystems.intake.commands.StopIntake;
+import frc.robot.subsystems.music.MusicSubsystem;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
 import frc.robot.subsystems.shooter.commands.ShootAtSpeed;
 import frc.robot.subsystems.shooter.commands.ShootNoVision1;
@@ -96,6 +99,7 @@ public class SubsystemFactory {
   private ShooterSubsystem shooter;
   private networkTables vision;
   private BallIntake ballIntake;
+  private MusicSubsystem musicSubsystem;
 
   // Should not be used outside of this class!
   private SubsystemFactory() {}
@@ -268,6 +272,21 @@ public class SubsystemFactory {
 
     elevator = new Elevator();
     elevator.init();
+
+    List<TalonFX> musicMotors = List.of(
+      new TalonFX(41),
+      new TalonFX(40),
+      new TalonFX(42),
+      new TalonFX(43)
+    );
+    Map<String, String> songs = Map.of(
+      "Never Gonna Give You Up", "Never Gonna Give You Up.chrp",
+      "Chop Suey", "Chop Suey.chrp",
+      "Wii Sports", "Wii Sports.chrp",
+      "Animal Crossing", "Animal Crossing Theme.chrp"
+    );
+    musicSubsystem = new MusicSubsystem(musicMotors, songs);
+    musicSubsystem.loadSong("Never Gonna Give You Up");
 
     io.bind(new shootBallTeleop(driveTrain, shooter, SubsystemFactory.getInstance().getBallIntake()), XboxController.Button.kX, StickButton.LEFT_1, ButtonActionType.WHEN_HELD);
     io.bind(new ZeroGyro(telemetry.getGyro()), Button.kY, StickButton.LEFT_1, ButtonActionType.WHEN_PRESSED);
