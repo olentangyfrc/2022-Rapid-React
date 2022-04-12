@@ -70,7 +70,7 @@ public class Climber extends SubsystemBase{
     private PIDController leftArmController = new PIDController(130, 0, 0);
     private PIDController rightArmController = new PIDController(130, 0, 0);
     public static final double MAX_ARM_ERROR = 0.05;
-    private static final double ARMS_TOLERANCE = 0.01;
+    private static final double ARMS_TOLERANCE = 0.005;
 
     private static final double LEFT_ARM_OFFSET = 0.189; //proto: 0.0763 comp: 
     private static final double RIGHT_ARM_OFFSET = 0.11; //proto: 0.1837 comp:

@@ -276,10 +276,10 @@ public class SubsystemFactory {
     io.bind(new shootBallTeleop(driveTrain, shooter, SubsystemFactory.getInstance().getBallIntake()), XboxController.Button.kX, StickButton.LEFT_1, ButtonActionType.WHEN_HELD);
     io.bind(new ZeroGyro(telemetry.getGyro()), Button.kY, StickButton.LEFT_1, ButtonActionType.WHEN_PRESSED);
     // Might need to be changed...
-    io.bind(new StartIntake(ballIntake), Button.kRightBumper, StickButton.RIGHT_6, ButtonActionType.WHEN_PRESSED);
-    io.bind(new StopIntake(ballIntake), Button.kRightBumper, StickButton.RIGHT_7, ButtonActionType.WHEN_RELEASED);
+    io.bind(new StartIntake(ballIntake), Button.kRightBumper, StickButton.LEFT_3, ButtonActionType.WHEN_PRESSED);
+    io.bind(new StopIntake(ballIntake), Button.kRightBumper, StickButton.LEFT_2, ButtonActionType.WHEN_RELEASED);
 
-    io.bindButtonBox(new ShootAtSpeed(shooter, ballIntake, 42.6), StickButton.LEFT_6, ButtonActionType.WHEN_HELD);
+    io.bindButtonBox(new ShootAtSpeed(shooter, ballIntake, 42.6), StickButton.LEFT_5, ButtonActionType.WHEN_HELD);
 
     // Climber commands
     // io.bindButtonBox(new ReachForFirstBar(climber, elevator), StickButton.RIGHT_3, ButtonActionType.WHEN_PRESSED);
@@ -291,45 +291,35 @@ public class SubsystemFactory {
     // io.bindButtonBox(new ReachForLastBar(elevator, climber), StickButton.RIGHT_8, ButtonActionType.WHEN_PRESSED);
     // io.bindButtonBox(new ClimbToFinalBar(climber, elevator), StickButton.RIGHT_7, ButtonActionType.WHEN_PRESSED);
 
-    io.bindButtonBox(new ManualArmsBackwards(climber), StickButton.RIGHT_3, ButtonActionType.WHEN_HELD);
-    io.bindButtonBox(new ManualArmsForwards(climber), StickButton.RIGHT_2, ButtonActionType.WHEN_HELD);
+    io.bindButtonBox(new ManualArmsBackwards(climber), StickButton.RIGHT_11, ButtonActionType.WHEN_HELD);
+    io.bindButtonBox(new ManualArmsForwards(climber), StickButton.RIGHT_10, ButtonActionType.WHEN_HELD);
 
-    io.bindButtonBox(new ManualElevatorDown(elevator), StickButton.RIGHT_1, ButtonActionType.WHEN_HELD);
-    io.bindButtonBox(new ManualElevatorUp(elevator), StickButton.RIGHT_5, ButtonActionType.WHEN_HELD);
-
-
-    io.bindButtonBox(new NudgeArmsDown(elevator), StickButton.LEFT_9, ButtonActionType.WHEN_PRESSED);
-    io.bindButtonBox(new NudgeArmsUp(elevator), StickButton.LEFT_8, ButtonActionType.WHEN_PRESSED);
-
-    io.bindButtonBox(new NudgeArmsBackwards(climber), StickButton.LEFT_11, ButtonActionType.WHEN_PRESSED);
-    io.bindButtonBox(new NudgeArmsForwards(climber), StickButton.LEFT_10, ButtonActionType.WHEN_PRESSED);
+    io.bindButtonBox(new ManualElevatorDown(elevator), StickButton.RIGHT_8, ButtonActionType.WHEN_HELD);
+    io.bindButtonBox(new ManualElevatorUp(elevator), StickButton.RIGHT_7, ButtonActionType.WHEN_HELD);
 
     // Lock to hanger
-    io.bindButtonBox(new LockToAngle(driveTrain, Rotation2d.fromDegrees(180)), StickButton.RIGHT_4, ButtonActionType.WHEN_PRESSED);
+    io.bindButtonBox(new EnableBrakeMode(driveTrain), StickButton.LEFT_10, ButtonActionType.WHEN_PRESSED);
+    io.bindButtonBox(new DisableBrakeMode(driveTrain), StickButton.LEFT_11, ButtonActionType.WHEN_PRESSED);
 
-    io.bindButtonBox(new ZeroGyro(telemetry.getGyro()), StickButton.LEFT_5, ButtonActionType.WHEN_PRESSED);
-    io.bindButtonBox(new EnableBrakeMode(driveTrain), StickButton.LEFT_1, ButtonActionType.WHEN_PRESSED);
-    io.bindButtonBox(new DisableBrakeMode(driveTrain), StickButton.LEFT_4, ButtonActionType.WHEN_PRESSED);
-
-    io.bindButtonBox(new PutIntakeDown(ballIntake), StickButton.LEFT_2, ButtonActionType.WHEN_PRESSED);
-    io.bindButtonBox(new BringIntakeUp(ballIntake), StickButton.LEFT_3, ButtonActionType.WHEN_PRESSED);
+    io.bindButtonBox(new PutIntakeDown(ballIntake), StickButton.LEFT_3, ButtonActionType.WHEN_PRESSED);
+    io.bindButtonBox(new BringIntakeUp(ballIntake), StickButton.LEFT_2, ButtonActionType.WHEN_PRESSED);
 
     // Shooter
     // Eject ball
-    io.bindButtonBox(new ShootAtSpeed(shooter, ballIntake, 27), StickButton.LEFT_7, ButtonActionType.WHEN_HELD);
+    io.bindButtonBox(new ShootAtSpeed(shooter, ballIntake, 6), StickButton.LEFT_6, ButtonActionType.WHEN_HELD);
     // io.bindButtonBox(new ToggleLatch(climber), StickButton.RIGHT_11, ButtonActionType.WHEN_PRESSED);
 
     // Shoot from tarmac edge
     io.bind(new ShootNoVision1(driveTrain, shooter, ballIntake), Button.kB, StickButton.LEFT_10, ButtonActionType.WHEN_HELD);
     io.bind(new ShootNoVision2(driveTrain, shooter, ballIntake), Button.kA, StickButton.LEFT_11, ButtonActionType.WHEN_HELD);
 
-    io.bindButtonBox(new RemoveLockedAngle(driveTrain), StickButton.RIGHT_9, ButtonActionType.WHEN_PRESSED);
+    io.bindButtonBox(new RemoveLockedAngle(driveTrain), StickButton.LEFT_1, ButtonActionType.WHEN_PRESSED);
     io.bindButtonBox(new InstantCommand() {
       @Override
       public void initialize() {
         CommandScheduler.getInstance().cancelAll();
       }
-    }, StickButton.RIGHT_10, ButtonActionType.WHEN_PRESSED);
+    }, StickButton.LEFT_9, ButtonActionType.WHEN_PRESSED);
   }
 
   /**

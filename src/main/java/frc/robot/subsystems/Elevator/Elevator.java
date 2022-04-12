@@ -63,7 +63,7 @@ public class Elevator extends SubsystemBase{
         //Minimum height of the arms in rotations (all the way down).
         minHeight = 0;
         //Maximum height of the arms in rotations (all the way up).
-        maxHeight = 7.89;
+        maxHeight = 7.38;
 
         //The percent output of the winch motor.
         verticalPercentOutput = 0.2; 
