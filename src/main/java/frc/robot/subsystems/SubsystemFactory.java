@@ -29,12 +29,6 @@ import frc.robot.subsystems.Climber.commands.ManualArmsBackwards;
 import frc.robot.subsystems.Climber.commands.ManualArmsForwards;
 import frc.robot.subsystems.Climber.commands.NudgeArmsBackwards;
 import frc.robot.subsystems.Climber.commands.NudgeArmsForwards;
-import frc.robot.subsystems.Climber.commands.auton.ClimbToFinalBar;
-import frc.robot.subsystems.Climber.commands.auton.ClimbToFirstBar;
-import frc.robot.subsystems.Climber.commands.auton.ClimbToNextBar;
-import frc.robot.subsystems.Climber.commands.auton.ReachForFirstBar;
-import frc.robot.subsystems.Climber.commands.auton.ReachForLastBar;
-import frc.robot.subsystems.Climber.commands.auton.ReachForNextBar;
 import frc.robot.subsystems.Elevator.Elevator;
 import frc.robot.subsystems.Elevator.commands.ManualElevatorDown;
 import frc.robot.subsystems.Elevator.commands.ManualElevatorUp;
@@ -382,6 +376,14 @@ public class SubsystemFactory {
 
   public BallIntake getBallIntake() {
     return ballIntake;
+  }
+
+  public Climber getClimber() {
+    return climber;
+  }
+
+  public Elevator getElevator() {
+    return elevator;
   }
 
   /**

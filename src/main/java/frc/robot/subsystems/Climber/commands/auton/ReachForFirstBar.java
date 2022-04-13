@@ -5,6 +5,7 @@
 package frc.robot.subsystems.Climber.commands.auton;
 
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.Climber.Climber;
 import frc.robot.subsystems.Climber.commands.PushArmsForwardToPosition;
 import frc.robot.subsystems.Elevator.Elevator;
@@ -19,8 +20,8 @@ public class ReachForFirstBar extends ParallelCommandGroup {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(
-      new PushArmsForwardToPosition(c, 0),
-      new ExtendArmsToPosition(e, 9.4)
+      new PushArmsForwardToPosition(c, 0.143),
+      new ExtendArmsToPosition(e, 7.37)
     );
   }
 }

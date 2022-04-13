@@ -15,17 +15,13 @@ import frc.robot.subsystems.Elevator.commands.ExtendArmsToPosition;
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 public class ReachForNextBar extends SequentialCommandGroup {
   /** Creates a new ReachForNextBar. */
-  public ReachForNextBar(Elevator el, Climber cb) {
+  public ReachForNextBar(Climber c, Elevator e) {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(
-      new ExtendArmsToPosition(el, 1.35),
-      new PushArmsForwardToPosition(cb, 0),
-      new ExtendArmsToPosition(el, -0.89),
-      new PushArmsForwardToPosition(cb, 0.4),
-      new ExtendArmsToPosition(el, 8.09),
-      new PushArmsForwardToPosition(cb, 0.615),
-      new ExtendArmsToPosition(el, 6.31)
+      new PushArmsForwardToPosition(c, 0.45),
+      new ExtendArmsToPosition(e, 6.493),
+      new PushArmsForwardToPosition(c, 0.575)
     );
   }
 }
