@@ -26,11 +26,11 @@ public class Climber extends SubsystemBase{
     //Declaration of right linear actuator.
     private CANSparkMax rightLinearActuator;
     //Right Linear Actuator CAN ID
-    private final int RIGHT_LIN_ACT_CAN = 7; //proto: 20 comp: 47
+    private final int RIGHT_LIN_ACT_CAN = 7;
     //Declaration of left linear actuator.
     private CANSparkMax leftLinearActuator;
     //Left Linear Actuator CAN ID
-    private final int LEFT_LIN_ACT_CAN = 20; //proto: 7 comp: 44
+    private final int LEFT_LIN_ACT_CAN = 20;
     //Sets Motor Type to Brushless according to Neo motors.
     private final CANSparkMaxLowLevel.MotorType MOTOR_TYPE = CANSparkMaxLowLevel.MotorType.kBrushless;
     //Sets right and left linear actuators into break mode.
@@ -67,16 +67,23 @@ public class Climber extends SubsystemBase{
     //Creating a new Shuffleboard Tab
     private ShuffleboardTab tab = Shuffleboard.getTab("Climber");
 
+    //PID controllers for both linear actuators
     private PIDController leftArmController = new PIDController(130, 0, 0);
     private PIDController rightArmController = new PIDController(130, 0, 0);
+    //Max error for linear actuators
     public static final double MAX_ARM_ERROR = 0.05;
+    //Tolerance for linear actuators
     private static final double ARMS_TOLERANCE = 0.005;
 
-    private static final double LEFT_ARM_OFFSET = 0.189; //proto: 0.0763 comp: 
-    private static final double RIGHT_ARM_OFFSET = 0.11; //proto: 0.1837 comp:
+    //Left linear actuator offset for position 0
+    private static final double LEFT_ARM_OFFSET = 0.189;
+    //Right linear actuator offset for position
+    private static final double RIGHT_ARM_OFFSET = 0.11;
 
-    public static final double MAX_ARM_POSITION = 0.72; //proto: 0.95 comp: 
+    //Max position for linear actuators
+    public static final double MAX_ARM_POSITION = 0.72;
 
+    //Target position for linear actuators
     private double targetArmPosition;
 
     //Initialization of the Climber Subsystems
@@ -84,10 +91,13 @@ public class Climber extends SubsystemBase{
         logger.info("Setting Up Climber");
 
         PortManager pm = SubsystemFactory.getInstance().getPortManager();
+        //Initialization of left and right linear actuators
         rightLinearActuator = new CANSparkMax(pm.aquirePort(PortType.CAN, RIGHT_LIN_ACT_CAN, "Right Linear Actuator"), MOTOR_TYPE);
         leftLinearActuator = new CANSparkMax(pm.aquirePort(PortType.CAN, LEFT_LIN_ACT_CAN, "Left Linear Actuator"), MOTOR_TYPE);
+        //Sets the linear actuators to brake mode
         rightLinearActuator.setIdleMode(MOTOR_MODE);
         leftLinearActuator.setIdleMode(MOTOR_MODE);
+        //Initialization of potentiometers
         rightPotentiometer = rightLinearActuator.getAnalog(POTENTIOMETER_MODE);
         leftPotentiometer = leftLinearActuator.getAnalog(POTENTIOMETER_MODE);
         rightLinearActuator.restoreFactoryDefaults();
@@ -95,6 +105,7 @@ public class Climber extends SubsystemBase{
         rightPotentiometer.setPositionConversionFactor(1);
         leftPotentiometer.setPositionConversionFactor(1);
 
+        //Sets the tolerance for the left and right linear actuators
         leftArmController.setTolerance(ARMS_TOLERANCE);
         rightArmController.setTolerance(ARMS_TOLERANCE);
 

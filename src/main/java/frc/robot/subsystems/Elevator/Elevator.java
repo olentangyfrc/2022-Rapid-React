@@ -24,7 +24,7 @@ public class Elevator extends SubsystemBase{
     public static final double MOTOR_ENCODER_TICKS = 2048;
     // Gear ratio between the Falcon 500 motor and the output shaft for the elevator.
     public static final double WINCH_GEAR_RATIO = 20;
-    private static final int WINCH_MOTOR_CAN = 10; //proto: 28 comp: 10
+    private static final int WINCH_MOTOR_CAN = 10;
 
     // The percent output to use for moving the arms forwards and backwards.
     private double verticalPercentOutput;
@@ -82,6 +82,7 @@ public class Elevator extends SubsystemBase{
         SmartDashboard.putNumber("Elevator pos", getPosition());    
     }
 
+    //Sets manual mode
     public void setManualMode(boolean manualMode) {
         this.manualMode = manualMode;
         stopWinch();
