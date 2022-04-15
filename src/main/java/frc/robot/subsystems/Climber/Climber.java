@@ -98,20 +98,30 @@ public class Climber extends SubsystemBase{
         leftArmController.setTolerance(ARMS_TOLERANCE);
         rightArmController.setTolerance(ARMS_TOLERANCE);
 
-        maxRightForwardPosition = 1.05; //proto: 1.12 comp: 0.838
-        minRightBackPosition = 0.0939; //proto: 0.171 comp: 0.111
+        //Max forward position for right linear actuator
+        maxRightForwardPosition = 1.05;
+        //Min back position for right linear actuator
+        minRightBackPosition = 0.0939;
 
-        maxLeftForwardPosition = 1.12; //proto: 1.05 comp: 0.971
-        minLeftBackPosition = 0.171; //proto: 0.0939 comp: 0.24
+        //Max forward position for left linear actuator
+        maxLeftForwardPosition = 1.12;
+        //Min back position for left linear actuator
+        minLeftBackPosition = 0.171;
 
+        //Pneumatics ports for old stationary hooks
         //pinsForward = 1;
         //pinsReverse = 0;
 
+        //Initialization of compressor
         compressor = new Compressor(pm.aquirePort(PortType.CAN, PCMCANID, "Compressor"), PneumaticsModuleType.CTREPCM);
+        //Starts the compressor
         compressor.enableDigital();
+
+        //Initialization of the double solenoid for the pneumatics churros
         // pins = new DoubleSolenoid(PCMCANID, PneumaticsModuleType.CTREPCM, pinsForward, pinsReverse);
         // pins.set(Value.kOff);
 
+        //Want arms to start at position 0
         targetArmPosition = 0;
         // letGoOfBar();
         Shuffleboard.getTab("Climber").addNumber("Arm pos", this::getAverageArmPosition);
@@ -125,6 +135,9 @@ public class Climber extends SubsystemBase{
         SmartDashboard.putNumber("Right arm pos", getRightPotentiometerPosition());
     }
 
+    /**
+     * Move the linear actuator arms forward with percent output
+     */
     public void pushArmsForwardWithPercent(){
         rightLinearActuator.set(0.2);
         leftLinearActuator.set(0.2);
@@ -139,23 +152,40 @@ public class Climber extends SubsystemBase{
         return (getRightPotentiometerPosition() + getLeftPotentiometerPosition()) / 2;
     }
 
+    /**
+     * Sees if the left linear actuator is at the target position
+     * 
+     * @return True if the arm is at the target position, false otherwise
+     */
     public boolean isLeftArmAtPosiiton() {
         return leftArmController.atSetpoint();
     }
 
+    /**
+     * Sees if the right linear actuator is at the target position
+     * 
+     * @return True if the arm is at the target position, false otherwise
+     */
     public boolean isRightArmAtPosition() {
         return rightArmController.atSetpoint();
     }
 
+    /**
+     * Checks to see if both linear actuators are at the target position
+     * 
+     * @return True if the arms are at the target position, false otherwise
+     */
     public boolean armsAtPosition(){
         if (isLeftArmAtPosiiton() && isRightArmAtPosition()) return true;
         return false;
     }
 
+    //Sets the target position for the linear actuators
     public void setTargetArmPosition(double pos){
         targetArmPosition = pos;
     }
 
+    //Caclulates voltage to apply to linear actuators and applies it
     public void applyArmVoltage(){
         double leftPosition = getLeftPotentiometerPosition();
         double rightPosition = getRightPotentiometerPosition();
@@ -167,53 +197,93 @@ public class Climber extends SubsystemBase{
         rightLinearActuator.setVoltage(rightVolts);
     }
 
+    //Moves the arms backwards with percent ouput
     public void pullArmsBackWithPercent(){
         rightLinearActuator.set(-0.2);
         leftLinearActuator.set(-0.2);
     }
 
+    //Latches the stationary hooks onto the bar
     public void latchOntoBar(){
         // pins.set(Value.kForward);
         isLatched = true;
     }
 
+    //The hooks let go of the bar
     public void letGoOfBar(){
         // pins.set(Value.kReverse);
         isLatched = false;
     }
 
+    //Stops the right linear actuator
     public void stopRightLinearActuator(){
         rightLinearActuator.stopMotor();
     }
 
+    //Stops the left linear actuator
     public void stopLeftLinearActuator(){
         leftLinearActuator.stopMotor();
     }
 
+    /**
+     * Returns the position of the right linear actuator
+     * 
+     * @return The position from the right potentiometer
+     */
     public double getRightPotentiometerPosition() {
         return rightPotentiometer.getPosition() - RIGHT_ARM_OFFSET;
     }
 
+    /**
+     * Returns the position of the left linear actuator
+     * 
+     * @return The position from the left potentiometer
+     */
     public double getLeftPotentiometerPosition(){
         return leftPotentiometer.getPosition() - LEFT_ARM_OFFSET;
     }
 
+    /**
+     * Returns the max position of the right linear actuator
+     * 
+     * @return The max position from the right potentiometer
+     */
     public double getRightMaxForwardPosition() {
         return maxRightForwardPosition;
     }
 
+    /**
+     * Returns the max position of the left linear actuator
+     * 
+     * @return The max position from the left potentiometer
+     */
     public double getLeftMaxForwardPosition() {
         return maxLeftForwardPosition;
     }
 
+    /**
+     * Returns the min position of the right linear actuator
+     * 
+     * @return The min position from the right potentiometer
+     */
     public double getRightMinBackPosition() {
         return minRightBackPosition;
     }
 
+    /**
+     * Returns the min position of the left linear actuator
+     * 
+     * @return The min position from the left potentiometer
+     */
     public double getLeftMinBackPosition() {
         return minLeftBackPosition;
     }
 
+    /**
+     * Sees if the hooks are latched onto the bar
+     * 
+     * @return True if the hooks are latched, false otherwise
+     */
     public boolean isLatched() {
         return isLatched;
     }
