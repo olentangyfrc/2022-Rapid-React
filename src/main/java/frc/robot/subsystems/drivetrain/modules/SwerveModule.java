@@ -44,7 +44,7 @@ public abstract class SwerveModule {
      * @param angle angle as a rotation2d
      */
     public void setAngle(Rotation2d angle) {
-        double output = anglePid.calculate(getAngle().getRadians(), angle.getRadians());
+        double output = -anglePid.calculate(getAngle().getRadians(), angle.getRadians());
         setAnglePercentOutput(output);
     }
 
@@ -108,7 +108,7 @@ public abstract class SwerveModule {
      * @return the current state of the module
      */
     public SwerveModuleState getState() {
-        return new SwerveModuleState(getVelocity(), Rotation2d.fromDegrees(-getAngle().getDegrees()));
+        return new SwerveModuleState(getVelocity(), Rotation2d.fromDegrees(getAngle().getDegrees()));
     }
 
     /**

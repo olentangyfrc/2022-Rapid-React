@@ -99,7 +99,7 @@ public class AutonTrajectoryFollower {
         ChassisSpeeds speeds = driveController.calculate(currentPosition, angleCorrectedGoal, goal.getVelocity(), goal.getPosition().getRotation());
         SmartDashboard.putNumber("X Speed: ", speeds.vxMetersPerSecond);
         SmartDashboard.putNumber("Y Speed: ", speeds.vyMetersPerSecond);
-        speeds.omegaRadiansPerSecond = -thetaController.calculate(currentPosition.getRotation().getDegrees(), goal.getPosition().getRotation().getDegrees());
+        speeds.omegaRadiansPerSecond = thetaController.calculate(currentPosition.getRotation().getDegrees(), goal.getPosition().getRotation().getDegrees());
         SmartDashboard.putNumber("Theta Speed: ", speeds.omegaRadiansPerSecond);
         
         return speeds;
