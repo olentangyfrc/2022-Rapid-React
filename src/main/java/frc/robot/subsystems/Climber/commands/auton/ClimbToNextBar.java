@@ -19,10 +19,10 @@ public class ClimbToNextBar extends SequentialCommandGroup {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(
-      new ExtendArmsToPosition(e, 3.142),
-      new PushArmsForwardToPosition(c, 0.06),
-      new ExtendArmsToPosition(e, 0.83),
-      new ExtendArmsToPosition(e, 2.16)
+      new ExtendArmsToPosition(e, 3.46),
+      new PushArmsForwardToPosition(c, 0.076),
+      new ExtendArmsToPosition(e, 0.724),
+      new ExtendArmsToPosition(e, 2.17)
     );
   }
 }

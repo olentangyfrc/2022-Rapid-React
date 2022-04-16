@@ -20,8 +20,8 @@ public class ClimbToFirstBar extends SequentialCommandGroup {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(
-      new ExtendArmsToPosition(e, 0.85),
-      new ExtendArmsToPosition(e, 2.23)
+      new ExtendArmsToPosition(e, 0.724),
+      new ExtendArmsToPosition(e, 2.17)
     );
   }
 }

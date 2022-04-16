@@ -19,8 +19,8 @@ public class ClimbToLastBar extends SequentialCommandGroup {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(
-      new ExtendArmsToPosition(e, 3.32),
-      new PushArmsForwardToPosition(c, 0.0767)
+      new ExtendArmsToPosition(e, 3.834),
+      new PushArmsForwardToPosition(c, 0.06)
     );
   }
 }

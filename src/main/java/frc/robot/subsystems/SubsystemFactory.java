@@ -13,8 +13,6 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import edu.wpi.first.cameraserver.CameraServer;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.XboxController;
@@ -24,23 +22,23 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.IO.ButtonActionType;
 import frc.robot.subsystems.IO.StickButton;
 import frc.robot.subsystems.Climber.Climber;
-import frc.robot.subsystems.Climber.ToggleLatch;
 import frc.robot.subsystems.Climber.commands.ManualArmsBackwards;
 import frc.robot.subsystems.Climber.commands.ManualArmsForwards;
-import frc.robot.subsystems.Climber.commands.NudgeArmsBackwards;
-import frc.robot.subsystems.Climber.commands.NudgeArmsForwards;
+import frc.robot.subsystems.Climber.commands.auton.ClimbToFirstBar;
+import frc.robot.subsystems.Climber.commands.auton.ClimbToLastBar;
+import frc.robot.subsystems.Climber.commands.auton.ClimbToNextBar;
+import frc.robot.subsystems.Climber.commands.auton.ReachForFirstBar;
+import frc.robot.subsystems.Climber.commands.auton.ReachForLastBar;
+import frc.robot.subsystems.Climber.commands.auton.ReachForNextBar;
 import frc.robot.subsystems.Elevator.Elevator;
 import frc.robot.subsystems.Elevator.commands.ManualElevatorDown;
 import frc.robot.subsystems.Elevator.commands.ManualElevatorUp;
-import frc.robot.subsystems.Elevator.commands.NudgeArmsDown;
-import frc.robot.subsystems.Elevator.commands.NudgeArmsUp;
 import frc.robot.subsystems.drivetrain.SingleFalconDrivetrain;
 import frc.robot.subsystems.drivetrain.SparkMaxDrivetrain;
 // Project imports:
 import frc.robot.subsystems.drivetrain.SwerveDrivetrain;
 import frc.robot.subsystems.drivetrain.commands.DisableBrakeMode;
 import frc.robot.subsystems.drivetrain.commands.EnableBrakeMode;
-import frc.robot.subsystems.drivetrain.commands.LockToAngle;
 import frc.robot.subsystems.drivetrain.commands.RemoveLockedAngle;
 import frc.robot.subsystems.intake.BallIntake;
 import frc.robot.subsystems.intake.commands.BringIntakeUp;
@@ -276,14 +274,14 @@ public class SubsystemFactory {
     io.bindButtonBox(new ShootAtSpeed(shooter, ballIntake, 42.6), StickButton.LEFT_5, ButtonActionType.WHEN_HELD);
 
     // Climber commands
-    // io.bindButtonBox(new ReachForFirstBar(climber, elevator), StickButton.RIGHT_3, ButtonActionType.WHEN_PRESSED);
-    // io.bindButtonBox(new ClimbToFirstBar(climber, elevator), StickButton.RIGHT_2, ButtonActionType.WHEN_PRESSED);
+    io.bindButtonBox(new ReachForFirstBar(climber, elevator), StickButton.RIGHT_3, ButtonActionType.WHEN_PRESSED);
+    io.bindButtonBox(new ClimbToFirstBar(climber, elevator), StickButton.RIGHT_6, ButtonActionType.WHEN_PRESSED);
 
-    // io.bindButtonBox(new ReachForNextBar(elevator, climber), StickButton.RIGHT_1, ButtonActionType.WHEN_PRESSED);
-    // io.bindButtonBox(new ClimbToNextBar(climber, elevator), StickButton.RIGHT_5, ButtonActionType.WHEN_PRESSED);
+    io.bindButtonBox(new ReachForNextBar(climber, elevator), StickButton.RIGHT_2, ButtonActionType.WHEN_PRESSED);
+    io.bindButtonBox(new ClimbToNextBar(climber, elevator), StickButton.RIGHT_5, ButtonActionType.WHEN_PRESSED);
 
-    // io.bindButtonBox(new ReachForLastBar(elevator, climber), StickButton.RIGHT_8, ButtonActionType.WHEN_PRESSED);
-    // io.bindButtonBox(new ClimbToFinalBar(climber, elevator), StickButton.RIGHT_7, ButtonActionType.WHEN_PRESSED);
+    io.bindButtonBox(new ReachForLastBar(climber, elevator), StickButton.RIGHT_1, ButtonActionType.WHEN_PRESSED);
+    io.bindButtonBox(new ClimbToLastBar(climber, elevator), StickButton.RIGHT_4, ButtonActionType.WHEN_PRESSED);
 
     io.bindButtonBox(new ManualArmsBackwards(climber), StickButton.RIGHT_11, ButtonActionType.WHEN_HELD);
     io.bindButtonBox(new ManualArmsForwards(climber), StickButton.RIGHT_10, ButtonActionType.WHEN_HELD);

@@ -19,9 +19,9 @@ public class ReachForNextBar extends SequentialCommandGroup {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(
-      new PushArmsForwardToPosition(c, 0.45),
-      new ExtendArmsToPosition(e, 6.493),
-      new PushArmsForwardToPosition(c, 0.575)
+      new PushArmsForwardToPosition(c, 0.476),
+      new ExtendArmsToPosition(e, 6.54),
+      new PushArmsForwardToPosition(c, 0.6)
     );
   }
 }
