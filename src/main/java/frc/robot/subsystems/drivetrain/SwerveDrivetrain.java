@@ -138,10 +138,10 @@ public abstract class SwerveDrivetrain extends SubsystemBase {
     public void drive(ChassisSpeeds speeds, boolean fieldOriented) {
         if(isInBrakeMode) {
             // Rotate all the wheels to point to the center of the bot so we are hard to move.
-            frontLeftModule.updateState(new SwerveModuleState(0, Rotation2d.fromDegrees(315)));
-            frontRightModule.updateState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
-            backLeftModule.updateState(new SwerveModuleState(0, Rotation2d.fromDegrees(225)));
-            backRightModule.updateState(new SwerveModuleState(0, Rotation2d.fromDegrees(135)));
+            frontLeftModule.updateState(new SwerveModuleState(0, Rotation2d.fromDegrees(225)));
+            frontRightModule.updateState(new SwerveModuleState(0, Rotation2d.fromDegrees(145)));
+            backLeftModule.updateState(new SwerveModuleState(0, Rotation2d.fromDegrees(315)));
+            backRightModule.updateState(new SwerveModuleState(0, Rotation2d.fromDegrees(225)));
             return;
         }
         Gyro gyro = SubsystemFactory.getInstance().getTelemetry().getGyro();
