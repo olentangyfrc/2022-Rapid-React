@@ -24,7 +24,7 @@ public class Elevator extends SubsystemBase{
     public static final double MOTOR_ENCODER_TICKS = 2048;
     // Gear ratio between the Falcon 500 motor and the output shaft for the elevator.
     public static final double WINCH_GEAR_RATIO = 20;
-    private static final int WINCH_MOTOR_CAN = 10; //proto: 28 comp: 10
+    private static final int WINCH_MOTOR_CAN = 10;
 
     // The percent output to use for moving the arms forwards and backwards.
     private double verticalPercentOutput;
@@ -63,7 +63,7 @@ public class Elevator extends SubsystemBase{
         //Minimum height of the arms in rotations (all the way down).
         minHeight = 0;
         //Maximum height of the arms in rotations (all the way up).
-        maxHeight = 7.89;
+        maxHeight = 7.38;
 
         //The percent output of the winch motor.
         verticalPercentOutput = 0.2; 
@@ -73,8 +73,6 @@ public class Elevator extends SubsystemBase{
         Shuffleboard.getTab("Climber").addNumber("Elevator height in rotations", this::getPosition);
     }
 
-    //NetworkTableEntry targetElevatorPosition = Shuffleboard.getTab("Climber").add("Target Position", 0).withWidget(BuiltInWidgets.kTextView).getEntry();
-
     @Override
     public void periodic() {
         // Constantly try to adhere to our target position.
@@ -82,10 +80,9 @@ public class Elevator extends SubsystemBase{
             setVoltageToWinchMotor();
         }
         SmartDashboard.putNumber("Elevator pos", getPosition());    
-
-        //setTargetRotations(targetElevatorPosition.getDouble(0));
     }
 
+    //Sets manual mode
     public void setManualMode(boolean manualMode) {
         this.manualMode = manualMode;
         stopWinch();
@@ -106,10 +103,12 @@ public class Elevator extends SubsystemBase{
         winchMotor.stopMotor();
     }
 
+    //Sets the voltage to the elevator using the profiled pid controller
     public void setVoltageToWinchMotor(){
         winchMotor.setVoltage(elevatorController.calculate(getPosition()));
     }
 
+    //Gets the target rotations for the elevator
     public double getTargetRotations() {
         return elevatorController.getGoal().position;
     }
@@ -162,6 +161,7 @@ public class Elevator extends SubsystemBase{
         elevatorController.setGoal(targetRotations);
     }
 
+    //Checks to see if the elevator has reached the target rotations
     public boolean isWinchAtGoal()
     {
        return elevatorController.atGoal();
@@ -182,7 +182,7 @@ public class Elevator extends SubsystemBase{
      * <p>
      * This uses the integrated sensor as it has better support for velocity.
      * 
-     * @return
+     * @return the velocity of the elevator
      */
     public double getVelocity(){
         return winchMotor.getSelectedSensorVelocity() / MOTOR_ENCODER_TICKS / WINCH_GEAR_RATIO;

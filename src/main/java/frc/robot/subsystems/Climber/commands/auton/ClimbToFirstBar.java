@@ -1,30 +1,27 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 package frc.robot.subsystems.Climber.commands.auton;
 
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.Climber.Climber;
-import frc.robot.subsystems.Climber.commands.LatchOntoBar;
 import frc.robot.subsystems.Climber.commands.PushArmsForwardToPosition;
 import frc.robot.subsystems.Elevator.Elevator;
 import frc.robot.subsystems.Elevator.commands.ExtendArmsToPosition;
 
-import java.util.logging.Logger;
-
-public class ClimbToFirstBar extends SequentialCommandGroup{
-    private Climber climber;
-    private Elevator elevator;
-
-    private static Logger logger = Logger.getLogger(ClimbToFirstBar.class.getName());
-    
-    public ClimbToFirstBar(Climber cb, Elevator el){
-        climber = cb;
-        elevator = el;
-        addRequirements(cb, el);
-        logger.info("Climb to First Bar");
-
-        addCommands(
-            new ExtendArmsToPosition(elevator, 0.1),
-            new PushArmsForwardToPosition(climber, 0.089),
-            new LatchOntoBar(climber)
-        );
-    }
+// NOTE:  Consider using this command inline, rather than writing a subclass.  For more
+// information, see:
+// https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
+public class ClimbToFirstBar extends SequentialCommandGroup {
+  /** Creates a new ClimbToFirstBar. */
+  public ClimbToFirstBar(Climber c, Elevator e) {
+    // Add your commands in the addCommands() call, e.g.
+    // addCommands(new FooCommand(), new BarCommand());
+    addCommands(
+      new ExtendArmsToPosition(e, 0.724),
+      new ExtendArmsToPosition(e, 2.17)
+    );
+  }
 }
