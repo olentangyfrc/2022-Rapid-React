@@ -33,7 +33,11 @@ public class rotateToHub extends CommandBase {
     
         // Relative hub position
         Translation2d relativeHubLocation = hubLocation.minus(botLocation);
-
+        //delete this code if offset is not working
+        Translation2d normal_left = new Translation2d( -relativeHubLocation.getY(),  relativeHubLocation.getX());
+        Translation2d offset = normal_left.div(normal_left.getNorm()).times(0.2);
+        relativeHubLocation = relativeHubLocation.plus(offset);
+        //offset is not working
     
         angle = new Rotation2d(Math.atan2(relativeHubLocation.getY(), relativeHubLocation.getX()));
         angle = Rotation2d.fromDegrees(angle.getDegrees());

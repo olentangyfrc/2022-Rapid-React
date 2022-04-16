@@ -53,8 +53,8 @@ public class IO extends SubsystemBase {
     private Logger logger = Logger.getLogger("IO");
     private ShuffleboardTab ioTab = Shuffleboard.getTab("IO");
     
-    private NetworkTableEntry invertForwards = ioTab.add("Invert Forwards", true).withWidget(BuiltInWidgets.kToggleSwitch).getEntry();
-    private NetworkTableEntry invertStrafe = ioTab.add("Invert Strafe", true).withWidget(BuiltInWidgets.kToggleSwitch).getEntry();
+    private NetworkTableEntry invertForwards = ioTab.add("Invert Forwards", false).withWidget(BuiltInWidgets.kToggleSwitch).getEntry();
+    private NetworkTableEntry invertStrafe = ioTab.add("Invert Strafe", false).withWidget(BuiltInWidgets.kToggleSwitch).getEntry();
     private NetworkTableEntry invertRotation = ioTab.add("Invert Rotation", false).withWidget(BuiltInWidgets.kToggleSwitch).getEntry();
     
     public IO() {
@@ -90,15 +90,15 @@ public class IO extends SubsystemBase {
     public double getStrafe() {
         if(invertStrafe.getBoolean(false)) {
             if(inputMethod.equals(InputMethod.XBOX)) {
-                return filterInput(-xbox.getLeftX());
-            } else {
-                return filterInput(-leftStick.getX());
-            }
-        } else {
-            if(inputMethod.equals(InputMethod.XBOX)) {
                 return filterInput(xbox.getLeftX());
             } else {
                 return filterInput(leftStick.getX());
+            }
+        } else {
+            if(inputMethod.equals(InputMethod.XBOX)) {
+                return filterInput(-xbox.getLeftX());
+            } else {
+                return filterInput(-leftStick.getX());
             }
         }
     }
@@ -111,15 +111,15 @@ public class IO extends SubsystemBase {
     public double getForward() {
         if(invertForwards.getBoolean(false)) {
             if(inputMethod.equals(InputMethod.XBOX)) {
-                return filterInput(-xbox.getLeftY());
-            } else {
-                return filterInput(-leftStick.getY());
-            }
-        } else {
-            if(inputMethod.equals(InputMethod.XBOX)) {
                 return filterInput(xbox.getLeftY());
             } else {
                 return filterInput(leftStick.getY());
+            }
+        } else {
+            if(inputMethod.equals(InputMethod.XBOX)) {
+                return filterInput(-xbox.getLeftY());
+            } else {
+                return filterInput(-leftStick.getY());
             }
         } 
     }
@@ -132,15 +132,15 @@ public class IO extends SubsystemBase {
     public double getRotation() {
         if(invertRotation.getBoolean(false)) {
             if(inputMethod.equals(InputMethod.XBOX)) {
-                return filterInput(-xbox.getRightX());
-            } else {
-                return filterInput(-rightStick.getX());
-            }
-        } else {
-            if(inputMethod.equals(InputMethod.XBOX)) {
                 return filterInput(xbox.getRightX());
             } else {
                 return filterInput(rightStick.getX());
+            }
+        } else {
+            if(inputMethod.equals(InputMethod.XBOX)) {
+                return filterInput(-xbox.getRightX());
+            } else {
+                return filterInput(-rightStick.getX());
             }
         }
     }

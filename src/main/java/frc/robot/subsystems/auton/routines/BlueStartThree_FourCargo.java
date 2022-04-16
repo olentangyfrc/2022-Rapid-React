@@ -5,6 +5,7 @@
 package frc.robot.subsystems.auton.routines;
 
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.subsystems.auton.AutonPaths;
 import frc.robot.subsystems.auton.commands.FollowTrajectoryCommand;
 import frc.robot.subsystems.drivetrain.SwerveDrivetrain;
@@ -29,10 +30,11 @@ public class BlueStartThree_FourCargo extends SequentialCommandGroup {
       new ShootBallAuton(drivetrain, shooter, intake, 2),
       //        \/ Wrong \/
       new FollowTrajectoryCommand(drivetrain, paths.getCargo6ToCargo5_3()),
-      new ShootBallAuton(drivetrain, shooter, intake, 1.5)
-      // new FollowTrajectoryCommand(drivetrain, paths.getCargo5ToCargo13_3()),
-      // new WaitCommand(1.5), // Wait for human player to add cargo
-      // new ShootBallAuton(drivetrain, shooter, intake, 2)
+      new ShootBallAuton(drivetrain, shooter, intake, 1.5),
+      new FollowTrajectoryCommand(drivetrain, paths.getCargo5ToCargo13_3()),
+      new WaitCommand(1.5), // Wait for human player to add cargo
+      new FollowTrajectoryCommand(drivetrain, paths.getCargo13ToShootPos_3()),
+      new ShootBallAuton(drivetrain, shooter, intake, 2)
     );
   }
 }
