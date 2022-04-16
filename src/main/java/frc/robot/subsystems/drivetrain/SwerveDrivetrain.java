@@ -39,12 +39,12 @@ public abstract class SwerveDrivetrain extends SubsystemBase {
     public static final double TRACK_WIDTH = 0.4445;
 
     public static final double MAX_LINEAR_SPEED = 3.5; // Meters per second
-    public static final double MAX_LINEAR_ACCELERATION = 1.5; // Meters per second squared
+    public static final double MAX_LINEAR_ACCELERATION = 3.5; // Meters per second squared
     public static final double MAX_ROTATION_SPEED = 15.1; // Radians per second
     public static final double MAX_ROTATION_ACCELERATION = Math.PI; // Radians per second squared
 
     // In meters per second
-    public static final double IS_MOVING_TRANSLATION_TOLERANCE = 0.5;
+    public static final double IS_MOVING_TRANSLATION_TOLERANCE = 3.5;
     // In radians per second
     public static final double IS_MOVING_ROTATION_TOLERANCE = 1;
 

@@ -11,7 +11,7 @@ import frc.robot.subsystems.drivetrain.SwerveDrivetrain;
 
 public class LeaveTarmac extends CommandBase {
   // The amount of time that the robot will drive backwards.
-  public static final double DRIVE_TIME = 1;
+  public static final double DRIVE_TIME = 1.25;
 
   private SwerveDrivetrain drivetrain;
   // The time that the bot started driving in seconds

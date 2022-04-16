@@ -89,7 +89,7 @@ public class SingleFalconModule extends SwerveModule {
      */
     @Override
     public double getVelocity() {
-        return driveMotor.getSelectedSensorVelocity(0) / 2048.0 * 2 * WHEEL_RADIUS * Math.PI * 0.6509;
+        return driveMotor.getSelectedSensorVelocity(0) / 2048.0 * 2 * WHEEL_RADIUS * Math.PI * 0.623;
     }
 
     @Override
