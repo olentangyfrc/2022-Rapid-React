@@ -16,11 +16,15 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.SubsystemFactory;
 import frc.robot.subsystems.Climber.commands.PushArmsForwardToPosition;
 import frc.robot.subsystems.Elevator.commands.ExtendArmsToPosition;
+import frc.robot.subsystems.IO.ButtonActionType;
+import frc.robot.subsystems.IO.StickButton;
 import frc.robot.subsystems.auton.AutonPaths;
 import frc.robot.subsystems.auton.routines.RoutineChooser;
 import frc.robot.subsystems.drivetrain.SwerveDrivetrain;
 import frc.robot.subsystems.intake.BallIntake;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
+import frc.robot.subsystems.shooter.commands.ShootAtSpeed;
+import frc.robot.subsystems.shooter.commands.ShootBallAuton;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -31,10 +35,6 @@ import frc.robot.subsystems.shooter.ShooterSubsystem;
 public class Robot extends TimedRobot {
   private RoutineChooser chooser;
   private CommandBase autonCommand;
-
-  private NetworkTableEntry elevatorPos = Shuffleboard.getTab("Climber").add("Elevator Target Pos", 0.0).withWidget(BuiltInWidgets.kTextView).withSize(2, 1).withPosition(0, 2).getEntry();
-  private NetworkTableEntry armPos = Shuffleboard.getTab("Climber").add("Arms Target Pos", 0.0).withWidget(BuiltInWidgets.kTextView).withSize(2, 1).withPosition(2, 2).getEntry();
-
   
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -54,21 +54,6 @@ public class Robot extends TimedRobot {
     AutonPaths paths = new AutonPaths(new TrajectoryConfig(SwerveDrivetrain.MAX_LINEAR_SPEED - 1, SwerveDrivetrain.MAX_LINEAR_ACCELERATION));
     
     chooser = new RoutineChooser(drivetrain, shooter, intake, paths);
-    
-    Shuffleboard.getTab("Climber").add("Move Elevator", new InstantCommand() {
-      @Override
-      public void initialize() {
-        (new ExtendArmsToPosition(SubsystemFactory.getInstance().getElevator(), elevatorPos.getDouble(0.0))).schedule();
-      }
-    }).withPosition(2, 3).withSize(2, 2);
-
-    Shuffleboard.getTab("Climber").add("Move Arms", new InstantCommand() {
-      @Override
-      public void initialize() {
-        (new PushArmsForwardToPosition(SubsystemFactory.getInstance().getClimber(), armPos.getDouble(0.0))).schedule();
-      }
-    }).withPosition(0, 3).withSize(2, 2);
-
   }
 
   @Override
@@ -80,6 +65,7 @@ public class Robot extends TimedRobot {
   public void autonomousInit() {
     autonCommand = chooser.get();
     autonCommand.schedule();
+    SubsystemFactory.getInstance().getBallIntake().putIntakeDown();
 
     // (new ResetLocation(SubsystemFactory.getInstance().getDrivetrain(), new Pose2d(6.716, 2.487, Rotation2d.fromDegrees(46.762)))).schedule();
     // (new ShootBallAuton(SubsystemFactory.getInstance().getDrivetrain(), SubsystemFactory.getInstance().getShooter(), SubsystemFactory.getInstance().getBallIntake(), 200)).schedule();

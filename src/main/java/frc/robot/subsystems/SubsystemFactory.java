@@ -243,10 +243,10 @@ public class SubsystemFactory {
     portAssignments.put("BR.Encoder", 0);
 
     HashMap<String, Double> wheelOffsets = new HashMap<String, Double>();
-    wheelOffsets.put("FL", 51.1);
-    wheelOffsets.put("FR", 322.77);
-    wheelOffsets.put("BL", 293.53);
-    wheelOffsets.put("BR", 249.6);
+    wheelOffsets.put("FL", 308.9);
+    wheelOffsets.put("FR", 37.23);
+    wheelOffsets.put("BL", 66.47);
+    wheelOffsets.put("BR", 110.4);
 
     // Create and initialize all subsystems:
     CameraServer.startAutomaticCapture(0);

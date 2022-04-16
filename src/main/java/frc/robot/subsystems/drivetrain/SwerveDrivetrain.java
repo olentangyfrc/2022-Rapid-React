@@ -39,9 +39,15 @@ public abstract class SwerveDrivetrain extends SubsystemBase {
     public static final double TRACK_WIDTH = 0.4445;
 
     public static final double MAX_LINEAR_SPEED = 3.5; // Meters per second
-    public static final double MAX_LINEAR_ACCELERATION = 1.5; // Meters per second squared
+    public static final double MAX_LINEAR_ACCELERATION = 3.5; // Meters per second squared
     public static final double MAX_ROTATION_SPEED = 15.1; // Radians per second
     public static final double MAX_ROTATION_ACCELERATION = Math.PI; // Radians per second squared
+
+    // In meters per second
+    public static final double IS_MOVING_TRANSLATION_TOLERANCE = 3.5;
+    // In radians per second
+    public static final double IS_MOVING_ROTATION_TOLERANCE = 1;
+
 
     public PIDController xController;
     public PIDController yController;
@@ -74,10 +80,10 @@ public abstract class SwerveDrivetrain extends SubsystemBase {
 
         // Pass in the coordinates of each wheel relative to the center of the bot.
         kinematics = new SwerveDriveKinematics(
-            new Translation2d(WHEEL_BASE / 2, -TRACK_WIDTH / 2), // FL
-            new Translation2d(WHEEL_BASE / 2, TRACK_WIDTH / 2), // FR
-            new Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2), // BL
-            new Translation2d(-WHEEL_BASE / 2, TRACK_WIDTH / 2) // BR
+            new Translation2d(WHEEL_BASE / 2, TRACK_WIDTH / 2), // FL
+            new Translation2d(WHEEL_BASE / 2, -TRACK_WIDTH / 2), // FR
+            new Translation2d(-WHEEL_BASE / 2, TRACK_WIDTH / 2), // BL
+            new Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2) // BR
         );
 
         odometry = new SwerveDriveOdometry(kinematics, new Rotation2d());
@@ -101,6 +107,7 @@ public abstract class SwerveDrivetrain extends SubsystemBase {
         tab.addNumber("FR angle", () -> frontRightModule.getAngle().getDegrees());
         tab.addNumber("BL angle", () -> backLeftModule.getAngle().getDegrees());
         tab.addNumber("BR angle", () -> backRightModule.getAngle().getDegrees());
+        tab.addBoolean("Is Moving", this::isMoving);
         tab.add(field);
 
     }
@@ -144,17 +151,16 @@ public abstract class SwerveDrivetrain extends SubsystemBase {
                 speeds.vyMetersPerSecond,
                 speeds.omegaRadiansPerSecond, 
                 Rotation2d.fromDegrees(gyro.getAngle())
-                );
+            );
         }
         SmartDashboard.putNumber("Target angle: ", targetAngle);
         if(!Double.isNaN(targetAngle)) {
-            speeds.omegaRadiansPerSecond = -anglePid.calculate(gyro.getAngle());
+            speeds.omegaRadiansPerSecond = anglePid.calculate(gyro.getAngle());
             isAtTargetAngle = anglePid.atSetpoint();
         }
         // Negate the vyMetersPerSecond so that a positive value will drive in the positive y direction. This must be done
         // Because for the wheels, clockwise is positive.
         // TODO: Make counter-clockwise positive for swerve modules.
-        speeds.vyMetersPerSecond = -speeds.vyMetersPerSecond;
         SwerveModuleState[] states = kinematics.toSwerveModuleStates(speeds);
         SwerveDriveKinematics.desaturateWheelSpeeds(states, MAX_LINEAR_SPEED); // Normalize wheel speeds so we don't go faster than 100%
         
@@ -171,6 +177,24 @@ public abstract class SwerveDrivetrain extends SubsystemBase {
         frontRightModule.updateState(SwerveModuleState.optimize(states[1], frontRightModule.getAngle()));
         backLeftModule.updateState(SwerveModuleState.optimize(states[2], backLeftModule.getAngle()));
         backRightModule.updateState(SwerveModuleState.optimize(states[3], backRightModule.getAngle()));
+    }
+
+    /**
+     * Determine if the robot is stopped, or moving very slowly.
+     * <p>
+     * This is mainly for ignoring vision measurements while we are moving.
+     * 
+     * @return
+     */
+    public boolean isMoving() {
+        boolean isMoving = false;
+        ChassisSpeeds speeds = kinematics.toChassisSpeeds(getModuleStates());
+        if(Math.sqrt(Math.pow(speeds.vxMetersPerSecond, 2) + Math.pow(speeds.vyMetersPerSecond, 2)) > IS_MOVING_TRANSLATION_TOLERANCE) {
+            isMoving = true;
+        } else if(Math.abs(speeds.omegaRadiansPerSecond) > IS_MOVING_ROTATION_TOLERANCE) {
+            isMoving = true;
+        }
+        return isMoving;
     }
 
     public SwerveModuleState[] getModuleStates() {

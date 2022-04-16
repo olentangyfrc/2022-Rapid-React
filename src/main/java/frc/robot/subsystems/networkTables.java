@@ -35,6 +35,7 @@ import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.drivetrain.SwerveDrivetrain;
 
 
 
@@ -59,9 +60,12 @@ public class networkTables extends SubsystemBase {
   public class past_object{
     private Pose2d estimate;
     private double timestamp;
-    public past_object(Pose2d estimate, double timestamp){
+    private boolean isMoving;
+
+    public past_object(Pose2d estimate, double timestamp, boolean isMoving){
       this.estimate = estimate;
       this.timestamp = timestamp;
+      this.isMoving = isMoving;
     }
     public Pose2d getEstimatedPosition(){
       return estimate;
@@ -69,6 +73,10 @@ public class networkTables extends SubsystemBase {
     
     public double getFPGATimestamp(){
       return timestamp;
+    }
+
+    public boolean getIsMoving() {
+      return isMoving;
     }
   }
 
@@ -92,7 +100,7 @@ public class networkTables extends SubsystemBase {
   }
 
   
-  public void onVisionUpdate(EntryNotification event ){
+  public void onVisionUpdate(EntryNotification event ) {
     
     //System.out.println("Time changed value: " + event.getEntry().getValue()); //If time is changed, then it records x,y,z
     double elapsedtime = event.getEntry().getDouble(0);
@@ -129,27 +137,44 @@ public class networkTables extends SubsystemBase {
       0, -1, 0);
 
     var corrected_vec = cv2_correction_mat.times(in_vec);
+
+    //SmartDashboard.putNumber("in_vecx", in_vec.get(0, 0));
+    //SmartDashboard.putNumber("in_vecy", in_vec.get(1, 0));
+   // SmartDashboard.putNumber("in_vecz", in_vec.get(2, 0));
+    
+
+
     // Build our rotation matrix
-    var pitch = -28 * Math.PI / 180;
-    var c = Math.cos(pitch);
-    var s = Math.sin(pitch);
+    double pitch = -35 * Math.PI / 180;
+    double c = Math.cos(pitch);
+    double s = Math.sin(pitch);
     var camera_to_bot = Matrix.mat(Nat.N3(), Nat.N3()).fill(
         c, 0, s,
         0, 1, 0,
       -s, 0, c);
 
-    // Rotate
+    // Rotatea
     var corrected_bot_oriented = camera_to_bot.times(corrected_vec);
+    //SmartDashboard.putNumber("corrected_bot_orientedx", corrected_bot_oriented.get(0, 0));
+    // SmartDashboard.putNumber("corrected_bot_orientedy", corrected_bot_oriented.get(1, 0));
+    // SmartDashboard.putNumber("corrected_bot_orientedz", corrected_bot_oriented.get(2, 0));
 
 
-    var trans2_vec = VecBuilder.fill(0.127, -0.315, 0.813); //Change this where we know the displacement of the camera to the center of the robot
 
+    var trans2_vec = VecBuilder.fill(-0.1, -0.315, 0.76); //Change this where we know the displacement of the camera to the center of the robot
+    
     var out_vec = trans2_vec.plus(corrected_bot_oriented);
-    double gyro_angle = 0; //add the heading by multipling by gyro angle
+
+    SmartDashboard.putNumber("out_vecx", out_vec.get(0, 0));
+    SmartDashboard.putNumber("out_vecy", out_vec.get(1, 0));
+    SmartDashboard.putNumber("out_vecz", out_vec.get(2, 0));
+
+    
+
     
     
    
-    gyro_angle = getPastPose(elapsedtime).getEstimatedPosition().getRotation().getRadians();
+    double gyro_angle = getPastPose(elapsedtime).getEstimatedPosition().getRotation().getRadians();
     c = Math.cos(gyro_angle);
     s = Math.sin(gyro_angle);
     var bot_to_field = Matrix.mat(Nat.N3(), Nat.N3()).fill(
@@ -157,6 +182,12 @@ public class networkTables extends SubsystemBase {
         s, c, 0,
         0, 0, 1);
     var final_vec = bot_to_field.times(out_vec);
+    SmartDashboard.putNumber("past_gryo", gyro_angle);
+
+
+    SmartDashboard.putNumber("final_vecx", final_vec.get(0, 0));
+    SmartDashboard.putNumber("final_vecy", final_vec.get(1, 0));
+    SmartDashboard.putNumber("final_vecz", final_vec.get(2, 0));
     
     var hub_coordinates = VecBuilder.fill( 8.255, 4.103, 2.64);
 
@@ -177,13 +208,15 @@ public class networkTables extends SubsystemBase {
        past_object.estimate = addTranslation(past_object.estimate, o2vtranslation);
       }
 
-      Pose2d final_position = addTranslation(odometry.getPoseMeters(), o2vtranslation);
+      Pose2d final_position = addTranslation(SubsystemFactory.getInstance().getDrivetrain().getLocation(), o2vtranslation);
       
 
       SmartDashboard.putNumber("posx", final_position.getX());
       SmartDashboard.putNumber("posy", final_position.getY());
       // final_position = new Pose2d(position.get(0, 0), position.get(1,0), gyro.getRotation2d());
-      odometry.resetPosition(final_position, gyro.getRotation2d());
+      if(!getPastPose(elapsedtime).getIsMoving()) {
+        odometry.resetPosition(final_position, gyro.getRotation2d());
+      }
       SmartDashboard.putNumber("Difference in LastVision",  final_position.getTranslation().minus(last_visionmeasurement.getTranslation()).getNorm());
       if(0.20 > final_position.getTranslation().minus(last_visionmeasurement.getTranslation()).getNorm()){
         laststabletime = Timer.getFPGATimestamp();
@@ -215,7 +248,7 @@ public class networkTables extends SubsystemBase {
         return past_positions.get(i);
       }
     } 
-    return new past_object(new Pose2d(), 0.0);
+    return new past_object(new Pose2d(), 0.0, false);
   }
 
   public double getDistanceFromHub() {
@@ -227,10 +260,11 @@ public class networkTables extends SubsystemBase {
   
   @Override
   public void periodic() { //called every 2 milliseconds
+    SwerveDrivetrain drivetrain = SubsystemFactory.getInstance().getDrivetrain();
     
     if (past_positions.size()>100)
       past_positions.remove(0);
-    past_positions.add(new past_object(odometry.getPoseMeters(), Timer.getFPGATimestamp()));
+    past_positions.add(new past_object(drivetrain.getLocation(), Timer.getFPGATimestamp(), drivetrain.isMoving()));
    
     
   }
