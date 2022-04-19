@@ -24,6 +24,8 @@ public class AutonPaths {
     private AutonTrajectory cargo6ToCargo5_2;
     private AutonTrajectory cargo5ToCargo13_2;
 
+    private AutonTrajectory startB3ToCargo6_short_3;
+
     private AutonTrajectory startB3ToCargo6_3;
     private AutonTrajectory cargo6ToCargo5_3;
     private AutonTrajectory cargo5ToCargo13_3;
@@ -38,6 +40,8 @@ public class AutonPaths {
     private AutonTrajectory startR3ToCargo12_6;
     private AutonTrajectory cargo12ToCargo11_6;
     private AutonTrajectory cargo11ToCargo14_6;
+
+    private AutonTrajectory startB2ToCargo5_7;
 
     public AutonPaths(TrajectoryConfig config) {
         loadTrajectories(config);
@@ -58,6 +62,12 @@ public class AutonPaths {
             config
         );
 
+        startB2ToCargo5_7 = new AutonTrajectory(
+            START_B2,
+            new Pose2d(5.608, 2.163, Rotation2d.fromDegrees(202.835)),
+            config
+        );
+
         cargo6ToCargo5_2 = new AutonTrajectory(
             new Pose2d(7.28, 0.856, Rotation2d.fromDegrees(298.549)),
             new Pose2d(5.532, 1.628, Rotation2d.fromDegrees(147.531)),
@@ -75,6 +85,13 @@ public class AutonPaths {
                 START_B3,
                 new Pose2d(7.819, 0.776, Rotation2d.fromDegrees(250.957)),
                 new Pose2d(5.026, 0.778, Rotation2d.fromDegrees(52.504))
+            ),
+            config
+        );
+
+        startB3ToCargo6_short_3 = new AutonTrajectory(List.of(
+                START_B3,
+                new Pose2d(7.819, 0.776, Rotation2d.fromDegrees(250.957))
             ),
             config
         );
@@ -204,5 +221,11 @@ public class AutonPaths {
         return cargo11ToCargo14_6;
     }
 
-    
+    public AutonTrajectory getStartB3ToCargo6_short_3() {
+        return startB3ToCargo6_short_3;
+    }
+
+    public AutonTrajectory getStartB2ToCargo5_7() {
+        return startB2ToCargo5_7;
+    }
 }
