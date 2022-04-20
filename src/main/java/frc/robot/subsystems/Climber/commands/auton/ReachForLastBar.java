@@ -6,7 +6,6 @@ package frc.robot.subsystems.Climber.commands.auton;
 
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.Climber.Climber;
-import frc.robot.subsystems.Climber.commands.LatchOntoBar;
 import frc.robot.subsystems.Climber.commands.PushArmsForwardToPosition;
 import frc.robot.subsystems.Elevator.Elevator;
 import frc.robot.subsystems.Elevator.commands.ExtendArmsToPosition;
@@ -16,20 +15,15 @@ import frc.robot.subsystems.Elevator.commands.ExtendArmsToPosition;
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 public class ReachForLastBar extends SequentialCommandGroup {
   /** Creates a new ReachForLastBar. */
-  public ReachForLastBar(Elevator e, Climber c) {
+  public ReachForLastBar(Climber c, Elevator e) {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(
-      new ExtendArmsToPosition(e, 0.015 - 0.15),
-      new PushArmsForwardToPosition(c, 0.1),
-      new LatchOntoBar(c),
-      new ExtendArmsToPosition(e, 1.7),
       new PushArmsForwardToPosition(c, 0),
-      new ExtendArmsToPosition(e, -0.88),
-      new PushArmsForwardToPosition(c, 0.4),
-      new ExtendArmsToPosition(e, 8.9),
-      new PushArmsForwardToPosition(c, 0.67),
-      new ExtendArmsToPosition(e, 6.5)
+      new ExtendArmsToPosition(e, 0),
+      new PushArmsForwardToPosition(c, 0.473),
+      new ExtendArmsToPosition(e, 6.5),
+      new PushArmsForwardToPosition(c, 0.62)
     );
   }
 }

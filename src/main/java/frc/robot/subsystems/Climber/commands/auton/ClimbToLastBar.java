@@ -4,11 +4,8 @@
 
 package frc.robot.subsystems.Climber.commands.auton;
 
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.subsystems.Climber.Climber;
-import frc.robot.subsystems.Climber.commands.LetGoOfBar;
 import frc.robot.subsystems.Climber.commands.PushArmsForwardToPosition;
 import frc.robot.subsystems.Elevator.Elevator;
 import frc.robot.subsystems.Elevator.commands.ExtendArmsToPosition;
@@ -16,20 +13,14 @@ import frc.robot.subsystems.Elevator.commands.ExtendArmsToPosition;
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
-public class ClimbToFinalBar extends SequentialCommandGroup {
-  /** Creates a new ClimbToFinalBar. */
-  public ClimbToFinalBar(Climber c, Elevator e) {
+public class ClimbToLastBar extends SequentialCommandGroup {
+  /** Creates a new ClimbToLastBar. */
+  public ClimbToLastBar(Climber c, Elevator e) {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(
-      new LetGoOfBar(c),
-      new ParallelCommandGroup(
-          new ExtendArmsToPosition(e, 5),
-          new SequentialCommandGroup(
-              new WaitCommand(0.4),
-              new PushArmsForwardToPosition(c, 0)
-          )
-      )
+      new ExtendArmsToPosition(e, 3.834),
+      new PushArmsForwardToPosition(c, 0.06)
     );
   }
 }
