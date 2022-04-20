@@ -53,6 +53,7 @@ import frc.robot.subsystems.intake.commands.BringIntakeUp;
 import frc.robot.subsystems.intake.commands.PutIntakeDown;
 import frc.robot.subsystems.intake.commands.StartIntake;
 import frc.robot.subsystems.intake.commands.StopIntake;
+import frc.robot.subsystems.leds.Led_Lights;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
 import frc.robot.subsystems.shooter.commands.ShootAtSpeed;
 import frc.robot.subsystems.shooter.commands.ShootNoVision1;
@@ -100,6 +101,7 @@ public class SubsystemFactory {
   private ShooterSubsystem shooter;
   private networkTables vision;
   private BallIntake ballIntake;
+  private Led_Lights leds;
 
   // Should not be used outside of this class!
   private SubsystemFactory() {}
@@ -256,6 +258,8 @@ public class SubsystemFactory {
     wheelOffsets.put("BL", 293.53);
     wheelOffsets.put("BR", 249.6);
 
+    leds = new Led_Lights(0);
+
     // Create and initialize all subsystems:
     CameraServer.startAutomaticCapture(0);
     driveTrain = new SingleFalconDrivetrain();
@@ -399,6 +403,10 @@ public class SubsystemFactory {
    */
   public ShooterSubsystem getShooter() {
     return shooter;
+  }
+
+  public Led_Lights getLeds() {
+    return leds;
   }
 
   /**
