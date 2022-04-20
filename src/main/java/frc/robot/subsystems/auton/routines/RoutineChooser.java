@@ -21,17 +21,18 @@ public class RoutineChooser {
 
     private SendableChooser<CommandBase> autonChooser;
     
-    private NetworkTableEntry xPosEntry = Shuffleboard.getTab(TAB_NAME).add("X Position", 0.0).withWidget(BuiltInWidgets.kTextView).getEntry();
-    private NetworkTableEntry yPosEntry = Shuffleboard.getTab(TAB_NAME).add("Y Position", 0.0).withWidget(BuiltInWidgets.kTextView).getEntry();
-    private NetworkTableEntry anglePosEntry = Shuffleboard.getTab(TAB_NAME).add("Bot Angle in Degrees", 0.0).withWidget(BuiltInWidgets.kTextView).getEntry();
+    private NetworkTableEntry xPosEntry = Shuffleboard.getTab(TAB_NAME).add("X Position", 0.0).withWidget(BuiltInWidgets.kTextView).withPosition(0, 2).getEntry();
+    private NetworkTableEntry yPosEntry = Shuffleboard.getTab(TAB_NAME).add("Y Position", 0.0).withWidget(BuiltInWidgets.kTextView).withPosition(1, 2).getEntry();
+    private NetworkTableEntry anglePosEntry = Shuffleboard.getTab(TAB_NAME).add("Bot Angle in Degrees", 0.0).withWidget(BuiltInWidgets.kTextView).withPosition(2, 2).getEntry();
     
     public RoutineChooser(SwerveDrivetrain drivetrain, ShooterSubsystem shooter, BallIntake intake, AutonPaths paths) {
         autonChooser = new SendableChooser<CommandBase>();
         autonChooser.setDefaultOption("None", new WaitCommand(0));
         autonChooser.addOption("BlueStartOne_TwoCargo", new BlueStartOne_TwoCargo(drivetrain, intake, shooter, paths));
-        autonChooser.addOption("BlueStartTwo_FourCargo", new BlueStartTwo_FourCargo(drivetrain, intake, shooter, paths));
+        autonChooser.addOption("BlueStartTwo_TwoCargo", new BlueStartTwo_TwoCargo(drivetrain, intake, shooter, paths));
         autonChooser.addOption("BlueStartThree_FourCargo", new BlueStartThree_FourCargo(drivetrain, intake, shooter, paths));
-        //autonChooser.addOption("ShootAndMoveBack", new ShootAndMoveBack(drivetrain, shooter, intake, new Pose2d(xPosEntry.getDouble(0.0), yPosEntry.getDouble(0.0), Rotation2d.fromDegrees(anglePosEntry.getDouble(0.0)))));
+        autonChooser.addOption("BlueStartThree_ThreeCargo", new BlueStartThree_ThreeCargo(drivetrain, intake, shooter, paths));
+        autonChooser.addOption("BlueStartThree_TwoCargo", new BlueStartThree_TwoCargo(drivetrain, intake, shooter, paths));
         autonChooser.addOption("ShootAndMoveBack", new CommandBase() {
             @Override
             public void initialize() {
