@@ -249,7 +249,9 @@ public class SubsystemFactory {
     wheelOffsets.put("BR", 110.4);
 
     // Create and initialize all subsystems:
-    CameraServer.startAutomaticCapture(0);
+    CameraServer.startAutomaticCapture(0).setFPS(15);
+    
+
     driveTrain = new SingleFalconDrivetrain();
     driveTrain.init(portAssignments, wheelOffsets);
 
