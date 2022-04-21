@@ -105,13 +105,13 @@ public class AutonPaths {
 
         cargo5ToCargo13_3 = new AutonTrajectory(List.of(
             new Pose2d(3.18, 1.753, Rotation2d.fromDegrees(30.959)),
-            new Pose2d(1.157, 1.53, Rotation2d.fromDegrees(221.924))),
+            new Pose2d(1.083, 1.493, Rotation2d.fromDegrees(221.924))),
             config
         );
 
         cargo13ToShootPos_3 = new AutonTrajectory(
-            new Pose2d(1.157, 1.53, Rotation2d.fromDegrees(221.924)),
-            new Pose2d(1.877, 1.723, Rotation2d.fromDegrees(30.781)),
+            new Pose2d(1.083, 1.493, Rotation2d.fromDegrees(221.924)),
+            new Pose2d(3.577, 2.154, Rotation2d.fromDegrees(25.237)),
             config
         );
 
