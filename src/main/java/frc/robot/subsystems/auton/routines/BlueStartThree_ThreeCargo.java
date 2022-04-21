@@ -18,9 +18,9 @@ import frc.robot.subsystems.shooter.commands.ShootBallAuton;
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
-public class BlueStartThree_FourCargo extends SequentialCommandGroup {
+public class BlueStartThree_ThreeCargo extends SequentialCommandGroup {
   /** Creates a new BlueStartOne_TwoCargo. */
-  public BlueStartThree_FourCargo(SwerveDrivetrain drivetrain, BallIntake intake, ShooterSubsystem shooter, AutonPaths paths) {
+  public BlueStartThree_ThreeCargo(SwerveDrivetrain drivetrain, BallIntake intake, ShooterSubsystem shooter, AutonPaths paths) {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(
@@ -28,13 +28,8 @@ public class BlueStartThree_FourCargo extends SequentialCommandGroup {
       new StartIntake(intake),
       new FollowTrajectoryCommand(drivetrain, paths.getStartB3ToCargo6_3()),
       new ShootBallAuton(drivetrain, shooter, intake, 1.2),
-      //        \/ Wrong \/
       new FollowTrajectoryCommand(drivetrain, paths.getCargo6ToCargo5_3()),
-      new ShootBallAuton(drivetrain, shooter, intake, 0.7),
-      new FollowTrajectoryCommand(drivetrain, paths.getCargo5ToCargo13_3()),
-      new WaitCommand(1), // Wait for human player to add cargo
-      new FollowTrajectoryCommand(drivetrain, paths.getCargo13ToShootPos_3()),
-      new ShootBallAuton(drivetrain, shooter, intake, 2)
+      new ShootBallAuton(drivetrain, shooter, intake, 1)
     );
   }
 }

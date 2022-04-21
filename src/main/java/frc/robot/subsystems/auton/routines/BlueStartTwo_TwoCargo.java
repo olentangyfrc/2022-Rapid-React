@@ -5,7 +5,6 @@
 package frc.robot.subsystems.auton.routines;
 
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.subsystems.auton.AutonPaths;
 import frc.robot.subsystems.auton.commands.FollowTrajectoryCommand;
 import frc.robot.subsystems.drivetrain.SwerveDrivetrain;
@@ -18,22 +17,15 @@ import frc.robot.subsystems.shooter.commands.ShootBallAuton;
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
-public class BlueStartThree_FourCargo extends SequentialCommandGroup {
-  /** Creates a new BlueStartOne_TwoCargo. */
-  public BlueStartThree_FourCargo(SwerveDrivetrain drivetrain, BallIntake intake, ShooterSubsystem shooter, AutonPaths paths) {
+public class BlueStartTwo_TwoCargo extends SequentialCommandGroup {
+  /** Creates a new BlueStartTwo_TwoCargo. */
+  public BlueStartTwo_TwoCargo(SwerveDrivetrain drivetrain, BallIntake intake, ShooterSubsystem shooter, AutonPaths paths) {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(
-      new ResetLocation(drivetrain, paths.getStartB3ToCargo6_3().getStartPosition()),
+      new ResetLocation(drivetrain, paths.getStartB2ToCargo5_7().getStartPosition()),
       new StartIntake(intake),
-      new FollowTrajectoryCommand(drivetrain, paths.getStartB3ToCargo6_3()),
-      new ShootBallAuton(drivetrain, shooter, intake, 1.2),
-      //        \/ Wrong \/
-      new FollowTrajectoryCommand(drivetrain, paths.getCargo6ToCargo5_3()),
-      new ShootBallAuton(drivetrain, shooter, intake, 0.7),
-      new FollowTrajectoryCommand(drivetrain, paths.getCargo5ToCargo13_3()),
-      new WaitCommand(1), // Wait for human player to add cargo
-      new FollowTrajectoryCommand(drivetrain, paths.getCargo13ToShootPos_3()),
+      new FollowTrajectoryCommand(drivetrain, paths.getStartB2ToCargo5_7()),
       new ShootBallAuton(drivetrain, shooter, intake, 2)
     );
   }

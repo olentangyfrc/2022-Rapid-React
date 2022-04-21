@@ -253,7 +253,9 @@ public class SubsystemFactory {
     leds = new Led_Lights(0);
 
     // Create and initialize all subsystems:
-    CameraServer.startAutomaticCapture(0);
+    CameraServer.startAutomaticCapture(0).setFPS(15);
+    
+
     driveTrain = new SingleFalconDrivetrain();
     driveTrain.init(portAssignments, wheelOffsets);
 
