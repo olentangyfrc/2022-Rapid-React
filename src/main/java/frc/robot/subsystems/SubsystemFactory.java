@@ -245,10 +245,10 @@ public class SubsystemFactory {
     portAssignments.put("BR.Encoder", 0);
 
     HashMap<String, Double> wheelOffsets = new HashMap<String, Double>();
-    wheelOffsets.put("FL", 308.9);
-    wheelOffsets.put("FR", 37.23);
-    wheelOffsets.put("BL", 66.47);
-    wheelOffsets.put("BR", 110.4);
+    wheelOffsets.put("FL", 308.5);
+    wheelOffsets.put("FR", 38.05);
+    wheelOffsets.put("BL", 66.62);
+    wheelOffsets.put("BR", 246.75);
 
     leds = new Led_Lights(0);
 

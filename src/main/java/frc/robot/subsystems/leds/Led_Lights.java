@@ -4,7 +4,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-import java.sql.Driver;
 
 import edu.wpi.first.wpilibj.DriverStation;
 
@@ -31,13 +30,14 @@ public class Led_Lights extends SubsystemBase {
 
   @Override
   public void periodic() {
+    
     switch(DriverStation.getAlliance()) {
       case Red:
         if(isShooting) {
           set(RED_SHOT_CODE);
         } else {
           set(RED_DEFAULT_CODE);
-          SmartDashboard.putBoolean("Red on", true);
+  
         }
         break;
       case Blue:
@@ -46,6 +46,9 @@ public class Led_Lights extends SubsystemBase {
         } else {
           set(BLUE_DEFAULT_CODE);
         }
+        
+        break;
+
       default:
         if(isShooting) {
           set(WHITE_SHOT_CODE);

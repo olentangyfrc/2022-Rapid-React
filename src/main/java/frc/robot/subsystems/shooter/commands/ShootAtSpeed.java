@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.subsystems.intake.BallIntake;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
+import frc.robot.subsystems.SubsystemFactory;
 
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
@@ -36,5 +37,7 @@ public class ShootAtSpeed extends SequentialCommandGroup {
     super.end(interrupted);
     shooter.stop();
     shooter.stopTrigger();
+    SubsystemFactory.getInstance().getLeds().setIsShooting(false);
+
   }
 }
