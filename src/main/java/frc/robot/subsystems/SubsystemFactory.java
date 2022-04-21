@@ -45,6 +45,7 @@ import frc.robot.subsystems.intake.commands.BringIntakeUp;
 import frc.robot.subsystems.intake.commands.PutIntakeDown;
 import frc.robot.subsystems.intake.commands.StartIntake;
 import frc.robot.subsystems.intake.commands.StopIntake;
+import frc.robot.subsystems.leds.Led_Lights;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
 import frc.robot.subsystems.shooter.commands.ShootAtSpeed;
 import frc.robot.subsystems.shooter.commands.ShootNoVision1;
@@ -92,6 +93,7 @@ public class SubsystemFactory {
   private ShooterSubsystem shooter;
   private networkTables vision;
   private BallIntake ballIntake;
+  private Led_Lights leds;
 
   // Should not be used outside of this class!
   private SubsystemFactory() {}
@@ -243,10 +245,12 @@ public class SubsystemFactory {
     portAssignments.put("BR.Encoder", 0);
 
     HashMap<String, Double> wheelOffsets = new HashMap<String, Double>();
-    wheelOffsets.put("FL", 308.9);
-    wheelOffsets.put("FR", 37.23);
-    wheelOffsets.put("BL", 66.47);
-    wheelOffsets.put("BR", 110.4);
+    wheelOffsets.put("FL", 308.5);
+    wheelOffsets.put("FR", 38.05);
+    wheelOffsets.put("BL", 66.62);
+    wheelOffsets.put("BR", 246.75);
+
+    leds = new Led_Lights(0);
 
     // Create and initialize all subsystems:
     CameraServer.startAutomaticCapture(0).setFPS(15);
@@ -391,6 +395,10 @@ public class SubsystemFactory {
    */
   public ShooterSubsystem getShooter() {
     return shooter;
+  }
+
+  public Led_Lights getLeds() {
+    return leds;
   }
 
   /**

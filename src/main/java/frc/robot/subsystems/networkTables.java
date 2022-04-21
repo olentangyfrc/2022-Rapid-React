@@ -141,11 +141,12 @@ public class networkTables extends SubsystemBase {
     //SmartDashboard.putNumber("in_vecx", in_vec.get(0, 0));
     //SmartDashboard.putNumber("in_vecy", in_vec.get(1, 0));
    // SmartDashboard.putNumber("in_vecz", in_vec.get(2, 0));
+
     
 
 
     // Build our rotation matrix
-    double pitch = -35 * Math.PI / 180;
+    double pitch = -39 * Math.PI / 180;
     double c = Math.cos(pitch);
     double s = Math.sin(pitch);
     var camera_to_bot = Matrix.mat(Nat.N3(), Nat.N3()).fill(

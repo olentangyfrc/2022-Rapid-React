@@ -22,6 +22,7 @@ import frc.robot.subsystems.auton.AutonPaths;
 import frc.robot.subsystems.auton.routines.RoutineChooser;
 import frc.robot.subsystems.drivetrain.SwerveDrivetrain;
 import frc.robot.subsystems.intake.BallIntake;
+import frc.robot.subsystems.leds.Led_Lights;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
 import frc.robot.subsystems.shooter.commands.ShootAtSpeed;
 import frc.robot.subsystems.shooter.commands.ShootBallAuton;
@@ -35,6 +36,7 @@ import frc.robot.subsystems.shooter.commands.ShootBallAuton;
 public class Robot extends TimedRobot {
   private RoutineChooser chooser;
   private CommandBase autonCommand;
+
   
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -64,6 +66,8 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     autonCommand = chooser.get();
+    //SubsystemFactory.getInstance().getPdp().setSwitchableChannel(true);
+
     autonCommand.schedule();
     SubsystemFactory.getInstance().getBallIntake().putIntakeDown();
 
@@ -81,6 +85,8 @@ public class Robot extends TimedRobot {
     if(autonCommand != null) {
       autonCommand.cancel();
     }
+    //SubsystemFactory.getInstance().getPdp().setSwitchableChannel(true);
+
   }
 
   @Override
@@ -89,7 +95,9 @@ public class Robot extends TimedRobot {
   }
   
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {
+    //SubsystemFactory.getInstance().getPdp().setSwitchableChannel(false);
+  }
 
   @Override
   public void disabledPeriodic() {}
@@ -98,6 +106,8 @@ public class Robot extends TimedRobot {
 
   @Override
   public void testInit() {
+    //SubsystemFactory.getInstance().getPdp().setSwitchableChannel(true);
+
   }
   
   @Override

@@ -30,6 +30,7 @@ public class shootBallTeleop extends SequentialCommandGroup {
         super.end(interrupted);
         shooter.stop();
         shooter.stopTrigger();
+        SubsystemFactory.getInstance().getLeds().setIsShooting(false);
     }
 
 }
