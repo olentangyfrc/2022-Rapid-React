@@ -49,9 +49,10 @@ public class AutonPaths {
 
     private void loadTrajectories(TrajectoryConfig config) {
         // Routine 1
-        startB1ToCargo3_1 = new AutonTrajectory(
+        startB1ToCargo3_1 = new AutonTrajectory(List.of(
             START_B1,
-            new Pose2d(5.499, 5.778, Rotation2d.fromDegrees(133.004)),
+            new Pose2d(5.151, 6.095, Rotation2d.fromDegrees(133.004)),
+            new Pose2d(5.916, 5.374, Rotation2d.fromDegrees(321.877))),
             config
         );
 

@@ -37,7 +37,7 @@ public class DriveCommand extends CommandBase {
       io.getRotation() * SwerveDrivetrain.MAX_ROTATION_SPEED
     );
   
-    drivetrain.drive(speeds, drivetrain.getFieldOriented());
+    drivetrain.drive(speeds, !io.isLeftBumperPressed());
 
   }
 
