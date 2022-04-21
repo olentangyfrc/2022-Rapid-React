@@ -98,7 +98,7 @@ public class AutonPaths {
 
         cargo6ToCargo5_3 = new AutonTrajectory(List.of(
             new Pose2d(5.026, 0.778, Rotation2d.fromDegrees(52.504)),
-            new Pose2d(4.887, 1.432, Rotation2d.fromDegrees(86.525)),
+            new Pose2d(4.936, 1.58, Rotation2d.fromDegrees(86.525)),
             new Pose2d(3.18, 1.753, Rotation2d.fromDegrees(30.959))),
             config
         );
