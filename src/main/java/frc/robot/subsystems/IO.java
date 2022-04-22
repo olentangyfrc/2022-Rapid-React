@@ -175,6 +175,10 @@ public class IO extends SubsystemBase {
         }
     }
 
+    public boolean isLeftBumperPressed() {
+        return xbox.getLeftBumper();
+    }
+
     public void bind(Command command, Button xboxButton, StickButton stickButton, ButtonActionType type) throws Exception {
         GenericHID joystick;
         int button;
