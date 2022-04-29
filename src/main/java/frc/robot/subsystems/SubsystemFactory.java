@@ -244,9 +244,9 @@ public class SubsystemFactory {
 
     HashMap<String, Double> wheelOffsets = new HashMap<String, Double>();
     wheelOffsets.put("FL", 308.9);
-    wheelOffsets.put("FR", 37.23);
+    wheelOffsets.put("FR", 39.37);
     wheelOffsets.put("BL", 66.47);
-    wheelOffsets.put("BR", 110.4);
+    wheelOffsets.put("BR", 248.1);
 
     // Create and initialize all subsystems:
     CameraServer.startAutomaticCapture(0);
