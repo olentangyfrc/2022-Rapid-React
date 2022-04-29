@@ -141,11 +141,12 @@ public class networkTables extends SubsystemBase {
     //SmartDashboard.putNumber("in_vecx", in_vec.get(0, 0));
     //SmartDashboard.putNumber("in_vecy", in_vec.get(1, 0));
    // SmartDashboard.putNumber("in_vecz", in_vec.get(2, 0));
+
     
 
 
     // Build our rotation matrix
-    double pitch = -35 * Math.PI / 180;
+    double pitch = -39 * Math.PI / 180;
     double c = Math.cos(pitch);
     double s = Math.sin(pitch);
     var camera_to_bot = Matrix.mat(Nat.N3(), Nat.N3()).fill(
@@ -204,26 +205,26 @@ public class networkTables extends SubsystemBase {
       //var o2vtransform = new Transform2d(o2vtranslation, new Rotation2d(0));
       SmartDashboard.putNumber("offset", o2vtranslation.getX()); 
 
-      for (past_object past_object : past_positions) {
-       past_object.estimate = addTranslation(past_object.estimate, o2vtranslation);
-      }
-
-      Pose2d final_position = addTranslation(SubsystemFactory.getInstance().getDrivetrain().getLocation(), o2vtranslation);
-      
-
-      SmartDashboard.putNumber("posx", final_position.getX());
-      SmartDashboard.putNumber("posy", final_position.getY());
-      // final_position = new Pose2d(position.get(0, 0), position.get(1,0), gyro.getRotation2d());
       if(!getPastPose(elapsedtime).getIsMoving()) {
+        for (past_object past_object : past_positions) {
+          past_object.estimate = addTranslation(past_object.estimate, o2vtranslation);
+        }
+
+        Pose2d final_position = addTranslation(SubsystemFactory.getInstance().getDrivetrain().getLocation(), o2vtranslation);
+        
+
+        SmartDashboard.putNumber("posx", final_position.getX());
+        SmartDashboard.putNumber("posy", final_position.getY());
+        // final_position = new Pose2d(position.get(0, 0), position.get(1,0), gyro.getRotation2d());
         odometry.resetPosition(final_position, gyro.getRotation2d());
+        SmartDashboard.putNumber("Difference in LastVision",  final_position.getTranslation().minus(last_visionmeasurement.getTranslation()).getNorm());
+        if(0.20 > final_position.getTranslation().minus(last_visionmeasurement.getTranslation()).getNorm()){
+          laststabletime = Timer.getFPGATimestamp();
+        }
+        last_visionmeasurement = final_position;
+        lastVisionTime = Timer.getFPGATimestamp();
+        SmartDashboard.putNumber("Last Vision Time", lastVisionTime);
       }
-      SmartDashboard.putNumber("Difference in LastVision",  final_position.getTranslation().minus(last_visionmeasurement.getTranslation()).getNorm());
-      if(0.20 > final_position.getTranslation().minus(last_visionmeasurement.getTranslation()).getNorm()){
-        laststabletime = Timer.getFPGATimestamp();
-      }
-      last_visionmeasurement = final_position;
-      lastVisionTime = Timer.getFPGATimestamp();
-      SmartDashboard.putNumber("Last Vision Time", lastVisionTime);
 
     }
 

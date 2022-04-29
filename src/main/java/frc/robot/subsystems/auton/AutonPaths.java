@@ -49,9 +49,10 @@ public class AutonPaths {
 
     private void loadTrajectories(TrajectoryConfig config) {
         // Routine 1
-        startB1ToCargo3_1 = new AutonTrajectory(
+        startB1ToCargo3_1 = new AutonTrajectory(List.of(
             START_B1,
-            new Pose2d(5.499, 5.778, Rotation2d.fromDegrees(133.004)),
+            new Pose2d(5.151, 6.095, Rotation2d.fromDegrees(133.004)),
+            new Pose2d(5.916, 5.374, Rotation2d.fromDegrees(321.877))),
             config
         );
 
@@ -98,20 +99,20 @@ public class AutonPaths {
 
         cargo6ToCargo5_3 = new AutonTrajectory(List.of(
             new Pose2d(5.026, 0.778, Rotation2d.fromDegrees(52.504)),
-            new Pose2d(4.887, 1.432, Rotation2d.fromDegrees(86.525)),
+            new Pose2d(4.936, 1.58, Rotation2d.fromDegrees(86.525)),
             new Pose2d(3.18, 1.753, Rotation2d.fromDegrees(30.959))),
             config
         );
 
         cargo5ToCargo13_3 = new AutonTrajectory(List.of(
             new Pose2d(3.18, 1.753, Rotation2d.fromDegrees(30.959)),
-            new Pose2d(1.157, 1.53, Rotation2d.fromDegrees(221.924))),
+            new Pose2d(1.083, 1.493, Rotation2d.fromDegrees(221.924))),
             config
         );
 
         cargo13ToShootPos_3 = new AutonTrajectory(
-            new Pose2d(1.157, 1.53, Rotation2d.fromDegrees(221.924)),
-            new Pose2d(1.877, 1.723, Rotation2d.fromDegrees(30.781)),
+            new Pose2d(1.083, 1.493, Rotation2d.fromDegrees(221.924)),
+            new Pose2d(3.577, 2.154, Rotation2d.fromDegrees(25.237)),
             config
         );
 

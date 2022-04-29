@@ -2,6 +2,7 @@ package frc.robot.subsystems.shooter.commands;
 
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import frc.robot.subsystems.SubsystemFactory;
 import frc.robot.subsystems.drivetrain.SwerveDrivetrain;
 import frc.robot.subsystems.intake.BallIntake;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
@@ -36,6 +37,7 @@ public class ShootBallAuton extends SequentialCommandGroup {
         super.end(interrupted);
         shooter.stop();
         shooter.stopTrigger();
+        SubsystemFactory.getInstance().getLeds().setIsShooting(false);
     }
 
 }
