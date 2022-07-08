@@ -6,6 +6,9 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 
+/**
+ * This is a container for all of the paths that the robot will follow.
+ */
 public class AutonPaths {
 
     // Blue alliance starts

@@ -17,7 +17,10 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-/** Add your docs here. */
+/**
+ * This is used to calculate speeds at certain times while following a trajectory.
+ * 
+ */
 public class AutonTrajectoryFollower {
     
     private AutonTrajectory trajectory;
@@ -65,43 +68,11 @@ public class AutonTrajectoryFollower {
         AutonTrajectoryState goal = trajectory.sample(time);
         Pose2d currentPosition = positionSupplier.get();
 
-        // Pose2d angleCorrectedPosition = new Pose2d(currentPosition.getTranslation(), goal.getReferenceAngle());
-
-        // // Calculate bot-oriented speeds to follow trajectory
-        // ChassisSpeeds speeds = driveController.calculate(angleCorrectedPosition, goal.getPosition(), goal.getVelocity(), goal.getPosition().getRotation());
-
-        
-        // // Rotate the vector so that it is field oriented and we don't have to worry about rotation.
-        // //Vector2d translation = new Vector2d(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond); // bot-oriented
-        // double desiredVelocity = Math.sqrt(Math.pow(speeds.vxMetersPerSecond, 2) + Math.pow(speeds.vyMetersPerSecond, 2));
-        // // System.out.println("X Translation: " + translation.x);
-        // // System.out.println("Y Translation: " + translation.y);
-        // // translation.rotate(goal.getReferenceAngle().getDegrees()); // rotate to field-oriented
-        // // System.out.println("REFERENCE ANGLE: " + goal.getReferenceAngle().getDegrees());
-
-        // double xCorrection = xController.calculate(currentPosition.getX(), goal.getPosition().getX());
-        // double yCorrection = yController.calculate(currentPosition.getY(), goal.getPosition().getY());
-
-
-        // speeds.vxMetersPerSecond = desiredVelocity * Math.cos(goal.getReferenceAngle().getRadians()) + xCorrection;
-        // speeds.vyMetersPerSecond = desiredVelocity * Math.sin(goal.getReferenceAngle().getRadians()) + yCorrection;
-
-        
-        SmartDashboard.putNumber("Current X: ", currentPosition.getX());
-        SmartDashboard.putNumber("Current Y: ", currentPosition.getY());
-        SmartDashboard.putNumber("Current Angle: ", currentPosition.getRotation().getDegrees());
-        
-        SmartDashboard.putNumber("Target X: ", goal.getPosition().getX());
-        SmartDashboard.putNumber("Target Y: ", goal.getPosition().getY());
-        SmartDashboard.putNumber("Target Angle: ", goal.getPosition().getRotation().getDegrees());
-        // Fake the angle so that robot is facing direction of travel.
+        // Fake the angle so that robot is facing direction of travel so the wpi trajectory doesn't get mad.
         Pose2d angleCorrectedGoal = new Pose2d(goal.getPosition().getTranslation(), goal.getReferenceAngle());
         ChassisSpeeds speeds = driveController.calculate(currentPosition, angleCorrectedGoal, goal.getVelocity(), goal.getPosition().getRotation());
-        SmartDashboard.putNumber("X Speed: ", speeds.vxMetersPerSecond);
-        SmartDashboard.putNumber("Y Speed: ", speeds.vyMetersPerSecond);
+        // Calculate radians per second on our own because we rotate separately.
         speeds.omegaRadiansPerSecond = thetaController.calculate(currentPosition.getRotation().getDegrees(), goal.getPosition().getRotation().getDegrees());
-        SmartDashboard.putNumber("Theta Speed: ", speeds.omegaRadiansPerSecond);
-        
         return speeds;
     }
 

@@ -12,7 +12,9 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 
-/** Add your docs here. */
+/**
+ * This class defines an autonomous trajectory made up of individual straight line segments.
+ */
 public class AutonTrajectory {
     private List<AutonTrajectorySegment> segments;
 
@@ -50,9 +52,9 @@ public class AutonTrajectory {
     public AutonTrajectoryState sample(double seconds) {
         // Determine which segment of the trajectory we are on:
         AutonTrajectorySegment currentSegment = null;
-        // Total seconds in all the previous segments.
-        double totalSeconds = 0;
+        double totalSeconds = 0; // Total seconds in all the previous segments.
         for(AutonTrajectorySegment segment : segments) {
+            // Check if we are currently following this segment
             if(seconds - totalSeconds <= segment.getTotalTimeSeconds()) {
                 currentSegment = segment;
                 break;
@@ -66,8 +68,10 @@ public class AutonTrajectory {
             return new AutonTrajectoryState(0, pos, new Rotation2d());
         }
 
-        double secondsInTrajectory = seconds - totalSeconds;
-        Trajectory.State state = currentSegment.getWpiTrajectory().sample(secondsInTrajectory);
+        // How many seconds we are into following this segment
+        double secondsInSegment = seconds - totalSeconds;
+        Trajectory.State state = currentSegment.getWpiTrajectory().sample(secondsInSegment);
+        // We do rotation seperately from the wpi trajectory so that we can more effectively utilize our swerve drivetrain.
         Pose2d angleCorrectedPose = new Pose2d(state.poseMeters.getTranslation(), currentSegment.getAngle());
 
         return new AutonTrajectoryState(state.velocityMetersPerSecond, angleCorrectedPose, currentSegment.getReferenceAngle());
@@ -76,7 +80,7 @@ public class AutonTrajectory {
     /**
      * Get the total time in seconds to follow this trajectory.
      * 
-     * @return The total time in seconds to follow this trajectory.
+     * @return The cumulative time to follow all of the segments in this trajectory
      */
     public double getTotalTimeSeconds() {
         double sum = 0;
@@ -96,10 +100,20 @@ public class AutonTrajectory {
         return timeSeconds > getTotalTimeSeconds();
     }
 
+    /**
+     * Get a list of all of the segments in this trajectory
+     * 
+     * @return
+     */
     public List<AutonTrajectorySegment> getSegments() {
         return segments;
     }
 
+    /**
+     * Get the position that the robot should be in to start following this trajectory.
+     * 
+     * @return The position as a Pose2d
+     */
     public Pose2d getStartPosition() {
         return segments.get(0).getStart();
     }

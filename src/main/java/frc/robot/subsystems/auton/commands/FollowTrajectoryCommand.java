@@ -1,21 +1,21 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot.subsystems.auton.commands;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+
 import frc.robot.subsystems.auton.AutonTrajectory;
 import frc.robot.subsystems.auton.AutonTrajectoryFollower;
 import frc.robot.subsystems.drivetrain.SwerveDrivetrain;
 
+/**
+ * This Command will make the robot's drivetrain follow a trajectory.
+ */
 public class FollowTrajectoryCommand extends CommandBase {
   
   private SwerveDrivetrain drivetrain;
   private AutonTrajectory trajectory;
-  private AutonTrajectoryFollower follower;
+  private AutonTrajectoryFollower follower; // This will be used to calculate the wheel output for the drivetrain
   
   // The time that the bot starts following the trajectory in seconds
   private double startTime;

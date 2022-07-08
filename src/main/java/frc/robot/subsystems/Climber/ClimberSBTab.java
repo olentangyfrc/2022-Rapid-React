@@ -6,6 +6,9 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import frc.robot.subsystems.Elevator.Elevator;
 import frc.robot.subsystems.Elevator.commands.ExtendArmsToPosition;
 
+/**
+ * This manages the shuffleboard tab for the climber subsystem
+ */
 public class ClimberSBTab {
     public Climber climber;
     public Elevator elevator;

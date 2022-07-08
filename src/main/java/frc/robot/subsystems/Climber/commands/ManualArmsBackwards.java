@@ -7,6 +7,13 @@ package frc.robot.subsystems.Climber.commands;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Climber.Climber;
 
+/**
+ * Manually move the arms backwards by retracting the linear actuators.
+ * <p>
+ * This works by setting the arms' target position to the minimum forwards position until this command ends.
+ * <p>
+ * This command doesn't end on its own.
+ */
 public class ManualArmsBackwards extends CommandBase {
   private Climber c;
 
@@ -25,13 +32,15 @@ public class ManualArmsBackwards extends CommandBase {
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {   
+  public void execute() {  
+    // Make sure that the arms actually move 
     c.applyArmVoltage();
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
+    // Set the target position to the current position so the arms don't move anymore
     c.setTargetArmPosition(c.getAverageArmPosition());
     c.stopLeftLinearActuator();
     c.stopRightLinearActuator();

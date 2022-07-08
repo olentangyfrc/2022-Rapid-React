@@ -7,11 +7,14 @@ package frc.robot.subsystems.auton;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 
-/** Add your docs here. */
+/**
+ * The robot's desired state at a given time while following a trajectory
+ */
 public class AutonTrajectoryState {
 
-    // Velocity in meters per second
+    // Velocity of the robot in meters per second
     private double velocity;
+    // Position of the robot on the field
     private Pose2d position;
     // The angle of the segment we are currently on. will be used to convert to field oriented.
     private Rotation2d referenceAngle;

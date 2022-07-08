@@ -13,13 +13,16 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 
-/** Add your docs here. */
+/**
+ * A single straight line segment that will be a part of an AutonTrajecotry
+ */
 public class AutonTrajectorySegment {
-    private Trajectory wpiTrajectory;
+    private Trajectory wpiTrajectory; // This is just used for the x and y position, not rotation
     private Rotation2d endAngle; // The desired angle at the end of this segment.
     private Pose2d start;
     private Pose2d end;
 
+    // The angle between the start position and the end position
     private Rotation2d referenceAngle;
 
     /**
@@ -55,10 +58,20 @@ public class AutonTrajectorySegment {
         return endAngle;
     }
 
+    /**
+     * Get the reference angle, which is the angle between the start position and the end position
+     * 
+     * @return the reference angle
+     */
     public Rotation2d getReferenceAngle() {
         return referenceAngle;
     }
 
+    /**
+     * Get the trajectory from wpi's library which is only used for position
+     * 
+     * @return the wpi trajectory
+     */
     public Trajectory getWpiTrajectory() {
         return wpiTrajectory;
     }

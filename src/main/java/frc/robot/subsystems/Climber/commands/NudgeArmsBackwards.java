@@ -4,6 +4,9 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Climber.Climber;
 
+/**
+ * Slightly decrease the arms' target position to move them back a very small amount.
+ */
 public class NudgeArmsBackwards extends CommandBase{
     public static final double NUDGE_AMOUNT = 0.05;
     private Climber climber;
@@ -15,6 +18,7 @@ public class NudgeArmsBackwards extends CommandBase{
     
     @Override
     public void initialize(){
+      // Make sure we don't try to go too far back.
       double newPosition = MathUtil.clamp(climber.getAverageArmPosition() - NUDGE_AMOUNT, 0, Climber.MAX_ARM_POSITION);
       climber.setTargetArmPosition(newPosition);
     }

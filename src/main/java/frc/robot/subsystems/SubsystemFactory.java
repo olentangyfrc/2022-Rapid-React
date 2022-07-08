@@ -305,7 +305,6 @@ public class SubsystemFactory {
     // Shooter
     // Eject ball
     io.bindButtonBox(new ShootAtSpeed(shooter, ballIntake, 25), StickButton.LEFT_6, ButtonActionType.WHEN_HELD);
-    // io.bindButtonBox(new ToggleLatch(climber), StickButton.RIGHT_11, ButtonActionType.WHEN_PRESSED);
 
     // Shoot from tarmac edge
     io.bind(new ShootNoVision1(driveTrain, shooter, ballIntake), Button.kB, StickButton.LEFT_10, ButtonActionType.WHEN_HELD);
