@@ -1,7 +1,3 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot.subsystems.drivetrain;
 
 import java.util.Map;
@@ -12,6 +8,9 @@ import frc.robot.subsystems.PortManager.PortType;
 import frc.robot.subsystems.SubsystemFactory;
 import frc.robot.subsystems.drivetrain.modules.CANSparkMaxModule;
 
+/**
+ * A drivetrain with 4 CANSparkMax swerver modules
+ */
 public class SparkMaxDrivetrain extends SwerveDrivetrain {
 
     @Override
@@ -22,6 +21,7 @@ public class SparkMaxDrivetrain extends SwerveDrivetrain {
         thetaController = new PIDController(1, 0, 0);
 
         PortManager portManager = SubsystemFactory.getInstance().getPortManager();
+        
         // Initialize swerve modules
         frontLeftModule = new CANSparkMaxModule(
             portManager.aquirePort(PortType.CAN, portAssignments.get("FL.SwerveMotor"), "FL.SwerveMotor"),

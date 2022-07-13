@@ -97,6 +97,7 @@ public class SingleFalconModule extends SwerveModule {
         driveMotor.setVoltage(voltage);
     }
 
+    // auto generated
     @Override
     public boolean equals(Object obj) {
         if (this == obj)
