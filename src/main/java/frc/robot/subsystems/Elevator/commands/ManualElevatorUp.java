@@ -1,16 +1,23 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot.subsystems.Elevator.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Elevator.Elevator;
 
+/**
+ * This command will extend the climbing arms slowly while it is active.
+ * <p>
+ * This does not end on its own
+ */
 public class ManualElevatorUp extends CommandBase {
   private Elevator elevator;
 
-  /** Creates a new ManualElevatorUp. */
+  /**
+   * Create a new ManualElevatorUp command.
+   * <p>
+   * This command does not end on its own.
+   * 
+   * @param elevator The elevator subsystem to move
+   */
   public ManualElevatorUp(Elevator elevator) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.elevator = elevator;
@@ -20,20 +27,20 @@ public class ManualElevatorUp extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    // Set the target position to the maximum extended position so that the arms will start extending
     elevator.setTargetRotations(elevator.getMaxHeight());
   }
-
-  // Called every time the scheduler runs while the command is scheduled.
-  @Override
-  public void execute() {}
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
+    // Set the target position to whatever the current position is so the elevator will no longer move.
     elevator.setTargetRotations(elevator.getPosition());
   }
 
-  // Returns true when the command should end.
+  /**
+   * This command does not end on its own
+   */
   @Override
   public boolean isFinished() {
     return false;

@@ -15,15 +15,17 @@ import frc.robot.subsystems.PortManager;
 import frc.robot.subsystems.PortManager.PortType;
 import frc.robot.subsystems.SubsystemFactory;
 
+/**
+ * The Elevator Subsystem controls the extension and retraction of the climbing arms
+ */
 public class Elevator extends SubsystemBase{
     private static Logger logger = Logger.getLogger(Elevator.class.getName());
 
-    // The maximum position error for the elevatorController in rotations.
-    //public static final double MAX_ERROR = 0.1;
     // The ticks per revolution of the Falcon 500
     public static final double MOTOR_ENCODER_TICKS = 2048;
     // Gear ratio between the Falcon 500 motor and the output shaft for the elevator.
     public static final double WINCH_GEAR_RATIO = 20;
+
     private static final int WINCH_MOTOR_CAN = 10;
 
     // The percent output to use for moving the arms forwards and backwards.
@@ -41,12 +43,12 @@ public class Elevator extends SubsystemBase{
     private final TrapezoidProfile.Constraints SPEED_CONSTRAINTS = new TrapezoidProfile.Constraints(6, 4);
     // Do not change these directly! Use SysID.
     private ProfiledPIDController elevatorController = new ProfiledPIDController(57.839, 0, 0, SPEED_CONSTRAINTS);
-    //private ProfiledPIDController elevatorController = new ProfiledPIDController(10.038, 0, 4.1283, SPEED_CONSTRAINTS);
+
+    // In manual mode, the elevator does not try to move on its own
     private boolean manualMode = false;
 
 
     public void init() throws Exception {
-        logger.info("Setting Up Elevator");
         //PortManager makes sure that a port is not used for two different objects.
         PortManager pm = SubsystemFactory.getInstance().getPortManager();
 
@@ -68,55 +70,74 @@ public class Elevator extends SubsystemBase{
         //The percent output of the winch motor.
         verticalPercentOutput = 0.2; 
         
-        // Set the initial goal to the current position.
+        // Set the initial goal to the current position so we don't try to move.
         setTargetRotations(getPosition());
+
+        // Display the elevator height to shuffleboard
         Shuffleboard.getTab("Climber").addNumber("Elevator height in rotations", this::getPosition);
     }
 
     @Override
     public void periodic() {
-        // Constantly try to adhere to our target position.
+        // Constantly try to adhere to our target position unless we're in manual mode
         if(!manualMode) {
             setVoltageToWinchMotor();
         }
-        SmartDashboard.putNumber("Elevator pos", getPosition());    
     }
 
-    //Sets manual mode
+    /**
+     * Sets manual mode
+     * 
+     * @param manualMode true to enable manual mode, false to disable
+     */
     public void setManualMode(boolean manualMode) {
         this.manualMode = manualMode;
         stopWinch();
     }
 
-    //Moves the arms up using percent output.
+    /**
+     * Causes the arms to start extending
+     */
     public void extendArms() {
         winchMotor.set(verticalPercentOutput);
     }
 
-    //Moves the arms down using percent output.
+    /**
+     * Causes the arms to start retracting
+     */
     public void retractArms() {
         winchMotor.set(-verticalPercentOutput);
     }
 
-    //Stops the winch motor.
+    /**
+     * Stop the winch motor
+     */
     public void stopWinch(){
         winchMotor.stopMotor();
     }
 
-    //Sets the voltage to the elevator using the profiled pid controller
+    /**
+     * Sets the voltage to the elevator using the profiled pid controller
+     */
     public void setVoltageToWinchMotor(){
         winchMotor.setVoltage(elevatorController.calculate(getPosition()));
     }
 
-    //Gets the target rotations for the elevator
+    /**
+     * Get the target position of the elevator
+     * 
+     * @return The target position of the elevator in rotations of the gear
+     */
     public double getTargetRotations() {
         return elevatorController.getGoal().position;
     }
 
     /**
      * Set the percent output of the winch motor.
+     * <p>
+     * If output is outside the range [-1, 1], no action will be taken.
      * 
-     * @param verticalPercentOutput The percent output (-1 to 1)
+     * @param verticalPercentOutput The percent output [-1 to 1]
      */
     public void setVerticalPercentOutput(double output) {
         if(output <= 1 && output >= -1) {
@@ -161,9 +182,12 @@ public class Elevator extends SubsystemBase{
         elevatorController.setGoal(targetRotations);
     }
 
-    //Checks to see if the elevator has reached the target rotations
-    public boolean isWinchAtGoal()
-    {
+    /**
+     * Determine if the elevator has reached its target position
+     * 
+     * @return true if the elevator has reached its target position
+     */
+    public boolean isWinchAtGoal() {
        return elevatorController.atGoal();
     }
 
@@ -180,7 +204,7 @@ public class Elevator extends SubsystemBase{
     /**
      * Get the current velocity of the winch motor in rotations per second.
      * <p>
-     * This uses the integrated sensor as it has better support for velocity.
+     * This uses the integrated sensor of the winch motor as it has better support for velocity.
      * 
      * @return the velocity of the elevator
      */
