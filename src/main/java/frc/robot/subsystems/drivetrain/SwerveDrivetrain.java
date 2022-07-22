@@ -24,7 +24,9 @@ import frc.robot.subsystems.drivetrain.commands.DriveCommand;
 import frc.robot.subsystems.drivetrain.modules.SwerveModule;
 import frc.robot.subsystems.telemetry.Pigeon;
 
-
+/**
+ * A SwerveDrivetrain subsystem represents a drivetrain with four swerve modules.
+ */
 public abstract class SwerveDrivetrain extends SubsystemBase {
 
     // Declaring Swerve Modules
