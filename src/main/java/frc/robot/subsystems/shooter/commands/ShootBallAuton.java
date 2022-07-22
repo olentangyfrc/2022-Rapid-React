@@ -7,10 +7,14 @@ import frc.robot.subsystems.drivetrain.SwerveDrivetrain;
 import frc.robot.subsystems.intake.BallIntake;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
 
+/**
+ * Prepare to shoot by speeding up our flywheel and turning to the hub, then feed a ball to our flywheel
+ * <p>
+ * This is different from shootBallTeleop because it ends on its own after a given amount of time.
+ */
 public class ShootBallAuton extends SequentialCommandGroup {
 
     private ShooterSubsystem shooter;
-    private BallIntake intake;
     
     /**
      * Shoot balls during autonomous
@@ -29,7 +33,6 @@ public class ShootBallAuton extends SequentialCommandGroup {
         );
 
         this.shooter = shooterSubsystem;
-        this.intake = intake;
     }
 
     @Override

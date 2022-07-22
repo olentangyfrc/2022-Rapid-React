@@ -7,10 +7,8 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.PortManager;
 import frc.robot.subsystems.PortManager.PortType;
@@ -18,7 +16,7 @@ import frc.robot.subsystems.SubsystemFactory;
 import frc.robot.subsystems.SubsystemFactory.BotType;
 
 /**
- * 
+ * This subsystem controls the flywheel and trigger wheel of the robot.
  */
 public class ShooterSubsystem extends SubsystemBase {
 
@@ -28,10 +26,11 @@ public class ShooterSubsystem extends SubsystemBase {
     private WPI_TalonFX triggerWheel;
 
     private double targetSpeed = 0;
-    private double previousTriggerSpeed = 0;
 
+    // units per rotation of the flywheel encoder
     private final int sensorUnitsPerRotation = 2048;
 
+    // Used to help the flywheel reach a target speed
     private SimpleMotorFeedforward feedForward;
     private PIDController pid;
     
@@ -41,17 +40,13 @@ public class ShooterSubsystem extends SubsystemBase {
 
     private boolean isStopped = true;
     private boolean isFlywheelAtSetpoint = false;
-    private TriggerWheelState triggerState = TriggerWheelState.EMPTY;
-
-    // For tuning purposes only
-    // Target speed in rps
 
     /**
      *  Initalizes the shooter subsystem. THIS FUNCTION MUST BE CALLED BEFORE THE SUBSYSTEM WILL WORK!
-     * @param botType The current bot type of the bot that the shooter subsytem is being initialized on
+     * 
+     * @param botType The current bot type of the bot that the shooter subsystem is being initialized on. ex: prototype bot or competition bot
      * @throws Exception Throws an exception if the fly wheel and trigger wheel ports are already taken or do not exist
      */
-
     public void init(BotType botType) throws Exception {
         final double Ks;
         final double Kv;
@@ -85,11 +80,6 @@ public class ShooterSubsystem extends SubsystemBase {
         pid.setTolerance(1.2);
         flyWheel.setSelectedSensorPosition(0);
 
-        tab.addNumber("Distance from hub: ", () -> {
-            // Bot position: 
-            return SubsystemFactory.getInstance().getVision().getDistanceFromHub();
-        });
-
         tab.addNumber("Current Shooter Speed", this::getFlySpeed);
         tab.addNumber("Target shooter speed", () -> {
             return targetSpeed;
@@ -98,7 +88,8 @@ public class ShooterSubsystem extends SubsystemBase {
 
     /**
      * This function must be called periodically in order for the shooter to run properly
-     * This function sets the voltage of both motors constantly
+     * <p>
+     * This function sets the voltage of both motors constantly unless the shooter is stopped
      */
     public void periodic() {
         if(isStopped) {
@@ -111,20 +102,25 @@ public class ShooterSubsystem extends SubsystemBase {
         }
     }
 
+    /**
+     * Stop the shooter flywheel from applying voltage (it will take a while to slow down)
+     */
     public void stop() {
         isStopped = true;
     }
 
+    /**
+     * Get the current of the trigger wheel motor
+     * 
+     * @return
+     */
     public double getTriggerCurrent() {
         return SubsystemFactory.getInstance().getPdp().getCurrent(8);
     }
-
-    public void takeInBall() {
-        triggerWheel.setVoltage(.75);
-    }
     
     /**
-     * Sets the speed of the fly wheel
+     * Sets the target speed of the fly wheel
+     * 
      * @param targetSpeed The target speed in rps
      */
     public void setSpeed(double targetSpeed) {
@@ -134,25 +130,35 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     /**
+     * Get the speed of the flywheel
+     * 
      * @return The current speed of the fly wheel in rps
      */
     public double getFlySpeed() {
         return -flyWheel.getSelectedSensorVelocity()/sensorUnitsPerRotation*10;
     }
 
+    /**
+     * Get the current speed of the trigger wheel
+     * 
+     * @return The current speed of the trigger wheel
+     */
     public double getTriggerSpeed() {
         return triggerWheel.getSelectedSensorVelocity();
     }
 
-    public double getPreviousTriggerSpeed() {
-        return previousTriggerSpeed;
-    }
-
+    /**
+     * Determine if the flywheel is within tolerance of the target speed
+     * 
+     * @return True if the flywheel is within tolerance of the target speed
+     */
     public boolean isReady() {
         return getFlyWheelState().equals(flyWheelState.ready);
     }
     
     /**
+     * Determine the current state of the flywheel
+     * 
      * @return The active state of the fly wheel
      */
     public flyWheelState getFlyWheelState() {
@@ -172,24 +178,16 @@ public class ShooterSubsystem extends SubsystemBase {
      * Rotates the trigger wheel to move the ball into the fly wheel
      */
     public void shoot() {
-        //This will cause problems. You cannot pause the flow of code. Code is impatient. 
-        // TODO: Fix this.
-        //while (getFlyWheelState().equals(flyWheelState.intermediate)) { System.out.println("Waiting"); }
         triggerWheel.setVoltage(10);
-        previousTriggerSpeed = 10;
     }
 
-    public void setTriggerState(TriggerWheelState state) {
-        triggerState = state;
-    }
-
+    /**
+     * Set the voltage to apply to the trigger wheel
+     * 
+     * @param voltage The voltage to apply to the trigger wheel
+     */
     public void setTriggerVoltage(double voltage) {
         triggerWheel.setVoltage(voltage);
-    }
-
-    public boolean isTriggerMoving() {
-        SmartDashboard.putNumber("Trigger moving", Math.abs(triggerWheel.getSelectedSensorVelocity()));
-        return (int) Math.abs(triggerWheel.getSelectedSensorVelocity()) > 0;
     }
 
     /**
@@ -197,24 +195,31 @@ public class ShooterSubsystem extends SubsystemBase {
      */
     public void stopTrigger() {
         triggerWheel.setVoltage(0);
-        previousTriggerSpeed = 0;
     }
 
+    /**
+     * Stop the fly wheel
+     */
     public void stopFlywheel() {
         setSpeed(0);
         isFlywheelAtSetpoint = false;
     }
-
-    public enum TriggerWheelState {
-        LOADING,
-        HAS_BALL,
-        EMPTY,
-        SHOOTING
-    }
     
+    /**
+     * Used to represent the state of the flywheel
+     */
     private enum flyWheelState {
+        /**
+         * ready means that the flywheel is within tolerance of the target speed
+         */
         ready,
+        /**
+         * intermediate means that the flywheel is currently moving towards its target speed
+         */
         intermediate,
+        /**
+         * off means that the flywheel is off
+         */
         off
     }
 

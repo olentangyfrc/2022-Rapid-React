@@ -15,13 +15,23 @@ import frc.robot.subsystems.networkTables;
 import frc.robot.subsystems.drivetrain.SwerveDrivetrain;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
 
+/**
+ * This command is used as the deadline within the ParallelDeadlineGroup prepareToShoot. It ends
+ * when the robot is facing the hub and the flywheel is at the right speed. If the robot is in teleop,
+ * there is an additional check that assures that vision has received a stable measurement recently.
+ */
 public class WaitToShoot extends CommandBase {
   private SwerveDrivetrain drivetrain;
   private ShooterSubsystem shooter;
 
   private double startTimeSeconds;
 
-  /** Creates a new WaitToShoot. */
+  /**
+   * Create a new WaitToShoot command
+   * 
+   * @param drivetrain The drivetrain that is rotating towards the hub
+   * @param shooter The shooter that is speeding up
+   */
   public WaitToShoot(SwerveDrivetrain drivetrain, ShooterSubsystem shooter) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.drivetrain = drivetrain;
@@ -34,17 +44,10 @@ public class WaitToShoot extends CommandBase {
     startTimeSeconds = Timer.getFPGATimestamp();
   }
 
-  // Called every time the scheduler runs while the command is scheduled.
-  @Override
-  public void execute() {}
-
-  // Called once the command ends or is interrupted.
-  @Override
-  public void end(boolean interrupted) {}
-
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
+    // These are displayed so that when the robot is refusing to shoot, we can see why.
     SmartDashboard.putBoolean("At target angle", drivetrain.atTargetAngle());
     SmartDashboard.putBoolean("Shooter at speed", shooter.isReady());
     SmartDashboard.putBoolean("Vision Ready", (networkTables.getlaststabletime()>startTimeSeconds));

@@ -6,6 +6,10 @@ import frc.robot.subsystems.drivetrain.commands.rotateToHub;
 import frc.robot.subsystems.intake.BallIntake;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
 
+/**
+ * Prepare to shoot at the hub by constantly rotating to the hub and speeding up the flywheel until we are both facing the hub 
+ * and our flywheel is at the correct speed.
+ */
 public class prepareToShoot extends ParallelDeadlineGroup {
     
     public prepareToShoot(SwerveDrivetrain driveTrain, ShooterSubsystem shooterSubsystem, BallIntake intake) {
