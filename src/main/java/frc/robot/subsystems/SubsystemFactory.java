@@ -1,8 +1,4 @@
 
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot.subsystems;
 
 import java.net.NetworkInterface;
@@ -19,6 +15,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.XboxController.Button;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+
 import frc.robot.subsystems.IO.ButtonActionType;
 import frc.robot.subsystems.IO.StickButton;
 import frc.robot.subsystems.Climber.Climber;
@@ -35,7 +32,6 @@ import frc.robot.subsystems.Elevator.commands.ManualElevatorDown;
 import frc.robot.subsystems.Elevator.commands.ManualElevatorUp;
 import frc.robot.subsystems.drivetrain.SingleFalconDrivetrain;
 import frc.robot.subsystems.drivetrain.SparkMaxDrivetrain;
-// Project imports:
 import frc.robot.subsystems.drivetrain.SwerveDrivetrain;
 import frc.robot.subsystems.drivetrain.commands.DisableBrakeMode;
 import frc.robot.subsystems.drivetrain.commands.EnableBrakeMode;
@@ -62,11 +58,8 @@ public class SubsystemFactory {
   // SubsystemFactory is a singleton, so keep a static instance.
   private static SubsystemFactory instance;
 
-  private PowerDistribution pdp;
-  private Climber climber;
-  private Elevator elevator;
   private Logger logger = Logger.getLogger("Subsystem Factory");
-
+  
   /**
    * Map of known bot addresses and respective types
    */
@@ -82,20 +75,26 @@ public class SubsystemFactory {
     "00:80:2F:27:04:C7", BotType.RIO3,
     "00:80:2F:27:04:C6", BotType.RIO3
   );
-
+    
   private BotType botType;
-  private Telemetry telemetry;
-
+  
   // Variables for all subsystems:
   private PortManager portManager;
   private IO io;
+  private Telemetry telemetry;
+  private PowerDistribution pdp;
+  private Climber climber;
+  private Elevator elevator;
   private SwerveDrivetrain driveTrain;
   private ShooterSubsystem shooter;
   private networkTables vision;
   private BallIntake ballIntake;
   private Led_Lights leds;
 
-  // Should not be used outside of this class!
+  /**
+   * This is intentionally private. To get an instance
+   * of SubsystemFactory, use the method getInstance()
+   */
   private SubsystemFactory() {}
 
   /**
@@ -140,6 +139,11 @@ public class SubsystemFactory {
     }
   }
 
+  /**
+   * Initialize the subsystems for RIO1
+   * 
+   * @throws Exception if there is an issue assigning a port
+   */
   private void initRIO1() throws Exception {
     HashMap<String, Integer> portAssignments = new HashMap<String, Integer>();
     portAssignments.put("FL.SwerveMotor", 9);
@@ -184,7 +188,8 @@ public class SubsystemFactory {
 
   /**
    * Initializes COVID subsystems
-   * @throws Exception
+   * 
+   * @throws Exception if there is an issue assigning a port
    */
   public void initCOVID() throws Exception {
     HashMap<String, Integer> portAssignments = new HashMap<String, Integer>();
@@ -223,7 +228,8 @@ public class SubsystemFactory {
 
   /**
    * Initializes Califorinia Bot subsystems
-   * @throws Exception
+   * 
+   * @throws Exception if there is an issue assigning a port
    */
   public void initRAPID_REACT() throws Exception{
     HashMap<String, Integer> portAssignments = new HashMap<String, Integer>();
@@ -271,9 +277,9 @@ public class SubsystemFactory {
     elevator = new Elevator();
     elevator.init();
 
+    // Button assignments
     io.bind(new shootBallTeleop(driveTrain, shooter, SubsystemFactory.getInstance().getBallIntake()), XboxController.Button.kX, StickButton.LEFT_1, ButtonActionType.WHEN_HELD);
     io.bind(new ZeroGyro(telemetry.getGyro()), Button.kY, StickButton.LEFT_1, ButtonActionType.WHEN_PRESSED);
-    // Might need to be changed...
     io.bind(new StartIntake(ballIntake), Button.kRightBumper, StickButton.LEFT_3, ButtonActionType.WHEN_PRESSED);
     io.bind(new StopIntake(ballIntake), Button.kRightBumper, StickButton.LEFT_2, ButtonActionType.WHEN_RELEASED);
 
@@ -311,6 +317,7 @@ public class SubsystemFactory {
     io.bind(new ShootNoVision2(driveTrain, shooter, ballIntake), Button.kA, StickButton.LEFT_11, ButtonActionType.WHEN_HELD);
 
     io.bindButtonBox(new RemoveLockedAngle(driveTrain), StickButton.LEFT_1, ButtonActionType.WHEN_PRESSED);
+    // Safety command to cancel all currently running commands
     io.bindButtonBox(new InstantCommand() {
       @Override
       public void initialize() {

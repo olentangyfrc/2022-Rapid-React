@@ -1,7 +1,3 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot.subsystems;
 
 import java.util.HashMap;
@@ -21,12 +17,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
-// Project imports
 
 /**
  * This subsystem handles all of the user input and output of the robot.
- * 
- * TODO: Add button binding functionality
  */
 public class IO extends SubsystemBase {
     public static final int XBOX_PORT = 0;
@@ -35,12 +28,12 @@ public class IO extends SubsystemBase {
     public static final int LEFT_BUTTON_BOX_PORT = 3;
     public static final int RIGHT_BUTTON_BOX_PORT = 4;
 
+    // Dead zone for the XBOX joysticks
     public static final double DEADZONE = 0.09;
 
     private HashMap<Binding, Command> buttonBindings = new HashMap<Binding, Command>();
 
     private InputMethod inputMethod;
-    private boolean useButtonBox = true;
 
     private XboxController xbox;
 
@@ -53,13 +46,10 @@ public class IO extends SubsystemBase {
     private Logger logger = Logger.getLogger("IO");
     private ShuffleboardTab ioTab = Shuffleboard.getTab("IO");
     
+    // Add controls so that controller axises can be inverted
     private NetworkTableEntry invertForwards = ioTab.add("Invert Forwards", false).withWidget(BuiltInWidgets.kToggleSwitch).getEntry();
     private NetworkTableEntry invertStrafe = ioTab.add("Invert Strafe", false).withWidget(BuiltInWidgets.kToggleSwitch).getEntry();
     private NetworkTableEntry invertRotation = ioTab.add("Invert Rotation", false).withWidget(BuiltInWidgets.kToggleSwitch).getEntry();
-    
-    public IO() {
-        // Add a command to reset IO
-    }
 
     @Override
     public void periodic() {
@@ -175,11 +165,26 @@ public class IO extends SubsystemBase {
         }
     }
 
+    /**
+     * Determine if the left bumper on the XBOX controller is pressed
+     * 
+     * @return True if the left bumper is pressed
+     */
     public boolean isLeftBumperPressed() {
-        return xbox.getLeftBumper();
+        return xbox != null && xbox.getLeftBumper();
     }
 
-    public void bind(Command command, Button xboxButton, StickButton stickButton, ButtonActionType type) throws Exception {
+    /**
+     * Bind a command to a button on the controller
+     * <p>
+     * Two bindings cannot match in both buttons and type. If so, they will be ignored.
+     * 
+     * @param command The command to bind
+     * @param xboxButton The XBOX button to bind the command to
+     * @param stickButton The Joystick button to bind the command to
+     * @param type The type of binding. ex: while_pressed or when_released
+     */
+    public void bind(Command command, Button xboxButton, StickButton stickButton, ButtonActionType type) {
         GenericHID joystick;
         int button;
 
@@ -233,8 +238,6 @@ public class IO extends SubsystemBase {
 
     /**
      * Bind a button to the button box.
-     * <p>
-     * Do not look at this code as an example! It is repetitive, but competition is in a week.
      * 
      * @param command The command to assign
      * @param buttonBoxButton The button to assign to.

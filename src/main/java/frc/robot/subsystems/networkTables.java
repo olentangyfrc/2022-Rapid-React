@@ -20,8 +20,6 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.networktables.EntryListenerFlags;
@@ -30,9 +28,7 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.TimesliceRobot;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.drivetrain.SwerveDrivetrain;
@@ -40,7 +36,9 @@ import frc.robot.subsystems.drivetrain.SwerveDrivetrain;
 
 
 
-
+/**
+ * This class contains logic for our vision based odometry system
+ */
 public class networkTables extends SubsystemBase {
 
   private SwerveDriveOdometry odometry;
@@ -57,7 +55,7 @@ public class networkTables extends SubsystemBase {
 
   double lastVisionTime = Timer.getFPGATimestamp();
 
-  public class past_object{
+  public static class past_object{
     private Pose2d estimate;
     private double timestamp;
     private boolean isMoving;
@@ -112,16 +110,12 @@ public class networkTables extends SubsystemBase {
     double z = ZEntry.getDouble(0);
    
     updatePositionwithVision(x, y, z, elapsedtime); //converts the x,y,z into final position vector
-
-    // Do work here like updates odometry...
-    //System.out.print(position);
-
   }
 
 
 
   /**
-       * Corrects Odermetry with Vision
+       * Corrects Odometry with Vision
        * 
        * @param x, @param y, @param z takes in the Tvec from Nano and converst between coordinate system
        * 
@@ -154,7 +148,7 @@ public class networkTables extends SubsystemBase {
         0, 1, 0,
       -s, 0, c);
 
-    // Rotatea
+    // Rotate
     var corrected_bot_oriented = camera_to_bot.times(corrected_vec);
     //SmartDashboard.putNumber("corrected_bot_orientedx", corrected_bot_oriented.get(0, 0));
     // SmartDashboard.putNumber("corrected_bot_orientedy", corrected_bot_oriented.get(1, 0));

@@ -6,26 +6,15 @@ package frc.robot;
 
 
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
-import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.SubsystemFactory;
-import frc.robot.subsystems.Climber.commands.PushArmsForwardToPosition;
-import frc.robot.subsystems.Elevator.commands.ExtendArmsToPosition;
-import frc.robot.subsystems.IO.ButtonActionType;
-import frc.robot.subsystems.IO.StickButton;
 import frc.robot.subsystems.auton.AutonPaths;
 import frc.robot.subsystems.auton.routines.RoutineChooser;
 import frc.robot.subsystems.drivetrain.SwerveDrivetrain;
 import frc.robot.subsystems.intake.BallIntake;
-import frc.robot.subsystems.leds.Led_Lights;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
-import frc.robot.subsystems.shooter.commands.ShootAtSpeed;
-import frc.robot.subsystems.shooter.commands.ShootBallAuton;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -34,7 +23,7 @@ import frc.robot.subsystems.shooter.commands.ShootBallAuton;
  * project.
  */
 public class Robot extends TimedRobot {
-  private RoutineChooser chooser;
+  private RoutineChooser chooser; // The autonomous routine chooser
   private CommandBase autonCommand;
 
   
@@ -42,7 +31,6 @@ public class Robot extends TimedRobot {
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
    */
-
   @Override
   public void robotInit() {
     try {
@@ -66,13 +54,9 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     autonCommand = chooser.get();
-    //SubsystemFactory.getInstance().getPdp().setSwitchableChannel(true);
 
     autonCommand.schedule();
     SubsystemFactory.getInstance().getBallIntake().putIntakeDown();
-
-    // (new ResetLocation(SubsystemFactory.getInstance().getDrivetrain(), new Pose2d(6.716, 2.487, Rotation2d.fromDegrees(46.762)))).schedule();
-    // (new ShootBallAuton(SubsystemFactory.getInstance().getDrivetrain(), SubsystemFactory.getInstance().getShooter(), SubsystemFactory.getInstance().getBallIntake(), 200)).schedule();
   }
 
   @Override
@@ -82,11 +66,10 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
+    // Cancel anything left over from the autonomous period
     if(autonCommand != null) {
       autonCommand.cancel();
     }
-    //SubsystemFactory.getInstance().getPdp().setSwitchableChannel(true);
-
   }
 
   @Override
@@ -96,7 +79,6 @@ public class Robot extends TimedRobot {
   
   @Override
   public void disabledInit() {
-    //SubsystemFactory.getInstance().getPdp().setSwitchableChannel(false);
   }
 
   @Override
@@ -106,8 +88,6 @@ public class Robot extends TimedRobot {
 
   @Override
   public void testInit() {
-    //SubsystemFactory.getInstance().getPdp().setSwitchableChannel(true);
-
   }
   
   @Override
