@@ -8,15 +8,16 @@ import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 
 /**
- * Zero the gyroscope. This can cause issues with a drivetrain if called directly.
- * <p>
- * For zeroing angle with a drivetrain, use frc.robot.subsystems.drivetrain.commands.ZeroAngle instead.
- * 
- * @see frc.robot.subsystems.drivetrain.commands.ZeroAngle
+ * Reset the gyro
  */
 public class ZeroGyro extends InstantCommand {
   private Gyro gyro;
 
+  /**
+   * Construct a new ZeroGyro command
+   * 
+   * @param gyro the gyro to reset
+   */
   public ZeroGyro(Gyro gyro) {
     this.gyro = gyro;
   }

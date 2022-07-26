@@ -16,8 +16,14 @@ import edu.wpi.first.wpilibj.interfaces.Gyro;
  */
 public class Pigeon implements Gyro {
     private WPI_PigeonIMU imu;
+    // True to invert the yaw of the gyro
     private boolean isInverted = true;
 
+    /**
+     * Construct a new Pigeon IMU.
+     * 
+     * @param deviceId The CAN id of the pigeon
+     */
     public Pigeon(int deviceId) {
         this.imu = new WPI_PigeonIMU(deviceId);
     }
@@ -38,7 +44,11 @@ public class Pigeon implements Gyro {
     @Override
     public double getAngle() {
         // Negate it to make it clockwise.
-        return (-imu.getYaw() % 360);
+        if(isInverted) {
+            return (-imu.getYaw() % 360);
+        } else {
+            return imu.getYaw() % 360;
+        }
     }
 
     /**

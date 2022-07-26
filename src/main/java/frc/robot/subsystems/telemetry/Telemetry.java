@@ -1,17 +1,16 @@
 package frc.robot.subsystems.telemetry;
 
-// Package imports
-import frc.robot.subsystems.PortManager;
-import frc.robot.subsystems.SubsystemFactory;
-import frc.robot.subsystems.PortManager.PortType;
-import frc.robot.subsystems.SubsystemFactory.BotType;
-
 // Java imports
 import java.util.logging.Logger;
 
-import edu.wpi.first.wpilibj.interfaces.Gyro;
 // WPILib imports
+import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+// Package imports
+import frc.robot.subsystems.PortManager;
+import frc.robot.subsystems.PortManager.PortType;
+import frc.robot.subsystems.SubsystemFactory;
+import frc.robot.subsystems.SubsystemFactory.BotType;
 
 /**
  * This class creates and initializes all of the sensors and stores references to them
@@ -25,6 +24,11 @@ public class Telemetry extends SubsystemBase {
 
     private BotType  botType;
 
+    /**
+     * Construct a new Telemetry object
+     * 
+     * @param botType The type of bot that this telemetry object is initialized on
+     */
     public Telemetry(BotType botType) {
         this.botType = botType;
     }
@@ -60,9 +64,11 @@ public class Telemetry extends SubsystemBase {
         gyro = pigeon;
     }
 
+    
     /**
-     *  Initializes COVID Bot sensors
-     * @throws Exception
+     * Initialize COVID bot sensors
+     * 
+     * @throws Exception If there is an issue assigning a port
      */
     private void initCOVID() throws Exception{
         PortManager pm = SubsystemFactory.getInstance().getPortManager();
@@ -75,6 +81,8 @@ public class Telemetry extends SubsystemBase {
 
     /**
      *  Initializes Rapid React Bot sensors
+     * 
+     *  @throws Exception If there is an issue assigning a port
      */
     private void initRAPID_REACT() throws Exception {
         PortManager pm = SubsystemFactory.getInstance().getPortManager();
@@ -87,12 +95,16 @@ public class Telemetry extends SubsystemBase {
 
     /**
      *  Initializes RIO99 sensors
+     * 
+     *  @throws Exception If there is an issue assigning a port
      */
     private void initRIO99() throws Exception {
         PortManager pm = SubsystemFactory.getInstance().getPortManager();
     }
 
     /**
+     * Get the gyroscope
+     * 
      * @return The active pigeon sensor
      */
     public Gyro getGyro() {
