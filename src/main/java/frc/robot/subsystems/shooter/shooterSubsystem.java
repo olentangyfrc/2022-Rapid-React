@@ -4,6 +4,8 @@ import java.util.logging.Logger;
 
 // CTRE imports
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
@@ -25,7 +27,7 @@ public class ShooterSubsystem extends SubsystemBase {
     private Logger logger = Logger.getLogger("Subsystem Factory");
     
     private WPI_TalonFX flyWheel;
-    private WPI_TalonFX triggerWheel;
+    private CANSparkMax triggerWheel;
 
     private double targetSpeed = 0;
     private double previousTriggerSpeed = 0;
@@ -57,15 +59,15 @@ public class ShooterSubsystem extends SubsystemBase {
         final double Kv;
         final double Ka;
         switch (botType) {
-            case COVID:            
-                Ks = 0.7329;
-                Kv = 0.11151;
-                Ka = 0.060377;
-                feedForward = new SimpleMotorFeedforward(Ks, Kv, Ka);
-                flyWheel = new WPI_TalonFX(portManager.aquirePort(PortType.CAN, 43, "shooterFlyWheel"));
-                flyWheel.configFactoryDefault();
-                triggerWheel = new WPI_TalonFX(portManager.aquirePort(PortType.CAN, 12, "shooterTriggerWheel"));
-                break;
+            // case COVID:            
+            //     Ks = 0.7329;
+            //     Kv = 0.11151;
+            //     Ka = 0.060377;
+            //     feedForward = new SimpleMotorFeedforward(Ks, Kv, Ka);
+            //     flyWheel = new WPI_TalonFX(portManager.aquirePort(PortType.CAN, 43, "shooterFlyWheel"));
+            //     flyWheel.configFactoryDefault();
+            //     triggerWheel = new CANSparkMax(portManager.aquirePort(PortType.CAN, 12, "shooterTriggerWheel"), MotorType.kBrushless);
+            //     break;
             case RAPID_REACT:
                 Ks = 0.51003;
                 Kv = 0.10813;
@@ -73,8 +75,7 @@ public class ShooterSubsystem extends SubsystemBase {
                 feedForward = new SimpleMotorFeedforward(Ks, Kv, Ka);
                 flyWheel = new WPI_TalonFX(portManager.aquirePort(PortType.CAN, 50, "Fly Wheel"));
                 flyWheel.configFactoryDefault();
-                triggerWheel = new WPI_TalonFX(portManager.aquirePort(PortType.CAN, 16, "Trigger Wheel"));
-                triggerWheel.configFactoryDefault();
+                triggerWheel = new CANSparkMax(portManager.aquirePort(PortType.CAN, 12, "Trigger Wheel"), MotorType.kBrushless);
                 triggerWheel.setInverted(true);
                 break;
             default:
@@ -140,9 +141,7 @@ public class ShooterSubsystem extends SubsystemBase {
         return -flyWheel.getSelectedSensorVelocity()/sensorUnitsPerRotation*10;
     }
 
-    public double getTriggerSpeed() {
-        return triggerWheel.getSelectedSensorVelocity();
-    }
+   
 
     public double getPreviousTriggerSpeed() {
         return previousTriggerSpeed;
@@ -185,11 +184,6 @@ public class ShooterSubsystem extends SubsystemBase {
 
     public void setTriggerVoltage(double voltage) {
         triggerWheel.setVoltage(voltage);
-    }
-
-    public boolean isTriggerMoving() {
-        SmartDashboard.putNumber("Trigger moving", Math.abs(triggerWheel.getSelectedSensorVelocity()));
-        return (int) Math.abs(triggerWheel.getSelectedSensorVelocity()) > 0;
     }
 
     /**

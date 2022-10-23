@@ -246,7 +246,7 @@ public class SubsystemFactory {
 
     HashMap<String, Double> wheelOffsets = new HashMap<String, Double>();
     wheelOffsets.put("FL", 308.9);
-    wheelOffsets.put("FR", 39.37);
+    wheelOffsets.put("FR", 39.37 + 272);
     wheelOffsets.put("BL", 66.47);
     wheelOffsets.put("BR", 248.1);
 

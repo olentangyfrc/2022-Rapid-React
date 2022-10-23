@@ -4,7 +4,11 @@
 
 package frc.robot.subsystems.drivetrain.commands;
 
+import java.util.Map;
+
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.IO;
 import frc.robot.subsystems.SubsystemFactory;
@@ -16,6 +20,7 @@ import frc.robot.subsystems.drivetrain.SwerveDrivetrain;
  */
 public class DriveCommand extends CommandBase {
   private SwerveDrivetrain drivetrain;
+  private NetworkTableEntry speedEntry = Shuffleboard.getTab("Drive").add("Drive percent", 1).withProperties(Map.of("min", -1, "max", 1)).getEntry();
 
   public DriveCommand(SwerveDrivetrain drivetrain) {
     this.drivetrain = drivetrain;
@@ -32,9 +37,9 @@ public class DriveCommand extends CommandBase {
   public void execute() {
     IO io = SubsystemFactory.getInstance().getIO();
     ChassisSpeeds speeds = new ChassisSpeeds(
-      io.getForward() * SwerveDrivetrain.MAX_LINEAR_SPEED,
-      io.getStrafe() * SwerveDrivetrain.MAX_LINEAR_SPEED,
-      io.getRotation() * SwerveDrivetrain.MAX_ROTATION_SPEED
+      io.getForward() * SwerveDrivetrain.MAX_LINEAR_SPEED * speedEntry.getDouble(1),
+      io.getStrafe() * SwerveDrivetrain.MAX_LINEAR_SPEED * speedEntry.getDouble(1),
+      io.getRotation() * SwerveDrivetrain.MAX_ROTATION_SPEED * speedEntry.getDouble(1)
     );
   
     drivetrain.drive(speeds, !io.isLeftBumperPressed());
